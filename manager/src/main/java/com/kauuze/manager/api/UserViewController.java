@@ -1,0 +1,92 @@
+package com.kauuze.manager.api;
+
+import com.kauuze.manager.api.pojo.common.*;
+import com.kauuze.manager.config.permission.Cms;
+import com.kauuze.manager.config.permission.Root;
+import com.kauuze.manager.domain.mongo.entity.userBastic.VerifyActor;
+import com.kauuze.manager.include.JsonResult;
+import com.kauuze.manager.include.PageDto;
+import com.kauuze.manager.service.UserViewService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
+
+/**
+ * @author kauuze
+ * @email 3412879785@qq.com
+ * @time 2019-04-30 14:38
+ */
+@RestController
+@RequestMapping("/userView")
+public class UserViewController {
+    @Autowired
+    private UserViewService userViewService;
+    @RequestMapping("/findByUid")
+    @Cms
+    public JsonResult findByUid(@Valid @RequestBody UidPojo uidPojo){
+        return JsonResult.success(userViewService.findByUid(uidPojo.getUid()));
+    }
+
+    @RequestMapping("/findByNickName")
+    @Cms
+    public JsonResult findByNickName(@Valid @RequestBody NickNamePojo nickNamePojo){
+        return JsonResult.success(userViewService.findByNickName(nickNamePojo.getNickName()));
+    }
+
+    @RequestMapping("/findByPhone")
+    @Cms
+    public JsonResult findByPhone(@Valid @RequestBody PhonePojo phonePojo){
+        return JsonResult.success(userViewService.findByPhone(phonePojo.getPhone()));
+    }
+
+    @RequestMapping("/findAllCms")
+    @Root
+    public JsonResult findAllCms(){
+        return JsonResult.success(userViewService.findAllCms());
+    }
+
+    @RequestMapping("/illegalNickname")
+    @Cms
+    public JsonResult illegalNickname(@Valid @RequestBody UidPojo uidPojo){
+        if(userViewService.illegalNickname(uidPojo.getUid())){
+            return JsonResult.success();
+        }else{
+            return JsonResult.failure();
+        }
+    }
+
+    @RequestMapping("/illegalPortrait")
+    @Cms
+    public JsonResult illegalPortrait(@Valid @RequestBody UidPojo uidPojo){
+        if(userViewService.illegalPortrait(uidPojo.getUid())){
+            return JsonResult.success();
+        }else{
+            return JsonResult.failure();
+        }
+    }
+
+    @RequestMapping("/illegalPersonalSign")
+    @Cms
+    public JsonResult illegalPersonalSign(@Valid @RequestBody UidPojo uidPojo){
+        if(userViewService.illegalPersonalSign(uidPojo.getUid())){
+            return JsonResult.success();
+        }else {
+            return JsonResult.failure();
+        }
+    }
+
+    @RequestMapping("/illegalOpenWxIdAndQQ")
+    @Cms
+    public JsonResult illegalOpenWxIdAndQQ(@Valid @RequestBody UidPojo uidPojo){
+        if(userViewService.illegalOpenWxIdAndQQ(uidPojo.getUid())){
+            return JsonResult.success();
+        }else{
+            return JsonResult.failure();
+        }
+    }
+
+
+}

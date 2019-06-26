@@ -1,0 +1,20 @@
+package com.kauuze.manager.domain.mongo.repository;
+
+import com.kauuze.manager.domain.enumType.BackRoleEnum;
+import com.kauuze.manager.domain.mongo.entity.userBastic.UserToken;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+/**
+ * @author kauuze
+ * @email 3412879785@qq.com
+ * @time 2019-04-15 02:11
+ */
+@Repository
+public interface UserTokenRepository extends MongoRepository<UserToken,String> {
+    List<UserToken> findByBackRole(BackRoleEnum backRoleEnum);
+    UserToken findByAccessToken(String accessToken);
+    UserToken findByUid(int uid);
+}

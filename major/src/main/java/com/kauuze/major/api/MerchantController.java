@@ -1,0 +1,90 @@
+package com.kauuze.major.api;
+
+import com.kauuze.major.api.pojo.common.IpAddressPojo;
+import com.kauuze.major.api.pojo.merchant.OpenStorePojo;
+import com.kauuze.major.api.pojo.merchant.VerifyActorPojo;
+import com.kauuze.major.api.pojo.systemOrder.WithdrawPojo;
+import com.kauuze.major.config.permission.Authorization;
+import com.kauuze.major.config.permission.Merchant;
+import com.kauuze.major.include.JsonResult;
+import com.kauuze.major.include.StringUtil;
+import com.kauuze.major.service.MerchantService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
+
+/**
+ * @author kauuze
+ * @email 3412879785@qq.com
+ * @time 2019-06-10 11:25
+ */
+@RestController
+@RequestMapping("/merchant")
+public class MerchantController {
+    @Autowired
+    private MerchantService merchantService;
+    @RequestMapping("/verifyActor")
+    @Authorization
+    public JsonResult verifyActor(@RequestAttribute int uid,@Valid @RequestBody VerifyActorPojo verifyActorPojo){
+        String result = merchantService.verifyActor(uid,verifyActorPojo.getBankTrueName(),verifyActorPojo.getIdcard(),verifyActorPojo.getFrontIdCardPhoto(),verifyActorPojo.getHandIdCardPhoto(),verifyActorPojo.getBackIdCardPhoto(),verifyActorPojo.getBankNo(),verifyActorPojo.getBankTrueName(),verifyActorPojo.getOpeningBank(),verifyActorPojo.getCompanyName(),verifyActorPojo.getUscc(),verifyActorPojo.getBusinessLicense(),verifyActorPojo.getOtherSupportPhotos());
+        if(StringUtil.isBlank(result)){
+            return JsonResult.success();
+        }else{
+            return JsonResult.failure(result);
+        }
+    }
+    @RequestMapping("/getVerifyActor")
+    @Authorization
+    public JsonResult getVerifyActor(@RequestAttribute int uid){
+        return JsonResult.success(merchantService.getVerifyActor(uid));
+    }
+
+    @RequestMapping("/getMerchantUdpDto")
+    @Merchant
+    public JsonResult getMerchantUdpDto(@RequestAttribute int uid){
+        return JsonResult.success(merchantService.getMerchantUdpDto(uid));
+    }
+
+    @RequestMapping("/modifyOrOpenStore")
+    @Merchant
+    public JsonResult modifyOrOpenStore(@RequestAttribute int uid, @Valid @RequestBody OpenStorePojo openStorePojo){
+        return JsonResult.success(merchantService.modifyOrOpenStore(uid,openStorePojo.getStoreName(),openStorePojo.getStoreIcon(),openStorePojo.getServicePhone(),openStorePojo.getMsCode(),openStorePojo.getStoreIntro(),openStorePojo.getBusinessLicense()));
+    }
+
+    @RequestMapping("/getDepositQrCode")
+    @Merchant
+    public JsonResult getDepositQrCode(@RequestAttribute int uid, @Valid @RequestBody IpAddressPojo ipAddressPojo){
+        String qrCodeUrl = merchantService.getDepositQrCode(uid,ipAddressPojo.getIpAddress());
+        if(qrCodeUrl != null){
+            return JsonResult.success(qrCodeUrl);
+        }else{
+            return JsonResult.failure();
+        }
+    }
+
+    @RequestMapping("/takeOutDeposit")
+    @Merchant
+    public JsonResult takeOutDeposit(@RequestAttribute int uid){
+        String result = merchantService.takeOutDeposit(uid);
+        if(result != null){
+            return JsonResult.success();
+        }else{
+            return JsonResult.failure(result);
+        }
+    }
+
+    @RequestMapping("/withdraw")
+    @Merchant
+    public JsonResult withdraw(@RequestAttribute int uid, @Valid @RequestBody WithdrawPojo withdrawPojo){
+        String result = merchantService.withdraw(uid,withdrawPojo.getMoney());
+        if(result != null){
+            return JsonResult.success();
+        }else{
+            return JsonResult.failure();
+        }
+    }
+}
