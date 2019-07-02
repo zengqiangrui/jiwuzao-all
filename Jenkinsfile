@@ -16,7 +16,7 @@ pipeline {
             agent {
                 docker {
                     image 'openjdk:8-jre'
-                    args '--name server -P -v /root/jenkins/workspace/jiwuzao:/home -v /tmp/jiwuzao-log:/tmp/jiwuzao-log'
+                    args '-P -v /root/jenkins/workspace/jiwuzao:/home -v /tmp/jiwuzao-log:/tmp/jiwuzao-log'
                 }
             }
             steps {
