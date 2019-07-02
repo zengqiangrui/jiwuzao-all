@@ -20,7 +20,7 @@ pipeline {
                 }
             }
             steps {
-                sh 'BUILD_ID=dontKillMe  ./jenkins/scripts/deliver.sh'
+                sh '/home/jenkins/scripts/deliver.sh'
             }
         }
     }
