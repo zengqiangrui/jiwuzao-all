@@ -20,7 +20,7 @@ pipeline {
                 }
             }
             steps {
-                sh '/home/jenkins/scripts/deliver.sh'
+                //sh '/home/jenkins/scripts/deliver.sh'
                 sh 'java -version'
             }
         }
