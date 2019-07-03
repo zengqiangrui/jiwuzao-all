@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'mvn -B -DskipTests clean package docker:build'
+                sh 'mvn -B -DskipTests clean package dockerfile:build'
             }
         }
         stage('Deliver') {
