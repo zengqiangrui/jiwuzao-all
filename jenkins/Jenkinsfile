@@ -1,4 +1,5 @@
 pipeline {
+    agent none
     stages {
         stage('Build') {
             agent {
@@ -14,8 +15,8 @@ pipeline {
             }
         }
         stage('Deliver') {
+            agent {label 'slave'}
             steps {
-                sh './jenkins/scripts/deliver.sh'
                 sh 'ls /usr/bin'
                 sh 'pwd'
             }
