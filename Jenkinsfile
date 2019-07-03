@@ -14,7 +14,6 @@ pipeline {
             }
         }
         stage('Deliver') {
-            agent none
             steps {
                 sh './jenkins/scripts/deliver.sh'
             }
