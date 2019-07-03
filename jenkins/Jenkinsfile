@@ -18,6 +18,7 @@ pipeline {
             steps {
                 sh 'ls /usr/bin'
                 sh 'pwd'
+                sh './jenkins/scripts/deliver.sh'
             }
         }
     }
