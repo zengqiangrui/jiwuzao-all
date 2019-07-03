@@ -8,6 +8,10 @@
         <version>2.1.4.RELEASE</version>
     </parent>
 
+    <properties>
+        <docker.image.prefix>jiwuzao</docker.image.prefix>
+    </properties>
+
     <groupId>com.jiwuzao</groupId>
     <artifactId>all</artifactId>
     <version>0.0.1-SNAPSHOT</version>
