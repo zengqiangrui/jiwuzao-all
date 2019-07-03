@@ -14,9 +14,9 @@ pipeline {
             }
         }
         stage('Deliver') {
+            agent none
             steps {
-                //sh '/home/jenkins/scripts/deliver.sh'
-                sh 'java -version'
+                sh './jenkins/scripts/deliver.sh'
             }
         }
     }
