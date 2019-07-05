@@ -1,6 +1,7 @@
 package com.kauuze.manager.domain.mysql.entity;
 
 
+import com.kauuze.manager.domain.enumType.OrderExStatusEnum;
 import com.kauuze.manager.domain.enumType.OrderStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -66,10 +67,15 @@ public class GoodsOrder {
      */
     private BigDecimal finalPay;
     /**
-     * 订单状态
+     * 订单面向用户状态
      */
     @Enumerated(EnumType.STRING)
     private OrderStatusEnum orderStatus;
+    /**
+     * 订单异常状态
+     */
+    @Enumerated(EnumType.STRING)
+    private OrderExStatusEnum orderExStatus;
     /**
      * 发货时间
      */
