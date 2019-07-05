@@ -88,7 +88,7 @@ public class UserPermissionService {
             return false;
         }
         User user = userRepository.findByIdForUpdate(uid);
-        user.setPwdFailCount(20);
+        user.setPwdFailCount(10);
         userRepository.save(user);
         return true;
     }

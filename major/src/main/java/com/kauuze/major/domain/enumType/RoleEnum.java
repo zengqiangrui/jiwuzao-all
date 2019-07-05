@@ -11,7 +11,7 @@ public enum RoleEnum {
      */
     user,
     /**
-     * 商家：接单者
+     * 商家：匠人
      */
     merchant
 }
