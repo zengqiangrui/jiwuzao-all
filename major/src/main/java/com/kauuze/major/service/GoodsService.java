@@ -66,7 +66,7 @@ public class GoodsService {
         }
         Goods goods = new Goods(null,uid,store.getId(),title,cover,classify,0,0,defaultPrice,postage,false,null,null,AuditTypeEnum.wait,null);
         goodsRepository.save(goods);
-        GoodsDetail goodsDetail = new GoodsDetail(null,slideshow,detailLabel,goodsType,goodsTypeClass,detailPhotos);
+        GoodsDetail goodsDetail = new GoodsDetail(null,goods.getGid(),slideshow,detailLabel,goodsType,goodsTypeClass,detailPhotos);
         goodsDetailRepository.save(goodsDetail);
         for (GoodsSpecPojo specPojo : goodsSpecPojo) {
             goodsSpecRepository.save(new GoodsSpec(null,goods.getGid(),specPojo.getSpecClass(),specPojo.getSpecPrice(),specPojo.getSpecInventory()));

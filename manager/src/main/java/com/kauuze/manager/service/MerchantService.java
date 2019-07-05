@@ -5,8 +5,8 @@ import com.kauuze.manager.domain.common.MongoUtil;
 import com.kauuze.manager.domain.enumType.AuditTypeEnum;
 import com.kauuze.manager.domain.enumType.RoleEnum;
 import com.kauuze.manager.domain.enumType.UserStateEnum;
-import com.kauuze.manager.domain.es.entity.Goods;
-import com.kauuze.manager.domain.es.repository.GoodsRepository;
+import com.kauuze.manager.domain.es.entity.GoodsEs;
+import com.kauuze.manager.domain.es.repository.GoodsRepositoryEs;
 import com.kauuze.manager.domain.mongo.entity.userBastic.Store;
 import com.kauuze.manager.domain.mongo.entity.userBastic.UserToken;
 import com.kauuze.manager.domain.mongo.entity.userBastic.VerifyActor;
@@ -39,7 +39,7 @@ public class MerchantService {
     @Autowired
     private StoreRepository storeRepository;
     @Autowired
-    private GoodsRepository goodsRepository;
+    private GoodsRepositoryEs goodsRepositoryEs;
     @Autowired
     private UserTokenRepository userTokenRepository;
 
@@ -100,10 +100,10 @@ public class MerchantService {
             store2.setViolationCause(violationCause);
             MongoUtil.updateNotNon("id",store2,Store.class);
         }
-        List<Goods> list = goodsRepository.findByUid(uid);
-        for (Goods goods : list) {
+        List<GoodsEs> list = goodsRepositoryEs.findByUid(uid);
+        for (GoodsEs goodsEs : list) {
             Map<String,String> map = new HashMap<>();
-            map.put("gid", goods.getGid());
+            map.put("gid", goodsEs.getGid());
             map.put("putaway","false");
             map.put("soldOutTime",String.valueOf(System.currentTimeMillis()));
             EsUtil.modify(map);

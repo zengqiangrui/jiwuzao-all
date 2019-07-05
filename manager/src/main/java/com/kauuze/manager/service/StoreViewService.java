@@ -3,10 +3,10 @@ package com.kauuze.manager.service;
 import com.kauuze.manager.domain.common.EsUtil;
 import com.kauuze.manager.domain.common.MongoUtil;
 import com.kauuze.manager.domain.enumType.UserStateEnum;
-import com.kauuze.manager.domain.es.entity.Goods;
-import com.kauuze.manager.domain.es.repository.GoodsRepository;
+import com.kauuze.manager.domain.mongo.entity.Goods;
 import com.kauuze.manager.domain.mongo.entity.userBastic.Store;
 import com.kauuze.manager.domain.mongo.entity.userBastic.UserToken;
+import com.kauuze.manager.domain.mongo.repository.GoodsRepository;
 import com.kauuze.manager.domain.mongo.repository.StoreRepository;
 import com.kauuze.manager.include.DateTimeUtil;
 import com.kauuze.manager.service.dto.storeView.StoreShowDto;
@@ -77,11 +77,10 @@ public class StoreViewService {
 
         List<Goods> list = goodsRepository.findByUid(uid);
         for (Goods goods : list) {
-            Map<String,String> map = new HashMap<>();
-            map.put("gid", goods.getGid());
-            map.put("putaway","false");
-            map.put("soldOutTime",String.valueOf(System.currentTimeMillis()));
-            EsUtil.modify(map);
+            goods.setSoldOutTime(System.currentTimeMillis());
+            goods.setPutaway(true);
+            goodsRepository.save(goods);
+
         }
         UserToken userToken = new UserToken();
         userToken.setUid(uid);
