@@ -24,13 +24,13 @@ public class VerifyActorPojo {
     @Idcard
     private String idcard;
     @Url
-    private String frontIdCardPhoto;
+    private String frontIdCardPhoto;//身份证正面
     @Url
-    private String handIdCardPhoto;
+    private String handIdCardPhoto;//手持身份证
     @Url
-    private String backIdCardPhoto;
+    private String backIdCardPhoto;//身份证背面
     @BankNo
-    private Long bankNo;
+    private Long bankNo;//银行号码
     @TrueName
     private String bankTrueName;
     @NotNull

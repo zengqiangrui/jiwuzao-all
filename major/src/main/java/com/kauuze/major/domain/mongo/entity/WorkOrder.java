@@ -55,7 +55,6 @@ public class WorkOrder {
      * 联系姓名
      */
     private String trueName;
-
     /**
      * 工单状态
      */
