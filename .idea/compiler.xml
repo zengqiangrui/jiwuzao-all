@@ -12,6 +12,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="jiwuzao-all" target="1.8" />
       <module name="major" target="1.8" />
       <module name="manager" target="1.8" />
       <module name="order" target="1.8" />

@@ -230,12 +230,11 @@ public class GoodsService {
         Optional<Store> optional = storeRepository.findById(goods.getSid());
         Optional<GoodsDetail> optional2 = goodsDetailRepository.findById(gid);
         List<GoodsSpec> goodsSpecs = goodsSpecRepository.findByGid(gid);
-        if(goods == null || !optional.isPresent() || !optional2.isPresent()){
+        if(!optional.isPresent() || !optional2.isPresent()){
             return null;
         }
         Store store = optional.get();
         GoodsDetail goodsDetail = optional2.get();
-        GoodsOpenDto goodsOpenDto = new GoodsOpenDto(gid,goods.getUid(),goods.getSid(),store.getBusinessLicense(),store.getServicePhone(),goods.getTitle(),goods.getCover(),goods.getClassify(),goods.getSalesVolume(),goods.getDefaultPrice(),goods.getPostage(),goodsDetail.getSlideshow(),goodsDetail.getDetailLabel(),goodsDetail.getDetailPhotos(),goodsDetail.getGoodsType(),goodsDetail.getGoodsTypeClass(),goodsSpecs);
-        return goodsOpenDto;
+        return new GoodsOpenDto(gid,goods.getUid(),goods.getSid(),store.getBusinessLicense(),store.getServicePhone(),goods.getTitle(),goods.getCover(),goods.getClassify(),goods.getSalesVolume(),goods.getDefaultPrice(),goods.getPostage(),goodsDetail.getSlideshow(),goodsDetail.getDetailLabel(),goodsDetail.getDetailPhotos(),goodsDetail.getGoodsType(),goodsDetail.getGoodsTypeClass(),goodsSpecs);
     }
 }

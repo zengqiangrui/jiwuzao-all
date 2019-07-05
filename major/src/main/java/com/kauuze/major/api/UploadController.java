@@ -2,6 +2,7 @@ package com.kauuze.major.api;
 
 
 import com.kauuze.major.api.pojo.common.SuffixPojo;
+import com.kauuze.major.api.pojo.common.UrlPojo;
 import com.kauuze.major.api.pojo.common.UrlsPojo;
 import com.kauuze.major.include.JsonResult;
 import com.kauuze.major.include.yun.QiniuUtil;
@@ -20,13 +21,20 @@ import javax.validation.Valid;
 @RequestMapping("/upload")
 public class UploadController {
     @RequestMapping("/upToken")
-    public JsonResult upToken(@Valid @RequestBody SuffixPojo suffixPojo){
+    public JsonResult upToken(@Valid @RequestBody SuffixPojo suffixPojo) {
         return JsonResult.success(QiniuUtil.upToken(suffixPojo.getSuffix()));
     }
 
     @RequestMapping("/delFilesBatch")
-    public JsonResult delFilesBatch(@Valid @RequestBody UrlsPojo urlsPojo){
+    public JsonResult delFilesBatch(@Valid @RequestBody UrlsPojo urlsPojo) {
         QiniuUtil.delFilesBatch(urlsPojo.getUrls());
         return JsonResult.success();
+    }
+
+    @RequestMapping("/delSingle")
+    public JsonResult delSingle(@Valid @RequestBody UrlPojo urlPojo) {
+        if (QiniuUtil.delSingle(urlPojo.getUrl()))
+            return JsonResult.success();
+        return JsonResult.failure();
     }
 }

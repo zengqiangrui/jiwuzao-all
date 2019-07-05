@@ -60,7 +60,7 @@ public class MerchantService {
     private UserBasicService userBasicService;
 
     /**
-     * 申请用户实名认证
+     * 申请商家认证
      */
     public String verifyActor(int uid, String trueName, String idcard, String frontIdCardPhoto
             , String handIdCardPhoto, String backIdCardPhoto, Long publicBankNo, String publicBankTrueName, OpeningBankEnum openingBank, String companyName, String uscc, String businessLicense, String otherSupportPhotos){
