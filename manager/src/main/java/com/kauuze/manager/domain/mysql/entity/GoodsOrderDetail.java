@@ -32,6 +32,11 @@ public class GoodsOrderDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    /**
+     * 关联订单号
+     */
+    private Integer goid;
     /**
      * 订单完成时间
      */

@@ -3,7 +3,7 @@ package com.kauuze.manager.domain.common;
 
 import com.kauuze.manager.ConfigUtil;
 import com.kauuze.manager.config.contain.SpringContext;
-import com.kauuze.manager.domain.es.entity.Goods;
+import com.kauuze.manager.domain.es.entity.GoodsEs;
 import com.kauuze.manager.include.HttpUtils;
 import com.kauuze.manager.include.ObjectUtil;
 import com.kauuze.manager.include.PageDto;
@@ -39,7 +39,7 @@ public class EsUtil {
      * @param sort
      * @return
      */
-    public static PageDto<SearchGoodsSimpleDto> search(String title, Goods condition, Map<String,SortOrder> sort, int num, int size, Long pageTime){
+    public static PageDto<SearchGoodsSimpleDto> search(String title, GoodsEs condition, Map<String,SortOrder> sort, int num, int size, Long pageTime){
         ElasticsearchTemplate elasticsearchTemplate = SpringContext.getBean(ElasticsearchTemplate.class);
         ExtResultMapper extResultMapper = SpringContext.getBean(ExtResultMapper.class);
 
@@ -73,13 +73,13 @@ public class EsUtil {
         }
         nativeSearchQueryBuilder.withSort(SortBuilders.fieldSort("_id").order(SortOrder.DESC));
 
-        Page<Goods> searchGoodss = elasticsearchTemplate.queryForPage(nativeSearchQueryBuilder.build()
-                ,Goods.class,extResultMapper);
-        List<Goods> list = searchGoodss.getContent();
+        Page<GoodsEs> searchGoodss = elasticsearchTemplate.queryForPage(nativeSearchQueryBuilder.build()
+                , GoodsEs.class,extResultMapper);
+        List<GoodsEs> list = searchGoodss.getContent();
         PageDto<SearchGoodsSimpleDto> pageDto = new PageDto<>();
         List<SearchGoodsSimpleDto> searchGoodsSimpleDtos = new ArrayList<>();
-        for (Goods goods : list) {
-            SearchGoodsSimpleDto searchGoodsSimpleDto = new SearchGoodsSimpleDto(goods.getGid(), goods.getTitle(), goods.getCover(), goods.getDefaultPrice(), goods.getPostage(), goods.getSalesVolume());
+        for (GoodsEs goodsEs : list) {
+            SearchGoodsSimpleDto searchGoodsSimpleDto = new SearchGoodsSimpleDto(goodsEs.getGid(), goodsEs.getTitle(), goodsEs.getCover(), goodsEs.getDefaultPrice(), goodsEs.getPostage(), goodsEs.getSalesVolume());
             searchGoodsSimpleDtos.add(searchGoodsSimpleDto);
         }
         pageDto.setTotal(searchGoodss.getTotalElements());

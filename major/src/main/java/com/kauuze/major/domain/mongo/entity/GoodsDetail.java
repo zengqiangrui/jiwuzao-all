@@ -20,6 +20,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class GoodsDetail {
     @Id
     private String id;
+
+    /**
+     * 关联商品gid
+     */
+    private String gid;
     /**
      * 短视频或图片轮播最多5，分析连接
      */
