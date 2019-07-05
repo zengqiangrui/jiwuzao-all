@@ -69,11 +69,11 @@ public class MerchantService {
             if(verifyActor.getAuditType() == AuditTypeEnum.refuse){
                 verifyActorRepository.deleteById(verifyActor.getId());
             }else{
-                return "您已申请实名认证";
+                return "您已申请匠人认证";
             }
         }
         if(verifyActorRepository.findByIdcardAndAuditType(idcard,AuditTypeEnum.agree) != null){
-            return "该身份证已被实名注册过";
+            return "该身份证已注册过匠人";
         }
         if(verifyActorRepository.findByUsccAndAuditType(uscc,AuditTypeEnum.agree) != null){
             return "改企业已被实名注册过";
