@@ -18,5 +18,6 @@ public interface UserInfoRepository extends MongoRepository<UserInfo,String> {
     List<UserInfo> findByUidIn(List<Integer> uids);
     UserInfo findByUid(int uid);
     UserInfo findByNickName(String nickName);
+    Page<UserInfo> findByNickNameLike(String nickName, Pageable pageable);
     Page<UserInfo> findByCreateTimeLessThanEqualAndNickNameLike(Long createTime, String nickName, Pageable pageable);
 }

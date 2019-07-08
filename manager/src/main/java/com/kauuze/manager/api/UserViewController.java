@@ -1,6 +1,7 @@
 package com.kauuze.manager.api;
 
 import com.kauuze.manager.api.pojo.common.*;
+import com.kauuze.manager.api.pojo.userView.FindByNickNamePojo;
 import com.kauuze.manager.config.permission.Cms;
 import com.kauuze.manager.config.permission.Root;
 import com.kauuze.manager.domain.mongo.entity.userBastic.VerifyActor;
@@ -32,8 +33,9 @@ public class UserViewController {
 
     @RequestMapping("/findByNickName")
     @Cms
-    public JsonResult findByNickName(@Valid @RequestBody NickNamePojo nickNamePojo){
-        return JsonResult.success(userViewService.findByNickName(nickNamePojo.getNickName()));
+    public JsonResult findByNickName(@Valid @RequestBody FindByNickNamePojo findByNickNamePojo){
+        return JsonResult.success(userViewService.findByNickName(findByNickNamePojo.getNickName(),
+                findByNickNamePojo.getNum(), findByNickNamePojo.getSize()));
     }
 
     @RequestMapping("/findByPhone")

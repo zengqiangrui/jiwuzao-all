@@ -166,7 +166,7 @@ public class UserBasicService {
      * @return
      */
     public PageDto<UserSimpleOpenDto> searchByNickName(String nickName, int num, int size, Long time){
-        Pageable pageable =  PageUtil.getPageable(num,size);
+        Pageable pageable =  PageUtil.getPageable(num, size);
         Page<UserInfo> page2 = userInfoRepository.findByCreateTimeLessThanEqualAndNickNameLike(time,nickName,pageable);
         List<UserInfo> userInfos = page2.getContent();
         List<Integer> uids = new ArrayList<>();

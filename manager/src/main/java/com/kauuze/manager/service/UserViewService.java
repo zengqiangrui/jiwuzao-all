@@ -1,6 +1,7 @@
 package com.kauuze.manager.service;
 
 
+import com.kauuze.manager.api.pojo.userView.FindByNickNamePojo;
 import com.kauuze.manager.domain.common.MongoUtil;
 import com.kauuze.manager.domain.enumType.BackRoleEnum;
 import com.kauuze.manager.domain.mongo.entity.userBastic.UserInfo;
@@ -10,10 +11,15 @@ import com.kauuze.manager.domain.mongo.repository.UserTokenRepository;
 import com.kauuze.manager.domain.mongo.repository.VerifyActorRepository;
 import com.kauuze.manager.domain.mysql.entity.User;
 import com.kauuze.manager.domain.mysql.repository.UserRepository;
+import com.kauuze.manager.include.PageDto;
+import com.kauuze.manager.include.PageUtil;
 import com.kauuze.manager.include.StringUtil;
 import com.kauuze.manager.include.TokenUtil;
 import com.kauuze.manager.service.dto.userView.UserShowDto;
+import com.kauuze.manager.service.dto.userView.UserSimpleOpenDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -86,15 +92,23 @@ public class UserViewService {
 
     /**
      * 通过昵称查询
-     * @param nickName
+     * @param
      * @return
      */
-    public UserShowDto findByNickName(String nickName){
-        UserInfo userInfo = userInfoRepository.findByNickName(nickName);
-        if(userInfo == null){
+    public PageDto<UserSimpleOpenDto> findByNickName(String nickName, int num, int size){
+        Pageable pageable = PageUtil.getPageable(num, size);
+        Page<UserInfo> page = userInfoRepository.findByNickNameLike(nickName, pageable);
+        if (page.getSize() == 0) {
             return null;
         }
-        return findByUid(userInfo.getUid());
+        List<UserInfo> list = page.getContent();
+        List<UserSimpleOpenDto> usd = new ArrayList<>();
+        for (UserInfo user : list) {
+            User u = userRepository.findById(user.getUid().intValue());
+            usd.add(new UserSimpleOpenDto(user.getUid(), user.getNickName(), user.getPortrait(), u.getPhone()));
+        }
+        PageDto<UserSimpleOpenDto> page2 = new PageDto<>(page.getTotalElements(), usd);
+        return page2;
     }
 
     /**
