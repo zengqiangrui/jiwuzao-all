@@ -48,19 +48,34 @@ public class MerchantService {
      * @param auditType
      * @return
      */
-    public PageDto<VerifyActor> findVerifyActorByAuditType(AuditTypeEnum auditType, int num, int size, long time){
+    public PageDto<VerifyActor> findVerifyActorByAuditType(AuditTypeEnum auditType, int num, int size){
         Pageable pageable = PageUtil.getNewsInsert(num,size);
         Page<VerifyActor> verifyActors;
+
         if(auditType != null){
-            verifyActors = verifyActorRepository.findByAuditTypeAndCreateTimeLessThanEqual(auditType,time,pageable);
+            verifyActors = verifyActorRepository.findByAuditType(auditType, pageable);
         }else{
-            verifyActors = verifyActorRepository.findByCreateTimeLessThanEqual(time,pageable);
+            verifyActors = verifyActorRepository.findAll(pageable);
         }
         PageDto<VerifyActor> verifyActorPageDto = new PageDto<>();
         verifyActorPageDto.setTotal(verifyActors.getTotalElements());
         verifyActorPageDto.setContent(verifyActors.getContent());
         return verifyActorPageDto;
     }
+
+    /**
+     * 按uid查询认证信息
+     * @param uid
+     * @return
+     */
+    public VerifyActor findVerifyActorByUid(Integer uid) {
+        VerifyActor verifyActor = verifyActorRepository.findByUid(uid);
+        if(verifyActor == null) {
+            return null;
+        }
+        return verifyActor;
+    }
+
 
     /**
      * 审批用户实名认证
@@ -74,7 +89,7 @@ public class MerchantService {
             return "该身份证已被实名注册过";
         }
         if(verifyActorRepository.findByUsccAndAuditType(verifyActor.getUscc(),AuditTypeEnum.agree) != null){
-            return "改企业已被实名注册过";
+            return "该企业已被实名注册过";
         }
         VerifyActor verifyActor2 = new VerifyActor();
         verifyActor2.setId(verifyActor.getId());

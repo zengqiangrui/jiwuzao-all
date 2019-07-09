@@ -107,8 +107,7 @@ public class UserViewService {
             User u = userRepository.findById(user.getUid().intValue());
             usd.add(new UserSimpleOpenDto(user.getUid(), user.getNickName(), user.getPortrait(), u.getPhone()));
         }
-        PageDto<UserSimpleOpenDto> page2 = new PageDto<>(page.getTotalElements(), usd);
-        return page2;
+        return new PageDto<>(page.getTotalElements(), usd);
     }
 
     /**
@@ -128,9 +127,9 @@ public class UserViewService {
      * 查询所有内容管理员信息
      * @return
      */
-    public List<UserShowDto> findAllCms(){
-        List<UserToken> userTokens = userTokenRepository.findByBackRole(BackRoleEnum.cms);
-        userTokens.addAll(userTokenRepository.findByBackRole(BackRoleEnum.root));
+    public PageDto<UserShowDto> findAllCms(int page, int size){
+        Pageable pageable = PageUtil.getPageable(page, size);
+        Page<UserToken> userTokens = userTokenRepository.findCms(pageable);
         List<UserShowDto> list = new ArrayList<>();
         for (UserToken userToken : userTokens) {
             UserShowDto userShowDto = findByUid(userToken.getUid());
@@ -138,7 +137,7 @@ public class UserViewService {
                 list.add(userShowDto);
             }
         }
-        return list;
+        return new PageDto<>(userTokens.getTotalElements(), list);
     }
 
     /**

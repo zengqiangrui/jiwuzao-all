@@ -15,7 +15,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @Data
 public class PagePojo {
-    private Integer num;
+    private Integer page;
     private Integer size;
-    private Long time;
 }

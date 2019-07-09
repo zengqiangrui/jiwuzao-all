@@ -9,9 +9,7 @@ import com.kauuze.manager.include.JsonResult;
 import com.kauuze.manager.include.PageDto;
 import com.kauuze.manager.service.UserViewService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -46,8 +44,8 @@ public class UserViewController {
 
     @RequestMapping("/findAllCms")
     @Root
-    public JsonResult findAllCms(){
-        return JsonResult.success(userViewService.findAllCms());
+    public JsonResult findAllCms(@RequestParam int page){
+        return JsonResult.success(userViewService.findAllCms(page, 20));
     }
 
     @RequestMapping("/illegalNickname")

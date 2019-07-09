@@ -222,8 +222,8 @@ public class Pattern {
      * @return
      */
     public static boolean validPage(PagePojo pagePojo){
-        if(isPositive(String.valueOf(pagePojo.getNum()),false) && isPositive(String.valueOf(pagePojo.getSize()),false)
-                && isMill(pagePojo.getTime())){
+        if(isPositive(String.valueOf(pagePojo.getPage()),false)
+                && isPositive(String.valueOf(pagePojo.getSize()),false)){
             return true;
         }
         return false;
