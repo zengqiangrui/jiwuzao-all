@@ -55,6 +55,12 @@ public class Store {
      * 店铺介绍
      */
     private String storeIntro;
+
+    /**
+     * 店铺风格，逗号拼接字符串如"简约，中国风"
+     */
+    private String storeStyle;
+
     /**
      * 营业执照
      */

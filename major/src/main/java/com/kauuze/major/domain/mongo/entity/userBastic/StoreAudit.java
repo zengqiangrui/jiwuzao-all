@@ -31,6 +31,12 @@ public class StoreAudit {
      * 店铺名称:[违规+uid]
      */
     @Indexed
+    private Boolean violation;
+
+    /**
+     * 店铺名称
+     */
+    @Indexed
     private String storeName;
     /**
      * 店铺图标
