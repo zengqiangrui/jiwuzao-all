@@ -15,7 +15,7 @@ public class StoreShowDto {
      */
     private String id;
     /**
-     * 索引id
+     * 匠人uid
      */
     private Integer uid;
     /**
