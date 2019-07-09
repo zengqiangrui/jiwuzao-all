@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
+ * 商品详情
  * @author kauuze
  * @email 3412879785@qq.com
  * @time 2019-04-13 23:44

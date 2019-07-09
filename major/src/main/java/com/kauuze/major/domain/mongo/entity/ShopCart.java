@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
+ * 购物车
  * @author kauuze
  * @email 3412879785@qq.com
  * @time 2019-05-20 17:26

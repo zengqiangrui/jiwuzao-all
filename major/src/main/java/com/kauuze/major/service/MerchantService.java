@@ -23,6 +23,8 @@ import com.kauuze.major.domain.mysql.repository.WithdrawOrderRepository;
 import com.kauuze.major.include.StringUtil;
 import com.kauuze.major.include.yun.WxPayUtil;
 import com.kauuze.major.service.dto.merchant.MerchantUdpDto;
+import com.qiniu.util.Json;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +41,7 @@ import java.util.Map;
  */
 @Service
 @Transactional(rollbackOn = Exception.class)
+@Slf4j
 public class MerchantService {
     @Autowired
     private UserRepository userRepository;
@@ -55,160 +58,166 @@ public class MerchantService {
     @Autowired
     private PayOrderRepository payOrderRepository;
     @Autowired
-    private StoreAuditRepository storeAuditRepository;
-    @Autowired
     private UserBasicService userBasicService;
 
     /**
      * 申请商家认证
      */
     public String verifyActor(int uid, String trueName, String idcard, String frontIdCardPhoto
-            , String handIdCardPhoto, String backIdCardPhoto, Long publicBankNo, String publicBankTrueName, OpeningBankEnum openingBank, String companyName, String uscc, String businessLicense, String otherSupportPhotos){
+            , String handIdCardPhoto, String backIdCardPhoto, Long publicBankNo, String publicBankTrueName, OpeningBankEnum openingBank, String companyName, String uscc, String businessLicense, String otherSupportPhotos) {
         VerifyActor verifyActor = verifyActorRepository.findByUid(uid);
-        if(verifyActor != null){
-            if(verifyActor.getAuditType() == AuditTypeEnum.refuse){
+        if (verifyActor != null) {
+            if (verifyActor.getAuditType() == AuditTypeEnum.refuse) {
                 verifyActorRepository.deleteById(verifyActor.getId());
-            }else{
+            } else {
                 return "您已申请匠人认证";
             }
         }
-        if(verifyActorRepository.findByIdcardAndAuditType(idcard,AuditTypeEnum.agree) != null){
+        if (verifyActorRepository.findByIdcardAndAuditType(idcard, AuditTypeEnum.agree) != null) {
             return "该身份证已注册过匠人";
         }
-        if(verifyActorRepository.findByUsccAndAuditType(uscc,AuditTypeEnum.agree) != null){
+        if (verifyActorRepository.findByUsccAndAuditType(uscc, AuditTypeEnum.agree) != null) {
             return "改企业已被实名注册过";
         }
-        verifyActor = new VerifyActor(null,uid,System.currentTimeMillis(),trueName,idcard,frontIdCardPhoto,backIdCardPhoto,handIdCardPhoto,publicBankNo,publicBankTrueName,openingBank,companyName,uscc,businessLicense,otherSupportPhotos,AuditTypeEnum.wait,null,null);
+        verifyActor = new VerifyActor(null, uid, System.currentTimeMillis(), trueName, idcard, frontIdCardPhoto, backIdCardPhoto, handIdCardPhoto, publicBankNo, publicBankTrueName, openingBank, companyName, uscc, businessLicense, otherSupportPhotos, AuditTypeEnum.wait, null, null);
         verifyActorRepository.insert(verifyActor);
         return null;
     }
 
     /**
      * 获取实名验证
+     *
      * @param uid
      * @return
      */
-    public VerifyActor getVerifyActor(int uid){
+    public VerifyActor getVerifyActor(int uid) {
         return verifyActorRepository.findByUid(uid);
     }
 
     /**
      * 获取商家金钱信息
+     *
      * @return
      */
-    public MerchantUdpDto getMerchantUdpDto(int uid){
+    public MerchantUdpDto getMerchantUdpDto(int uid) {
         User user = userRepository.findById(uid);
         List<WithdrawOrder> withdrawOrders = withdrawOrderRepository.findByUidAndWithdrawStatusNot(uid, WithdrawStatusEnum.success);
         BigDecimal onWithdrawOrder = new BigDecimal("0");
         for (WithdrawOrder withdrawOrder : withdrawOrders) {
             onWithdrawOrder.add(withdrawOrder.getRemitMoney());
         }
-        MerchantUdpDto merchantUdpDto = new MerchantUdpDto(user.getDeposit(),user.getWithdrawal(),onWithdrawOrder,user.getTodayWithdrawal());
+        MerchantUdpDto merchantUdpDto = new MerchantUdpDto(user.getDeposit(), user.getWithdrawal(), onWithdrawOrder, user.getTodayWithdrawal());
         return merchantUdpDto;
     }
 
     /**
      * 修改或开店铺
      */
-    public String modifyOrOpenStore(int uid, String storeName, String storeIcon, String servicePhone,Integer mscode,String storeIntro, String businessLicense){
-        if(!userBasicService.validSms(servicePhone,mscode)){
+    public String modifyOrOpenStore(int uid, String storeName, String storeIcon,String storeBgImg,String servicePhone, Integer mscode, String storeIntro,String storeStyle) {
+        if (!userBasicService.validSms(servicePhone, mscode)) {
             return "验证码错误";
         }
         VerifyActor verifyActor = verifyActorRepository.findByUid(uid);
-        if(verifyActor == null || verifyActor.getAuditType() != AuditTypeEnum.agree){
+        if (verifyActor == null || verifyActor.getAuditType() != AuditTypeEnum.agree) {
             return "您未通过实名认证";
         }
-        Store store = storeRepository.findByUid(uid);
-        if(store == null){
-            if(storeRepository.findByStoreName(storeName) != null){
+        Store myStore = storeRepository.findByUid(uid);
+        if (myStore == null) {
+            if (storeRepository.findByStoreName(storeName) != null) {
                 return "该店铺名称已被使用";
             }
-        }else{
-            if(!StringUtil.isEq(store.getStoreName(),storeName) && storeRepository.findByStoreName(storeName) != null){
+            myStore = new Store();
+            myStore.setCreateTime(System.currentTimeMillis());
+        } else {
+            if (!StringUtil.isEq(myStore.getStoreName(), storeName) && storeRepository.findByStoreName(storeName) != null) {
                 return "该店铺名称已被使用";
             }
+            myStore.setModifyTime(System.currentTimeMillis());
         }
-        StoreAudit storeAudit = storeAuditRepository.findByUid(uid);
-        if(storeAudit == null){
-            storeAudit = new StoreAudit();
-            storeAudit.setCreateTime(System.currentTimeMillis());
-        }else{
-            if(storeAudit.getAuditType() == AuditTypeEnum.wait){
-                return "已有申请未审批";
-            }
-        }
-        storeAudit.setStoreName(storeName);
-        storeAudit.setStoreIcon(storeIcon);
-        storeAudit.setServicePhone(servicePhone);
-        storeAudit.setStoreIntro(storeIntro);
-        storeAudit.setBusinessLicense(businessLicense);
-        storeAudit.setAuditType(AuditTypeEnum.wait);
-        storeAuditRepository.save(storeAudit);
-        return null;
+        myStore.setUid(uid);
+        myStore.setStoreName(storeName);
+        myStore.setStoreIcon(storeIcon);
+        myStore.setStoreBgImg(storeBgImg);
+        myStore.setServicePhone(servicePhone);
+        myStore.setStoreIntro(storeIntro);
+        myStore.setStoreStyle(storeStyle);
+        return Json.encode(storeRepository.save(myStore));
     }
 
     /**
      * 缴纳保证金二维码
+     *
      * @param uid
      * @param userIp
      * @return
      */
-    public String getDepositQrCode(int uid,String userIp){
+    public String getDepositQrCode(int uid, String userIp) {
         SystemGoods systemGoods = systemGoodsRepository.findByName(SystemGoodsNameEnum.deposit);
-        PayOrder payOrder = new PayOrder(null,uid,System.currentTimeMillis(),null,true,false,true,null,systemGoods.getId(),systemGoods.getPrice(),systemGoods.getName().name,null,null,false,null,null);
+        PayOrder payOrder = new PayOrder(null, uid, System.currentTimeMillis(), null, true, false, true, null, systemGoods.getId(), systemGoods.getPrice(), systemGoods.getName().name, null, null, false, null, null);
         payOrderRepository.save(payOrder);
-        payOrderRepository.save(payOrderRepository.findByIdForUpdate(payOrder.getId()).setPayOrderNo(OrderUtil.getOrderNo(payOrder.getId(),"p")));
-        return WxPayUtil.generateWxPayQrCode(systemGoods.getId(),systemGoods.getName().name,payOrder.getPayOrderNo(),payOrder.getFinalPay(), ConfigUtil.payCallBackDomain + PayCallBackUrl.systemGoodsWxNoticeWxQrCode,userIp);
+        payOrderRepository.save(payOrderRepository.findByIdForUpdate(payOrder.getId()).setPayOrderNo(OrderUtil.getOrderNo(payOrder.getId(), "p")));
+        return WxPayUtil.generateWxPayQrCode(systemGoods.getId(), systemGoods.getName().name, payOrder.getPayOrderNo(), payOrder.getFinalPay(), ConfigUtil.payCallBackDomain + PayCallBackUrl.systemGoodsWxNoticeWxQrCode, userIp);
     }
 
     /**
      * 取出保证金:下架所有商品，15-30天提现
+     *
      * @return
      */
-    public String takeOutDeposit(int uid){
+    public String takeOutDeposit(int uid) {
         Store store = storeRepository.findByUid(uid);
-        if(store != null && store.getViolation()){
+        if (store != null && store.getViolation()) {
             return "你因违规，保证金被冻结";
         }
         List<Goods> list = goodsRepository.findByUid(uid);
         for (Goods goods : list) {
-            Map<String,String> map = new HashMap<>();
+            Map<String, String> map = new HashMap<>();
             map.put("gid", goods.getGid());
-            map.put("putaway","false");
-            map.put("soldOutTime",String.valueOf(System.currentTimeMillis()));
+            map.put("putaway", "false");
+            map.put("soldOutTime", String.valueOf(System.currentTimeMillis()));
             EsUtil.modify(map);
         }
         User user = userRepository.findByIdForUpdate(uid);
         VerifyActor verifyActor = verifyActorRepository.findByUid(uid);
-        WithdrawOrder withdrawOrder = new WithdrawOrder(null,uid,System.currentTimeMillis(),true, WithdrawStatusEnum.wait,null,user.getDeposit(),verifyActor.getBankNo(),verifyActor.getBankTrueName(),verifyActor.getOpeningBank(),"取出保证金",null,null,null);
+        WithdrawOrder withdrawOrder = new WithdrawOrder(null, uid, System.currentTimeMillis(), true, WithdrawStatusEnum.wait, null, user.getDeposit(), verifyActor.getBankNo(), verifyActor.getBankTrueName(), verifyActor.getOpeningBank(), "取出保证金", null, null, null);
         withdrawOrderRepository.save(withdrawOrder);
-        withdrawOrderRepository.save(withdrawOrderRepository.findByIdForUpdate(withdrawOrder.getId()).setWithdrawOrderNo(OrderUtil.getOrderNo(withdrawOrder.getId(),"w")));
+        withdrawOrderRepository.save(withdrawOrderRepository.findByIdForUpdate(withdrawOrder.getId()).setWithdrawOrderNo(OrderUtil.getOrderNo(withdrawOrder.getId(), "w")));
         return null;
     }
 
     /**
      * 商家提现
+     *
      * @param uid
      * @param money
      * @return
      */
-    public String withdraw(int uid,BigDecimal money){
+    public String withdraw(int uid, BigDecimal money) {
         User user = userRepository.findByIdForUpdate(uid);
-        if(user.getTodayWithdrawal()){
+        if (user.getTodayWithdrawal()) {
             return "今日已提现";
         }
-        if(user.getWithdrawal().compareTo(money) < 0){
+        if (user.getWithdrawal().compareTo(money) < 0) {
             return "余额不足";
         }
         VerifyActor verifyActor = verifyActorRepository.findByUid(uid);
-        if(verifyActor == null || verifyActor.getAuditType() != AuditTypeEnum.agree){
+        if (verifyActor == null || verifyActor.getAuditType() != AuditTypeEnum.agree) {
             return "操作失败";
         }
         user.setWithdrawal(user.getWithdrawal().subtract(money));
         user.setTodayWithdrawal(true);
         userRepository.save(user);
-        WithdrawOrder withdrawOrder = new WithdrawOrder(null,uid,System.currentTimeMillis(),false,WithdrawStatusEnum.wait,null,money,verifyActor.getBankNo(),verifyActor.getBankTrueName(),verifyActor.getOpeningBank(),null,null,null,null);
+        WithdrawOrder withdrawOrder = new WithdrawOrder(null, uid, System.currentTimeMillis(), false, WithdrawStatusEnum.wait, null, money, verifyActor.getBankNo(), verifyActor.getBankTrueName(), verifyActor.getOpeningBank(), null, null, null, null);
         withdrawOrderRepository.save(withdrawOrder);
         return null;
+    }
+
+    /**
+     * 商户获取店铺信息
+     * @param uid
+     * @return
+     */
+    public Store getMerchantStore(int uid) {
+        return storeRepository.findByUid(uid);
     }
 }
