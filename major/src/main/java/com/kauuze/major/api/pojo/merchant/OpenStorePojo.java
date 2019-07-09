@@ -20,12 +20,15 @@ public class OpenStorePojo {
     private String storeName;
     @Url
     private String storeIcon;
+    @Url
+    private String storeBgImg;
     @Phone
     private String servicePhone;
     @MsCode
     private Integer msCode;
     @StringMax
     private String storeIntro;
-    @Url
-    private String businessLicense;
+    @StringMax(max = 21,require = false)
+    private String storeStyle;
+
 }

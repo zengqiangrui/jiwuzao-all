@@ -26,6 +26,8 @@ public class Store {
     private Integer uid;
     @Indexed
     private Long createTime;
+    @Indexed
+    private Long modifyTime;
 
     /**
      * 是否违规：违规下架所有商品，不得再上架。
@@ -47,6 +49,10 @@ public class Store {
      */
     private String storeIcon;
 
+    /**
+     * 店铺背景图片
+     */
+    private String storeBgImg;
     /**
      * 客服电话:短信确认
      */
