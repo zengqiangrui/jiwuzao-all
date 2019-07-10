@@ -1,5 +1,6 @@
 package com.kauuze.major.include.yun;
 
+import com.kauuze.major.include.StringUtil;
 import com.qiniu.common.QiniuException;
 import com.qiniu.common.Zone;
 import com.qiniu.storage.BucketManager;
@@ -84,12 +85,12 @@ public class QiniuUtil {
         Auth auth = Auth.create(accesskey, secretkey);
         BucketManager bucketManager = new BucketManager(auth, cfg);
         try {
-            bucketManager.delete(bucket,url);
+            bucketManager.delete(bucket, StringUtil.getUrn(url));
         } catch (QiniuException e) {
             e.printStackTrace();
             System.err.println(e.response.toString());
         }
-        return false;
+        return true;
     }
 
 }
