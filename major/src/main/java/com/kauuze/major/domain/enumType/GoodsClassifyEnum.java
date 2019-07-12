@@ -1,11 +1,5 @@
 package com.kauuze.major.domain.enumType;
 
-import com.kauuze.major.domain.es.entity.Goods;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import org.junit.Test;
-
 /**
  * @author kauuze
  * @email 3412879785@qq.com
@@ -27,15 +21,26 @@ public enum GoodsClassifyEnum {
     /**
      * 饰品
      */
-    ornament,
+    jewelry,
     /**
      * 箱包
      */
     bags,
     /**
-     * 美妆
+     * 器具
+     */
+    appliance,
+
+    /**
+     * 极礼
+     */
+    gift,
+
+    /**
+     * 美业
      */
     beauty,
+
     /**
      * 家居
      */
@@ -48,10 +53,6 @@ public enum GoodsClassifyEnum {
      * 玩具
      */
     toy,
-    /**
-     * 礼品
-     */
-    gift,
     /**
      * 器具
      */

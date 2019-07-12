@@ -37,11 +37,11 @@ public class GoodsDetail {
     private String detailLabel;
 
     /**
-     * 商品二级分类
+     * 商品规格
      */
     private String goodsType;
     /**
-     * 商品类型分类
+     * 商品规格明细
      */
     private String goodsTypeClass;
     /**

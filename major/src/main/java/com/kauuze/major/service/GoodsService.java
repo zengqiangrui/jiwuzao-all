@@ -6,15 +6,12 @@ import com.kauuze.major.domain.common.MongoUtil;
 import com.kauuze.major.domain.enumType.AuditTypeEnum;
 import com.kauuze.major.domain.enumType.GoodsClassifyEnum;
 import com.kauuze.major.domain.enumType.SystemGoodsNameEnum;
-import com.kauuze.major.domain.es.entity.Goods;
-import com.kauuze.major.domain.es.repository.GoodsRepository;
+import com.kauuze.major.domain.es.entity.GoodsEs;
+import com.kauuze.major.domain.mongo.entity.Goods;
 import com.kauuze.major.domain.mongo.entity.GoodsDetail;
 import com.kauuze.major.domain.mongo.entity.GoodsSpec;
 import com.kauuze.major.domain.mongo.entity.userBastic.Store;
-import com.kauuze.major.domain.mongo.repository.GoodsDetailRepository;
-import com.kauuze.major.domain.mongo.repository.GoodsSpecRepository;
-import com.kauuze.major.domain.mongo.repository.StoreRepository;
-import com.kauuze.major.domain.mongo.repository.SystemGoodsRepository;
+import com.kauuze.major.domain.mongo.repository.*;
 import com.kauuze.major.domain.mysql.entity.User;
 import com.kauuze.major.domain.mysql.repository.UserRepository;
 import com.kauuze.major.include.DateTimeUtil;
@@ -52,15 +49,15 @@ public class GoodsService {
      */
     public String addGoods(int uid, GoodsClassifyEnum classify, String title, String cover, BigDecimal defaultPrice, String slideshow, BigDecimal postage, String detailLabel, String goodsType, String goodsTypeClass, String detailPhotos, List<GoodsSpecPojo> goodsSpecPojo){
         Store store = storeRepository.findByUid(uid);
-        if(store == null){
-            return "未开通店铺";
-        }
-        if(store.getViolation()){
-            return "店铺被封禁";
-        }
-        if(goodsRepository.countByUid(uid) > 100){
-            return "最多添加100个商品";
-        }
+//        if(store == null){
+//            return "未开通店铺";
+//        }
+//        if(store.getViolation()){
+//            return "店铺被封禁";
+//        }
+//        if(goodsRepository.countByUid(uid) > 100){
+//            return "最多添加100个商品";
+//        }
         Goods goods = new Goods(null,uid,store.getId(),title,cover,classify,0,0,defaultPrice,postage,false,null,null,AuditTypeEnum.wait,null);
         goodsRepository.save(goods);
         GoodsDetail goodsDetail = new GoodsDetail(null,goods.getGid(),slideshow,detailLabel,goodsType,goodsTypeClass,detailPhotos);
@@ -213,7 +210,7 @@ public class GoodsService {
         if(goods.getUid() != uid){
             return "你无权限";
         }
-        MongoUtil.updateNotNon("id",new Goods().setGid(gid).setPostage(postage),Goods.class);
+        MongoUtil.updateNotNon("id",new GoodsEs().setGid(gid).setPostage(postage), GoodsEs.class);
         return null;
     }
 

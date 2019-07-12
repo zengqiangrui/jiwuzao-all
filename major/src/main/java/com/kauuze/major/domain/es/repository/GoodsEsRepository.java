@@ -1,6 +1,6 @@
 package com.kauuze.major.domain.es.repository;
 
-import com.kauuze.major.domain.es.entity.Goods;
+import com.kauuze.major.domain.es.entity.GoodsEs;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,8 +13,8 @@ import java.util.List;
  * @time 2019-02-27 13:27
  */
 @Repository
-public interface GoodsRepository extends ElasticsearchRepository<Goods, String> {
-    List<Goods> findByUid(int uid);
-    Goods findByGid(String sid);
+public interface GoodsEsRepository extends ElasticsearchRepository<GoodsEs, String> {
+    List<GoodsEs> findByUid(int uid);
+    GoodsEs findByGid(String sid);
     int countByUid(int uid);
 }

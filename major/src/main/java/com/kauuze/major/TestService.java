@@ -1,6 +1,6 @@
 package com.kauuze.major;
 
-import com.kauuze.major.domain.es.repository.GoodsRepository;
+import com.kauuze.major.domain.mongo.repository.GoodsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

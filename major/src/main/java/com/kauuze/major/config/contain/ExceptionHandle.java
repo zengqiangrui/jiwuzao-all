@@ -5,6 +5,7 @@ import com.kauuze.major.domain.mongo.entity.Log;
 import com.kauuze.major.domain.mongo.repository.LogRepository;
 import com.kauuze.major.include.DateTimeUtil;
 import com.kauuze.major.include.StateModel;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -22,6 +23,7 @@ import java.io.StringWriter;
  * 异常处理
  */
 @ControllerAdvice
+@Slf4j
 public class ExceptionHandle {
     @Autowired
     private LogRepository logRepository;

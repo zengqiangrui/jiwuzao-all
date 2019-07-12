@@ -2,7 +2,7 @@ package com.kauuze.major.config.contain;
 
 
 import com.kauuze.major.config.permission.GreenWay;
-import com.kauuze.major.domain.es.repository.GoodsRepository;
+import com.kauuze.major.domain.mongo.repository.GoodsRepository;
 import com.kauuze.major.domain.mongo.repository.UserTokenRepository;
 import com.kauuze.major.domain.mysql.repository.UserRepository;
 import com.kauuze.major.include.DateTimeUtil;

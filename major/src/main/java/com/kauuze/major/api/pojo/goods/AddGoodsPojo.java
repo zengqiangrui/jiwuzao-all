@@ -24,6 +24,8 @@ import java.util.List;
 public class AddGoodsPojo {
     @NotNull
     private GoodsClassifyEnum goodsClassify;
+    @NotNull
+    private String goodsClassDetail;
     @StringMax(max = 40)
     private String title;
     @Url

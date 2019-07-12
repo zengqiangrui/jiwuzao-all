@@ -23,7 +23,7 @@ import java.math.BigDecimal;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class Goods {
+public class GoodsEs {
     /**
      * 商品详情id
      */
