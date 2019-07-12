@@ -1,11 +1,21 @@
 package com.kauuze.major.domain.enumType;
 
+import com.kauuze.major.domain.es.entity.Goods;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import org.junit.Test;
+
 /**
  * @author kauuze
  * @email 3412879785@qq.com
  * @time 2019-05-29 15:53
  */
 public enum GoodsClassifyEnum {
+    /**
+     * 灵物
+     */
+    special,
     /**
      * 食品
      */
@@ -53,5 +63,6 @@ public enum GoodsClassifyEnum {
     /**
      * 其他
      */
-    other
+    other;
+
 }

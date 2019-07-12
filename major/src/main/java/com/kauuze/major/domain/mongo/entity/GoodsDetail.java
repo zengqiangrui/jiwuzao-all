@@ -1,5 +1,6 @@
 package com.kauuze.major.domain.mongo.entity;
 
+import com.kauuze.major.domain.enumType.GoodsClassifyEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,8 +35,9 @@ public class GoodsDetail {
      *详情标签,最多5个,每个5字
      */
     private String detailLabel;
+
     /**
-     * 商品类型
+     * 商品二级分类
      */
     private String goodsType;
     /**
@@ -43,7 +45,7 @@ public class GoodsDetail {
      */
     private String goodsTypeClass;
     /**
-     * 详情图:可以9张
+     * 详情图:可以6张
      */
     private String detailPhotos;
 }
