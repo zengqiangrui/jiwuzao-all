@@ -30,10 +30,10 @@ public class Store {
     private Long modifyTime;
 
     /**
-     * 是否违规：违规下架所有商品，不得再上架。
+     * 是否违规：违规下架所有商品，不得再上架。默认未违规
      */
     @Indexed
-    private Boolean violation;
+    private Boolean violation = false;
     /**
      * 违规原因：富文本
      */

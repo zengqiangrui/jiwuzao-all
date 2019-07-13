@@ -136,7 +136,7 @@ public class UserBasicService {
             return null;
         }
         userToken = TokenUtil.judgeEndTime(userToken);
-        Store store = storeRepository.findByUid(uid);
+        Store store = storeRepository.findByUid(uid).get();
         if(StringUtil.isBlank(store.getStoreName()) || store.getViolation()){
             store = new Store();
         }

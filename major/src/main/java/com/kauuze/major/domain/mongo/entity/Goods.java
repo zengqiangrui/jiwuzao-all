@@ -41,7 +41,8 @@ public class Goods {
     /**
      * 分类
      */
-    @Indexed(unique = true)
+//    @Indexed(unique = true)
+    @Indexed
     private GoodsClassifyEnum classify;
     /**
      * 评分:默认排序,排序必含

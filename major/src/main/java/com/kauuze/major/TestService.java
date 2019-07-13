@@ -14,8 +14,8 @@ import javax.transaction.Transactional;
 @Service
 @Transactional(rollbackOn = Exception.class)
 public class TestService {
-    @Autowired
-    private GoodsRepository goodsRepository;
+//    @Autowired
+//    private GoodsRepository goodsRepository;
     public void test(){
     }
 }

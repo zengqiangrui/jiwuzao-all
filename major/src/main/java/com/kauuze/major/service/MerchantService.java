@@ -32,6 +32,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author kauuze
@@ -120,14 +121,16 @@ public class MerchantService {
         if (verifyActor == null || verifyActor.getAuditType() != AuditTypeEnum.agree) {
             return "您未通过实名认证";
         }
-        Store myStore = storeRepository.findByUid(uid);
-        if (myStore == null) {
+        Optional<Store> opt = storeRepository.findByUid(uid);
+        Store myStore;
+        if (!opt.isPresent()) {
             if (storeRepository.findByStoreName(storeName) != null) {
                 return "该店铺名称已被使用";
             }
             myStore = new Store();
             myStore.setCreateTime(System.currentTimeMillis());
         } else {
+            myStore = opt.get();
             if (!StringUtil.isEq(myStore.getStoreName(), storeName) && storeRepository.findByStoreName(storeName) != null) {
                 return "该店铺名称已被使用";
             }
@@ -164,8 +167,8 @@ public class MerchantService {
      * @return
      */
     public String takeOutDeposit(int uid) {
-        Store store = storeRepository.findByUid(uid);
-        if (store != null && store.getViolation()) {
+        Optional<Store> opt = storeRepository.findByUid(uid);
+        if (opt.isPresent() && opt.get().getViolation()) {
             return "你因违规，保证金被冻结";
         }
         List<Goods> list = goodsRepository.findByUid(uid);
@@ -217,6 +220,6 @@ public class MerchantService {
      * @return
      */
     public Store getMerchantStore(int uid) {
-        return storeRepository.findByUid(uid);
+        return storeRepository.findByUid(uid).orElse(null);
     }
 }

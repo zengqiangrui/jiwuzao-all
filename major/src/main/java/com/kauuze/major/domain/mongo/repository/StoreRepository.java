@@ -6,6 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * @author kauuze
  * @email 3412879785@qq.com
@@ -14,6 +16,15 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface StoreRepository extends MongoRepository<Store,String> {
     Store findByStoreName(String storeName);
-    Store findByUid(int uid);
+
+    //Store findByUid(int uid);
+
+    /**
+     *
+     * @param uid
+     * @return
+     */
+    Optional<Store> findByUid(int uid);
+
     Page<Store> findByStoreNameLikeAndCreateTimeLessThanEqual(String storeName, Long createTime, Pageable pageable);
 }
