@@ -1,6 +1,7 @@
 package com.jiwuzao.common.pojo.common;
 
 
+import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
 import com.jiwuzao.common.include.valid.Page;
 import lombok.AllArgsConstructor;
 import lombok.Data;

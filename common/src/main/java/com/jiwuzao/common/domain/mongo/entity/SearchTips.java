@@ -1,4 +1,4 @@
-package com.kauuze.manager.domain.mongo.entity;
+package com.jiwuzao.common.domain.mongo.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,35 +8,33 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.math.BigDecimal;
-
 /**
- * 商品规格
+ * 搜索提示词：人工审核content时添加
  * @author kauuze
  * @email 3412879785@qq.com
- * @time 2019-05-20 17:55
+ * @time 2019-04-21 21:46
  */
 @Document
 @Data
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class GoodsSpec {
+public class SearchTips {
     @Id
     private String id;
-    @Indexed
-    private String gid;
     /**
-     * 规格分类(逗号分隔)
+     * 搜索提示词:最长20字
+     */
+    @Indexed(unique = true)
+    private String tips;
+    /**
+     * 搜索提示词点击量
      */
     @Indexed
-    private String specClass;
+    private Integer hits;
     /**
-     * 规格价格
+     * 每周点击量：大家都在搜，周一置零
      */
-    private BigDecimal specPrice;
-    /**
-     * 规格库存
-     */
-    private Integer specInventory;
+    @Indexed
+    private Integer weekHits;
 }

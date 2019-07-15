@@ -1,10 +1,10 @@
 package com.jiwuzao.common.pojo.userBasic;
 
+import com.jiwuzao.common.domain.enumType.SexEnum;
 import com.jiwuzao.common.include.valid.Mill;
 import com.jiwuzao.common.include.valid.QQ;
 import com.jiwuzao.common.include.valid.StringMax;
 import com.jiwuzao.common.include.valid.WxId;
-import com.kauuze.major.domain.enumType.SexEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

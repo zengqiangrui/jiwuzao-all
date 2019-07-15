@@ -1,8 +1,8 @@
 package com.jiwuzao.common.pojo.goods;
 
+import com.jiwuzao.common.domain.enumType.GoodsClassifyEnum;
 import com.jiwuzao.common.include.valid.*;
 import com.jiwuzao.common.pojo.common.GoodsSpecPojo;
-import com.kauuze.major.domain.enumType.GoodsClassifyEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

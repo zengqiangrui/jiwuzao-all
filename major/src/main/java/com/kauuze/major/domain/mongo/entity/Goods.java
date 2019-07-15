@@ -7,11 +7,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 商品搜索
@@ -26,6 +31,7 @@ public class Goods {
      * 商品详情id
      */
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private String gid;
     private Integer uid;
     private String sid;
@@ -80,4 +86,14 @@ public class Goods {
      * 拒绝原因
      */
     private String refuseCause;
+
+    /**
+     * entity创建时间
+     */
+    private Long createTime;
+
+    /**
+     * entity更新时间
+     */
+    private Long updateTime;
 }

@@ -1,9 +1,8 @@
 package com.kauuze.manager.service;
 
-import com.kauuze.manager.domain.common.EsUtil;
+import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.kauuze.manager.domain.common.MongoUtil;
 import com.kauuze.manager.domain.enumType.UserStateEnum;
-import com.kauuze.manager.domain.mongo.entity.Goods;
 import com.kauuze.manager.domain.mongo.entity.userBastic.Store;
 import com.kauuze.manager.domain.mongo.entity.userBastic.UserToken;
 import com.kauuze.manager.domain.mongo.repository.GoodsRepository;
@@ -14,9 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Transactional(rollbackOn = Exception.class)

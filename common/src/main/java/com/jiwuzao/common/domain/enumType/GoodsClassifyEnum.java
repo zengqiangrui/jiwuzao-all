@@ -1,0 +1,69 @@
+package com.jiwuzao.common.domain.enumType;
+
+/**
+ * @author kauuze
+ * @email 3412879785@qq.com
+ * @time 2019-05-29 15:53
+ */
+public enum GoodsClassifyEnum {
+    /**
+     * 灵物
+     */
+    special,
+    /**
+     * 食品
+     */
+    food,
+    /**
+     * 服装
+     */
+    clothing,
+    /**
+     * 饰品
+     */
+    jewelry,
+    /**
+     * 箱包
+     */
+    bags,
+    /**
+     * 器具
+     */
+    appliance,
+
+    /**
+     * 极礼
+     */
+    gift,
+
+    /**
+     * 美业
+     */
+    beauty,
+
+    /**
+     * 家居
+     */
+    house,
+    /**
+     * 母婴
+     */
+    mom,
+    /**
+     * 玩具
+     */
+    toy,
+    /**
+     * 器具
+     */
+    tool,
+    /**
+     * 电子
+     */
+    electron,
+    /**
+     * 其他
+     */
+    other;
+
+}

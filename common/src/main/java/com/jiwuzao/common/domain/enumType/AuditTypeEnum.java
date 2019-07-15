@@ -1,4 +1,4 @@
-package com.kauuze.manager.domain.enumType;
+package com.jiwuzao.common.domain.enumType;
 
 /**
  * 审批类型

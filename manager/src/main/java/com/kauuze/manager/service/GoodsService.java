@@ -1,12 +1,10 @@
 package com.kauuze.manager.service;
 
+import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
+import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.kauuze.manager.domain.common.MongoUtil;
-import com.kauuze.manager.domain.enumType.AuditTypeEnum;
 import com.kauuze.manager.domain.enumType.SystemGoodsNameEnum;
-import com.kauuze.manager.domain.mongo.entity.Goods;
-import com.kauuze.manager.domain.mongo.repository.GoodsRepository;
-import com.kauuze.manager.domain.mongo.repository.StoreRepository;
-import com.kauuze.manager.domain.mongo.repository.SystemGoodsRepository;
+import com.kauuze.manager.domain.mongo.repository.*;
 import com.kauuze.manager.domain.mysql.repository.UserRepository;
 import com.kauuze.manager.include.PageDto;
 import com.kauuze.manager.include.PageUtil;
@@ -24,6 +22,10 @@ import java.util.List;
 @Service
 public class GoodsService {
 
+    @Autowired
+    private GoodsSpecRepository goodsSpecRepository;
+    @Autowired
+    private GoodsDetailRepository goodsDetailRepository;
     @Autowired
     private GoodsRepository goodsRepository;
     @Autowired
@@ -71,8 +73,9 @@ public class GoodsService {
             String gid = goods.getGid();
             GoodsShowDto goodsShowDto = new GoodsShowDto();
             goodsShowDto.setGoods(goods);
-            goodsShowDto.setGoodsDetail(null);
-            goodsShowDto.setGoodsSpec(null);
+            //Todo
+            goodsShowDto.setGoodsDetail(goodsDetailRepository.findByGid(gid).get());
+            goodsShowDto.setGoodsSpec(goodsSpecRepository.findByGid(gid));
             dtoList.add(goodsShowDto);
 
         }

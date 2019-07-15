@@ -34,9 +34,9 @@ public class AddGoodsPojo {
     private BigDecimal defaultPrice;
     @Urls
     private String slideshow;
-    @Decimal(zero = true)
-    private BigDecimal postage;
-    @StringMax
+    @Decimal(zero = true,require = false)
+    private BigDecimal postage = BigDecimal.ZERO;
+    @StringMax(require = false)
     private String detailLabel;
     @StringMax
     private String goodsType;

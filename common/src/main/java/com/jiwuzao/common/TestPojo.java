@@ -1,6 +1,6 @@
 package com.jiwuzao.common;
 
-import com.kauuze.major.domain.enumType.OrderStatusEnum;
+import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

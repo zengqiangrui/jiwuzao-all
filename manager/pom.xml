@@ -7,7 +7,7 @@
 		<artifactId>all</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<groupId>com.jiwozao</groupId>
+	<groupId>com.jiwuzao</groupId>
 	<artifactId>manager</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>manager</name>
@@ -16,6 +16,14 @@
 	<properties>
 		<java.version>1.8</java.version>
 	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.jiwuzao</groupId>
+			<artifactId>common</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<plugins>

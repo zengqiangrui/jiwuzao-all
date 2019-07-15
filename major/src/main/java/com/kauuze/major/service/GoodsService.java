@@ -7,6 +7,7 @@ import com.kauuze.major.domain.enumType.AuditTypeEnum;
 import com.kauuze.major.domain.enumType.GoodsClassifyEnum;
 import com.kauuze.major.domain.enumType.SystemGoodsNameEnum;
 import com.kauuze.major.domain.es.entity.GoodsEs;
+import com.kauuze.major.domain.mongo.entity.Category;
 import com.kauuze.major.domain.mongo.entity.Goods;
 import com.kauuze.major.domain.mongo.entity.GoodsDetail;
 import com.kauuze.major.domain.mongo.entity.GoodsSpec;
@@ -17,6 +18,10 @@ import com.kauuze.major.domain.mysql.repository.UserRepository;
 import com.kauuze.major.include.DateTimeUtil;
 import com.kauuze.major.service.dto.goods.GoodsOpenDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -43,6 +48,8 @@ public class GoodsService {
     private StoreRepository storeRepository;
     @Autowired
     private SystemGoodsRepository systemGoodsRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     /**
      * 添加商品
@@ -57,9 +64,9 @@ public class GoodsService {
         if (goodsRepository.countByUid(uid) > 100) {
             return "最多添加100个商品";
         }
-        Goods goods = new Goods(null, uid, opt.get().getId(), title, cover, classify, 0, 0, defaultPrice, postage, false, null, null, AuditTypeEnum.wait, null);
+        Goods goods = new Goods(null, uid, opt.get().getId(), title, cover, classify, 0, 0, defaultPrice, postage, false, null, null, AuditTypeEnum.wait, null,System.currentTimeMillis(),null);
         goodsRepository.save(goods);
-        GoodsDetail goodsDetail = new GoodsDetail(null, goods.getGid(), slideshow, detailLabel, goodsType, goodsTypeClass, detailPhotos);
+        GoodsDetail goodsDetail = new GoodsDetail(null, goods.getGid(), slideshow, detailLabel, classify, goodsType, goodsTypeClass, detailPhotos);
         goodsDetailRepository.save(goodsDetail);
         for (GoodsSpecPojo specPojo : goodsSpecPojo) {
             goodsSpecRepository.save(new GoodsSpec(null, goods.getGid(), specPojo.getSpecClass(), specPojo.getSpecPrice(), specPojo.getSpecInventory()));
@@ -228,7 +235,7 @@ public class GoodsService {
     public GoodsOpenDto getGoodsOpenDto(String gid) {
         Goods goods = goodsRepository.findByGid(gid);
         Optional<Store> optional = storeRepository.findById(goods.getSid());
-        Optional<GoodsDetail> optional2 = goodsDetailRepository.findById(gid);
+        Optional<GoodsDetail> optional2 = goodsDetailRepository.findByGid(gid);
         List<GoodsSpec> goodsSpecs = goodsSpecRepository.findByGid(gid);
         if (!optional.isPresent() || !optional2.isPresent()) {
             return null;
@@ -236,5 +243,32 @@ public class GoodsService {
         Store store = optional.get();
         GoodsDetail goodsDetail = optional2.get();
         return new GoodsOpenDto(gid, goods.getUid(), goods.getSid(), store.getBusinessLicense(), store.getServicePhone(), goods.getTitle(), goods.getCover(), goods.getClassify(), goods.getSalesVolume(), goods.getDefaultPrice(), goods.getPostage(), goodsDetail.getSlideshow(), goodsDetail.getDetailLabel(), goodsDetail.getDetailPhotos(), goodsDetail.getGoodsType(), goodsDetail.getGoodsTypeClass(), goodsSpecs);
+    }
+
+
+    /**
+     * 获取商品详情的list
+     * @param pageable
+     * @return
+     */
+    public List<GoodsOpenDto> getGoodsPage(Pageable pageable) {
+        Page<Goods> goods = goodsRepository.findAll(pageable);
+        List<GoodsOpenDto> goodsOpenDtos = new ArrayList<>();
+        goods.getContent().forEach(e -> {
+            goodsOpenDtos.add(getGoodsOpenDto(e.getGid()));
+        });
+        System.out.println(goodsOpenDtos);
+        return goodsOpenDtos;
+    }
+
+    /**
+     * 根据商品目录id获取商品目录json字符串
+     *
+     * @param categoryId
+     * @return
+     */
+    public Category getCategoryById(Integer categoryId) {
+        Optional<Category> opt = categoryRepository.findById(categoryId);
+        return opt.orElse(null);
     }
 }

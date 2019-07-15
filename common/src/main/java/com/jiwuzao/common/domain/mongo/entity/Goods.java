@@ -1,7 +1,8 @@
-package com.kauuze.manager.domain.mongo.entity;
+package com.jiwuzao.common.domain.mongo.entity;
 
-import com.kauuze.manager.domain.enumType.AuditTypeEnum;
-import com.kauuze.manager.domain.enumType.GoodsClassifyEnum;
+
+import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
+import com.jiwuzao.common.domain.enumType.GoodsClassifyEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import java.math.BigDecimal;
 
 /**
@@ -25,6 +28,7 @@ public class Goods {
      * 商品详情id
      */
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private String gid;
     private Integer uid;
     private String sid;
@@ -79,4 +83,14 @@ public class Goods {
      * 拒绝原因
      */
     private String refuseCause;
+
+    /**
+     * entity创建时间
+     */
+    private Long createTime;
+
+    /**
+     * entity更新时间
+     */
+    private Long updateTime;
 }

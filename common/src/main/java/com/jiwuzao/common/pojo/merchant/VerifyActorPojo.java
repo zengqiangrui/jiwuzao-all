@@ -1,7 +1,7 @@
 package com.jiwuzao.common.pojo.merchant;
 
+import com.jiwuzao.common.domain.enumType.OpeningBankEnum;
 import com.jiwuzao.common.include.valid.*;
-import com.kauuze.major.domain.enumType.OpeningBankEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
