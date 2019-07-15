@@ -1,7 +1,7 @@
 package com.kauuze.manager.domain.mongo.entity.userBastic;
 
 
-import com.kauuze.manager.domain.enumType.AuditTypeEnum;
+import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
 import com.kauuze.manager.domain.enumType.OpeningBankEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;

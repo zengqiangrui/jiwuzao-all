@@ -1,8 +1,8 @@
 package com.kauuze.manager.service;
 
+import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
 import com.kauuze.manager.domain.common.EsUtil;
 import com.kauuze.manager.domain.common.MongoUtil;
-import com.kauuze.manager.domain.enumType.AuditTypeEnum;
 import com.kauuze.manager.domain.enumType.RoleEnum;
 import com.kauuze.manager.domain.enumType.UserStateEnum;
 import com.kauuze.manager.domain.es.entity.GoodsEs;

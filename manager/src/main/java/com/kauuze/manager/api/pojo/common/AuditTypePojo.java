@@ -1,6 +1,6 @@
 package com.kauuze.manager.api.pojo.common;
 
-import com.kauuze.manager.domain.enumType.AuditTypeEnum;
+import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
 import com.kauuze.manager.include.valid.Page;
 import lombok.AllArgsConstructor;
 import lombok.Data;
