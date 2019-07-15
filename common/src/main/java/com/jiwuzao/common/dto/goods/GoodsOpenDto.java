@@ -1,5 +1,6 @@
 package com.jiwuzao.common.dto.goods;
 
+import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
 import com.jiwuzao.common.domain.enumType.GoodsClassifyEnum;
 import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
 import lombok.AllArgsConstructor;
@@ -79,7 +80,14 @@ public class GoodsOpenDto {
      * 获取商品规格
      */
     private List<GoodsSpec> goodsSpecs;
-
+    /**
+     * 是否上架
+     */
+    private Boolean putaway;
+    /**
+     * 商品审核状态
+     */
+    private AuditTypeEnum auditType;
     /**
      * 创建时间
      */

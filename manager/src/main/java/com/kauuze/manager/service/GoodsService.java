@@ -2,9 +2,12 @@ package com.kauuze.manager.service;
 
 import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
+import com.jiwuzao.common.domain.mongo.entity.GoodsDetail;
+import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
 import com.jiwuzao.common.dto.goods.GoodsOpenDto;
 import com.kauuze.manager.domain.common.MongoUtil;
 import com.kauuze.manager.domain.enumType.SystemGoodsNameEnum;
+import com.kauuze.manager.domain.mongo.entity.userBastic.Store;
 import com.kauuze.manager.domain.mongo.repository.*;
 import com.kauuze.manager.domain.mysql.repository.UserRepository;
 import com.kauuze.manager.include.PageDto;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -66,14 +70,39 @@ public class GoodsService {
         }
         PageDto<GoodsOpenDto> goodsPageDto = new PageDto<>();
         goodsPageDto.setTotal(goodsPage.getTotalElements());
-        //将商品信息放入GoodsShowDto
+        //GoodsOpenDto
         List<Goods> goodsList = goodsPage.getContent();
         List<GoodsOpenDto> dtoList = new ArrayList<GoodsOpenDto>();
-        for (Goods goods : goodsList) {
-            String gid = goods.getGid();
-
-        }
+        goodsList.forEach(e -> {
+            dtoList.add(getGoodsOpenDto(e.getGid()));
+        });
         goodsPageDto.setContent(dtoList);
         return goodsPageDto;
+    }
+
+    /**
+     * 获取商品资料
+     *
+     * @param gid
+     * @return
+     */
+    public GoodsOpenDto getGoodsOpenDto(String gid) {
+        Goods goods = goodsRepository.findByGid(gid);
+        Optional<Store> optional = storeRepository.findById(goods.getSid());
+        Optional<GoodsDetail> optional2 = goodsDetailRepository.findByGid(gid);
+        List<GoodsSpec> goodsSpecs = goodsSpecRepository.findByGid(gid);
+        if (!optional.isPresent() || !optional2.isPresent()) {
+            return null;
+        }
+        Store store = optional.get();
+        GoodsDetail goodsDetail = optional2.get();
+        return new GoodsOpenDto(gid, goods.getUid(), goods.getSid(),
+                store.getBusinessLicense(), store.getServicePhone(),
+                goods.getTitle(), goods.getCover(), goods.getClassify(),
+                goods.getSalesVolume(), goods.getDefaultPrice(), goods.getPostage(),
+                goodsDetail.getSlideshow(), goodsDetail.getDetailLabel(),
+                goodsDetail.getDetailPhotos(), goodsDetail.getGoodsType(),
+                goodsDetail.getGoodsTypeClass(), goodsSpecs, goods.getPutaway(),
+                goods.getAuditType(), goods.getCreateTime(), goods.getUpdateTime());
     }
 }

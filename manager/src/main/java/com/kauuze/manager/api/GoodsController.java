@@ -1,5 +1,6 @@
 package com.kauuze.manager.api;
 
+import com.jiwuzao.common.dto.goods.GoodsOpenDto;
 import com.kauuze.manager.api.pojo.common.AuditGoodsPojo;
 import com.kauuze.manager.api.pojo.common.AuditTypePojo;
 import com.kauuze.manager.api.pojo.common.PagePojo;
@@ -30,9 +31,11 @@ public class GoodsController {
     @Cms
     public JsonResult findGoodsByAuditType(@Valid @RequestBody AuditTypePojo auditTypePojo){
         PagePojo pagePojo = auditTypePojo.getPage();
-        PageDto<GoodsShowDto> pageDto = goodsService.findGoodsByAuditType(auditTypePojo.getAuditType(),
+        PageDto<GoodsOpenDto> pageDto = goodsService.findGoodsByAuditType(auditTypePojo.getAuditType(),
                 pagePojo.getPage(), 20);
-        return JsonResult.success(pageDto);
+        if (pageDto.getTotal() != 0)
+            return JsonResult.success(pageDto);
+        return JsonResult.failure("没找到商品信息");
     }
 
     /**
