@@ -1,0 +1,59 @@
+package com.kauuze.manager.api;
+
+import com.kauuze.manager.api.pojo.common.AuditGoodsPojo;
+import com.kauuze.manager.api.pojo.common.AuditTypePojo;
+import com.kauuze.manager.api.pojo.common.GidPojo;
+import com.kauuze.manager.api.pojo.common.PagePojo;
+import com.kauuze.manager.config.permission.Cms;
+import com.kauuze.manager.config.permission.Merchant;
+import com.kauuze.manager.domain.enumType.AuditTypeEnum;
+import com.kauuze.manager.domain.mongo.entity.Goods;
+import com.kauuze.manager.domain.mongo.entity.userBastic.VerifyActor;
+import com.kauuze.manager.include.JsonResult;
+import com.kauuze.manager.include.PageDto;
+import com.kauuze.manager.service.GoodsService;
+import com.kauuze.manager.service.dto.Goods.GoodsShowDto;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
+
+@RestController
+@RequestMapping("/goods")
+public class GoodsController {
+    @Autowired
+    private GoodsService goodsService;
+
+    /**
+     * 按认证状态分页查询商品
+     * @param auditTypePojo
+     * @return
+     */
+    @RequestMapping("/findGoodsByAuditType")
+    @Cms
+    public JsonResult findGoodsByAuditType(@Valid @RequestBody AuditTypePojo auditTypePojo){
+        PagePojo pagePojo = auditTypePojo.getPage();
+        PageDto<GoodsShowDto> pageDto = goodsService.findGoodsByAuditType(auditTypePojo.getAuditType(),
+                pagePojo.getPage(), 20);
+        return JsonResult.success(pageDto);
+    }
+
+    /**
+     * 改变认证状态
+     * @param auditGoodsPojo
+     * @return
+     */
+    @RequestMapping("/audit")
+    @Cms
+    public JsonResult audit(@RequestAttribute int uid, @Valid @RequestBody AuditGoodsPojo auditGoodsPojo) {
+        String result = goodsService.audit(uid, auditGoodsPojo.getGid(), auditGoodsPojo.getAuditType());
+        if (result == null) {
+            return JsonResult.success();
+        } else {
+            return JsonResult.failure(result);
+        }
+    }
+}

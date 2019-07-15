@@ -1,5 +1,6 @@
 package com.kauuze.manager.domain.mongo.repository;
 
+import com.kauuze.manager.domain.enumType.AuditTypeEnum;
 import com.kauuze.manager.domain.mongo.entity.Goods;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,4 +20,5 @@ public interface GoodsRepository extends MongoRepository<Goods, String> {
     List<Goods> findByUid(int uid);
     Goods findByGid(String gid);
     Page<Goods> findBySid(String sid, Pageable pageable);
+    Page<Goods> findByAuditType(AuditTypeEnum auditTypeEnum, Pageable pageable);
 }

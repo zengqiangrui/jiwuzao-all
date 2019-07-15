@@ -1,7 +1,5 @@
 package com.kauuze.manager.domain.mongo.entity;
 
-
-import com.kauuze.manager.ConfigUtil;
 import com.kauuze.manager.domain.enumType.AuditTypeEnum;
 import com.kauuze.manager.domain.enumType.GoodsClassifyEnum;
 import lombok.AllArgsConstructor;
@@ -42,7 +40,8 @@ public class Goods {
     /**
      * 分类
      */
-    @Indexed(unique = true)
+//    @Indexed(unique = true)
+    @Indexed
     private GoodsClassifyEnum classify;
     /**
      * 评分:默认排序,排序必含
