@@ -1,6 +1,8 @@
 package com.kauuze.major.domain.mongo.repository;
 
 import com.kauuze.major.domain.mongo.entity.Goods;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +15,8 @@ public interface GoodsRepository extends MongoRepository<Goods,String> {
     Goods findByGid(String gid);
 
     List<Goods> findByUid(int uid);
+
+    Page<Goods> findByUid(int uid,Pageable pageable);
 
 
 }

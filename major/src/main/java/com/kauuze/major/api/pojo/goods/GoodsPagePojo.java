@@ -31,9 +31,9 @@ public class GoodsPagePojo {
     private Boolean isAsc = true;
 
     /**
-     * 根据数据库中的字段排列
+     * 根据数据库中的字段排列默认为时间排序
      */
-    private String sortBy;
+    private String sortBy = "createTime";
 
 
 }
