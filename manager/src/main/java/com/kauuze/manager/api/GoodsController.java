@@ -7,7 +7,6 @@ import com.kauuze.manager.config.permission.Cms;
 import com.kauuze.manager.include.JsonResult;
 import com.kauuze.manager.include.PageDto;
 import com.kauuze.manager.service.GoodsService;
-import com.kauuze.manager.service.dto.Goods.GoodsShowDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;

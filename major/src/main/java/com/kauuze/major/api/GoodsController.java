@@ -37,6 +37,7 @@ public class GoodsController {
     @Autowired
     private GoodsService goodsService;
 
+
     @RequestMapping("/addGoods")
     @Merchant
     public JsonResult addGoods(@RequestAttribute int uid, @Valid @RequestBody AddGoodsPojo addGoodsPojo) {
@@ -59,6 +60,12 @@ public class GoodsController {
         }
     }
 
+    /**
+     * 商品上架
+     * @param uid
+     * @param gidPojo
+     * @return
+     */
     @RequestMapping("/putaway")
     @Merchant
     public JsonResult putaway(@RequestAttribute int uid, @Valid @RequestBody GidPojo gidPojo) {
