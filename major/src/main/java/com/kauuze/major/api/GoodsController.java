@@ -2,13 +2,20 @@ package com.kauuze.major.api;
 
 import com.kauuze.major.api.pojo.common.GidPojo;
 import com.kauuze.major.api.pojo.goods.AddGoodsPojo;
+import com.kauuze.major.api.pojo.goods.CategoryPojo;
+import com.kauuze.major.api.pojo.goods.GoodsPagePojo;
 import com.kauuze.major.config.contain.ParamMismatchException;
 import com.kauuze.major.config.permission.Merchant;
+import com.kauuze.major.domain.mongo.entity.Category;
 import com.kauuze.major.include.JsonResult;
 import com.kauuze.major.include.JsonUtil;
 import com.kauuze.major.service.GoodsService;
+import com.kauuze.major.service.dto.goods.GoodsOpenDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,7 +52,6 @@ public class GoodsController {
             throw new ParamMismatchException();
         }
         String result = goodsService.addGoods(uid, addGoodsPojo.getGoodsClassify(), addGoodsPojo.getTitle(), addGoodsPojo.getCover(), addGoodsPojo.getDefaultPrice(), addGoodsPojo.getSlideshow(), addGoodsPojo.getPostage(), addGoodsPojo.getDetailLabel(), addGoodsPojo.getGoodsType(), addGoodsPojo.getGoodsTypeClass(), addGoodsPojo.getDetailPhotos(), addGoodsPojo.getGoodsSpecPojo());
-        System.out.println(1111111111);
         if (result == null) {
             return JsonResult.success();
         } else {
@@ -62,5 +68,40 @@ public class GoodsController {
         } else {
             return JsonResult.failure(result);
         }
+    }
+
+    /**
+     * 获取商品目录
+     *
+     * @param categoryPojo
+     * @return
+     */
+    @RequestMapping("/getCategory")
+    public JsonResult getCategory(@Valid @RequestBody CategoryPojo categoryPojo) {
+        Category category = goodsService.getCategoryById(categoryPojo.getCategoryId());
+        if (null != category) {
+            return JsonResult.success(category);
+        } else {
+            return JsonResult.failure();
+        }
+    }
+
+    /**
+     * 获取商品列表分页显示
+     * @param goodsPagePojo
+     * @return
+     */
+    @RequestMapping("/getGoodsList")
+    public JsonResult getGoodsList(@Valid @RequestBody GoodsPagePojo goodsPagePojo) {
+        Pageable pageAble;
+        if (goodsPagePojo.getIsAsc()) {
+            pageAble = PageRequest.of(goodsPagePojo.getCurrentPage(), goodsPagePojo.getPageSize(), Sort.Direction.ASC, goodsPagePojo.getSortBy());
+        } else {
+            pageAble = PageRequest.of(goodsPagePojo.getCurrentPage(), goodsPagePojo.getPageSize(), Sort.Direction.DESC, goodsPagePojo.getSortBy());
+        }
+        List<GoodsOpenDto> list = goodsService.getGoodsPage(pageAble);
+        if (list.size() != 0)
+            return JsonResult.success(list);
+        return JsonResult.failure("没找到商品信息");
     }
 }
