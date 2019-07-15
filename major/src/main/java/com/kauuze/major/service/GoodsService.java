@@ -242,12 +242,12 @@ public class GoodsService {
         }
         Store store = optional.get();
         GoodsDetail goodsDetail = optional2.get();
-        return new GoodsOpenDto(gid, goods.getUid(), goods.getSid(), store.getBusinessLicense(), store.getServicePhone(), goods.getTitle(), goods.getCover(), goods.getClassify(), goods.getSalesVolume(), goods.getDefaultPrice(), goods.getPostage(), goodsDetail.getSlideshow(), goodsDetail.getDetailLabel(), goodsDetail.getDetailPhotos(), goodsDetail.getGoodsType(), goodsDetail.getGoodsTypeClass(), goodsSpecs);
+        return new GoodsOpenDto(gid, goods.getUid(), goods.getSid(), store.getBusinessLicense(), store.getServicePhone(), goods.getTitle(), goods.getCover(), goods.getClassify(), goods.getSalesVolume(), goods.getDefaultPrice(), goods.getPostage(), goodsDetail.getSlideshow(), goodsDetail.getDetailLabel(), goodsDetail.getDetailPhotos(), goodsDetail.getGoodsType(), goodsDetail.getGoodsTypeClass(), goodsSpecs,goods.getCreateTime(),goods.getUpdateTime());
     }
 
 
     /**
-     * 获取商品详情的list
+     * 获取所有商品详情的list
      * @param pageable
      * @return
      */
@@ -257,7 +257,15 @@ public class GoodsService {
         goods.getContent().forEach(e -> {
             goodsOpenDtos.add(getGoodsOpenDto(e.getGid()));
         });
-        System.out.println(goodsOpenDtos);
+        return goodsOpenDtos;
+    }
+
+    public List<GoodsOpenDto> getGoodsPageByUid(int uid,Pageable pageable){
+        List<Goods> goods = goodsRepository.findByUid(uid);
+        List<GoodsOpenDto> goodsOpenDtos = new ArrayList<>();
+        goods.forEach(e->{
+            goodsOpenDtos.add(getGoodsOpenDto(e.getGid()));
+        });
         return goodsOpenDtos;
     }
 

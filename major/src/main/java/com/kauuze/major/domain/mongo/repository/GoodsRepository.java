@@ -13,4 +13,6 @@ public interface GoodsRepository extends MongoRepository<Goods,String> {
     Goods findByGid(String gid);
 
     List<Goods> findByUid(int uid);
+
+
 }

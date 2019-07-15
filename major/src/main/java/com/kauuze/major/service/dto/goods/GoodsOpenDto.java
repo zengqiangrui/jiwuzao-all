@@ -79,4 +79,14 @@ public class GoodsOpenDto {
      * 获取商品规格
      */
     private List<GoodsSpec> goodsSpecs;
+
+    /**
+     * 创建时间
+     */
+    private Long createTime;
+
+    /**
+     * 更新时间
+     */
+    private Long updateTime;
 }

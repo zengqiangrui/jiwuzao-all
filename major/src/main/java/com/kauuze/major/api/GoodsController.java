@@ -92,14 +92,15 @@ public class GoodsController {
      * @return
      */
     @RequestMapping("/getGoodsList")
-    public JsonResult getGoodsList(@Valid @RequestBody GoodsPagePojo goodsPagePojo) {
+    @Merchant
+    public JsonResult getGoodsList(@RequestAttribute int uid,@Valid @RequestBody GoodsPagePojo goodsPagePojo) {
         Pageable pageAble;
         if (goodsPagePojo.getIsAsc()) {
             pageAble = PageRequest.of(goodsPagePojo.getCurrentPage(), goodsPagePojo.getPageSize(), Sort.Direction.ASC, goodsPagePojo.getSortBy());
         } else {
             pageAble = PageRequest.of(goodsPagePojo.getCurrentPage(), goodsPagePojo.getPageSize(), Sort.Direction.DESC, goodsPagePojo.getSortBy());
         }
-        List<GoodsOpenDto> list = goodsService.getGoodsPage(pageAble);
+        List<GoodsOpenDto> list = goodsService.getGoodsPageByUid(uid,pageAble);
         if (list.size() != 0)
             return JsonResult.success(list);
         return JsonResult.failure("没找到商品信息");
