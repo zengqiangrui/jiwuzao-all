@@ -1,5 +1,6 @@
 package com.kauuze.major.service.dto.goods;
 
+import com.kauuze.major.domain.enumType.AuditTypeEnum;
 import com.kauuze.major.domain.enumType.GoodsClassifyEnum;
 import com.kauuze.major.domain.mongo.entity.GoodsSpec;
 import lombok.AllArgsConstructor;
@@ -79,6 +80,16 @@ public class GoodsOpenDto {
      * 获取商品规格
      */
     private List<GoodsSpec> goodsSpecs;
+
+    /**
+     * 是否上架
+     */
+    private Boolean putaway;
+
+    /**
+     * 审核状态
+     */
+    private AuditTypeEnum auditTyp;
 
     /**
      * 创建时间

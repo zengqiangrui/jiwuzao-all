@@ -16,6 +16,7 @@ import com.kauuze.major.domain.mongo.repository.*;
 import com.kauuze.major.domain.mysql.entity.User;
 import com.kauuze.major.domain.mysql.repository.UserRepository;
 import com.kauuze.major.include.DateTimeUtil;
+import com.kauuze.major.include.PageDto;
 import com.kauuze.major.service.dto.goods.GoodsOpenDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -242,7 +243,7 @@ public class GoodsService {
         }
         Store store = optional.get();
         GoodsDetail goodsDetail = optional2.get();
-        return new GoodsOpenDto(gid, goods.getUid(), goods.getSid(), store.getBusinessLicense(), store.getServicePhone(), goods.getTitle(), goods.getCover(), goods.getClassify(), goods.getSalesVolume(), goods.getDefaultPrice(), goods.getPostage(), goodsDetail.getSlideshow(), goodsDetail.getDetailLabel(), goodsDetail.getDetailPhotos(), goodsDetail.getGoodsType(), goodsDetail.getGoodsTypeClass(), goodsSpecs,goods.getCreateTime(),goods.getUpdateTime());
+        return new GoodsOpenDto(gid, goods.getUid(), goods.getSid(), store.getBusinessLicense(), store.getServicePhone(), goods.getTitle(), goods.getCover(), goods.getClassify(), goods.getSalesVolume(), goods.getDefaultPrice(), goods.getPostage(), goodsDetail.getSlideshow(), goodsDetail.getDetailLabel(), goodsDetail.getDetailPhotos(), goodsDetail.getGoodsType(), goodsDetail.getGoodsTypeClass(), goodsSpecs,goods.getPutaway(),goods.getAuditType(),goods.getCreateTime(),goods.getUpdateTime());
     }
 
 
@@ -251,21 +252,29 @@ public class GoodsService {
      * @param pageable
      * @return
      */
-    public List<GoodsOpenDto> getGoodsPage(Pageable pageable) {
-        Page<Goods> goods = goodsRepository.findAll(pageable);
-        List<GoodsOpenDto> goodsOpenDtos = new ArrayList<>();
-        goods.getContent().forEach(e -> {
-            goodsOpenDtos.add(getGoodsOpenDto(e.getGid()));
-        });
-        return goodsOpenDtos;
+    public PageDto<GoodsOpenDto> getGoodsPage(Pageable pageable) {
+        return getByGoodsPage(goodsRepository.findAll(pageable));
     }
 
-    public List<GoodsOpenDto> getGoodsPageByUid(int uid,Pageable pageable){
-        List<Goods> goods = goodsRepository.findByUid(uid);
-        List<GoodsOpenDto> goodsOpenDtos = new ArrayList<>();
+    /**
+     * 根据用户id获取所有发布商品
+     * @param uid
+     * @param pageable
+     * @return
+     */
+    public PageDto<GoodsOpenDto> getGoodsPageByUid(int uid, Pageable pageable){
+        Page<Goods> goods = goodsRepository.findByUid(uid,pageable);
+        return getByGoodsPage(goods);
+    }
+
+    private PageDto<GoodsOpenDto> getByGoodsPage(Page<Goods> goods){
+        List<GoodsOpenDto> goodsOpenList = new ArrayList<>();
+        PageDto<GoodsOpenDto> goodsOpenDtos = new PageDto<>();
         goods.forEach(e->{
-            goodsOpenDtos.add(getGoodsOpenDto(e.getGid()));
+            goodsOpenList.add(getGoodsOpenDto(e.getGid()));
         });
+        goodsOpenDtos.setContent(goodsOpenList);
+        goodsOpenDtos.setTotal(goods.getTotalElements());
         return goodsOpenDtos;
     }
 
