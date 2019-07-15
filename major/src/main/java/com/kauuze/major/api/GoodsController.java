@@ -9,6 +9,7 @@ import com.kauuze.major.config.permission.Merchant;
 import com.kauuze.major.domain.mongo.entity.Category;
 import com.kauuze.major.include.JsonResult;
 import com.kauuze.major.include.JsonUtil;
+import com.kauuze.major.include.PageDto;
 import com.kauuze.major.service.GoodsService;
 import com.kauuze.major.service.dto.goods.GoodsOpenDto;
 import lombok.extern.slf4j.Slf4j;
@@ -107,9 +108,9 @@ public class GoodsController {
         } else {
             pageAble = PageRequest.of(goodsPagePojo.getCurrentPage(), goodsPagePojo.getPageSize(), Sort.Direction.DESC, goodsPagePojo.getSortBy());
         }
-        List<GoodsOpenDto> list = goodsService.getGoodsPageByUid(uid,pageAble);
-        if (list.size() != 0)
-            return JsonResult.success(list);
+        PageDto<GoodsOpenDto> page = goodsService.getGoodsPageByUid(uid,pageAble);
+        if (page.getContent().size() != 0)
+            return JsonResult.success(page);
         return JsonResult.failure("没找到商品信息");
     }
 }
