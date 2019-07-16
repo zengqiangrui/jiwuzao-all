@@ -1,6 +1,6 @@
 package com.kauuze.major.api.pojo.userBasic;
 
-import com.kauuze.major.domain.enumType.SexEnum;
+import com.jiwuzao.common.domain.enumType.SexEnum;
 import com.kauuze.major.include.valid.Mill;
 import com.kauuze.major.include.valid.QQ;
 import com.kauuze.major.include.valid.StringMax;

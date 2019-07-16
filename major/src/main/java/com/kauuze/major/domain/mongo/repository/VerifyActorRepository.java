@@ -1,8 +1,8 @@
 package com.kauuze.major.domain.mongo.repository;
 
 
-import com.kauuze.major.domain.enumType.AuditTypeEnum;
-import com.kauuze.major.domain.mongo.entity.userBastic.VerifyActor;
+import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
+import com.jiwuzao.common.domain.mongo.entity.userBastic.VerifyActor;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

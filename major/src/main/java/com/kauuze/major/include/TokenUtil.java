@@ -2,13 +2,13 @@ package com.kauuze.major.include;
 
 import com.kauuze.major.config.contain.SpringContext;
 import com.kauuze.major.domain.common.MongoUtil;
-import com.kauuze.major.domain.enumType.BackRoleEnum;
-import com.kauuze.major.domain.enumType.RoleEnum;
-import com.kauuze.major.domain.enumType.UserStateEnum;
-import com.kauuze.major.domain.mongo.entity.userBastic.UserInfo;
-import com.kauuze.major.domain.mongo.entity.userBastic.UserToken;
+import com.jiwuzao.common.domain.enumType.BackRoleEnum;
+import com.jiwuzao.common.domain.enumType.RoleEnum;
+import com.jiwuzao.common.domain.enumType.UserStateEnum;
+import com.jiwuzao.common.domain.mongo.entity.userBastic.UserInfo;
+import com.jiwuzao.common.domain.mongo.entity.userBastic.UserToken;
 import com.kauuze.major.domain.mongo.repository.UserTokenRepository;
-import com.kauuze.major.domain.mysql.entity.User;
+import com.jiwuzao.common.domain.mysql.entity.User;
 import com.kauuze.major.domain.mysql.repository.UserRepository;
 
 import java.util.List;

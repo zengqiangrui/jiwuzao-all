@@ -1,8 +1,8 @@
 package com.kauuze.major.domain.mongo.entity;
 
 
-import com.kauuze.major.domain.enumType.AuditTypeEnum;
-import com.kauuze.major.domain.enumType.GoodsClassifyEnum;
+import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
+import com.jiwuzao.common.domain.enumType.GoodsClassifyEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

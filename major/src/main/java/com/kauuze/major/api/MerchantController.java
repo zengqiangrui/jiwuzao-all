@@ -1,9 +1,9 @@
 package com.kauuze.major.api;
 
-import com.kauuze.major.api.pojo.common.IpAddressPojo;
-import com.kauuze.major.api.pojo.merchant.OpenStorePojo;
-import com.kauuze.major.api.pojo.merchant.VerifyActorPojo;
-import com.kauuze.major.api.pojo.systemOrder.WithdrawPojo;
+import com.jiwuzao.common.pojo.common.IpAddressPojo;
+import com.jiwuzao.common.pojo.merchant.OpenStorePojo;
+import com.jiwuzao.common.pojo.merchant.VerifyActorPojo;
+import com.jiwuzao.common.pojo.systemOrder.WithdrawPojo;
 import com.kauuze.major.config.permission.Authorization;
 import com.kauuze.major.config.permission.Merchant;
 import com.kauuze.major.domain.mongo.entity.userBastic.Store;

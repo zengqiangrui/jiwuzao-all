@@ -1,6 +1,6 @@
 package com.kauuze.major.domain.mongo.repository;
 
-import com.kauuze.major.domain.mongo.entity.userBastic.UserInfo;
+import com.jiwuzao.common.domain.mongo.entity.userBastic.UserInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
