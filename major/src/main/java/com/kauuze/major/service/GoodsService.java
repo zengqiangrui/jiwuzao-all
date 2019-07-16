@@ -18,6 +18,7 @@ import com.kauuze.major.domain.mysql.repository.UserRepository;
 import com.kauuze.major.include.DateTimeUtil;
 import com.kauuze.major.include.PageDto;
 import com.kauuze.major.service.dto.goods.GoodsOpenDto;
+import com.kauuze.major.service.dto.goods.GoodsSimpleDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -65,7 +66,7 @@ public class GoodsService {
         if (goodsRepository.countByUid(uid) > 100) {
             return "最多添加100个商品";
         }
-        Goods goods = new Goods(null, uid, opt.get().getId(), title, cover, classify, 0, 0, defaultPrice, postage, false, null, null, AuditTypeEnum.wait, null,System.currentTimeMillis(),null);
+        Goods goods = new Goods(null, uid, opt.get().getId(), title, cover, classify, 0, 0, defaultPrice, postage, false, null, null, AuditTypeEnum.wait, null, System.currentTimeMillis(), null);
         goodsRepository.save(goods);
         GoodsDetail goodsDetail = new GoodsDetail(null, goods.getGid(), slideshow, detailLabel, classify, goodsType, goodsTypeClass, detailPhotos);
         goodsDetailRepository.save(goodsDetail);
@@ -243,12 +244,13 @@ public class GoodsService {
         }
         Store store = optional.get();
         GoodsDetail goodsDetail = optional2.get();
-        return new GoodsOpenDto(gid, goods.getUid(), goods.getSid(), store.getBusinessLicense(), store.getServicePhone(), goods.getTitle(), goods.getCover(), goods.getClassify(), goods.getSalesVolume(), goods.getDefaultPrice(), goods.getPostage(), goodsDetail.getSlideshow(), goodsDetail.getDetailLabel(), goodsDetail.getDetailPhotos(), goodsDetail.getGoodsType(), goodsDetail.getGoodsTypeClass(), goodsSpecs,goods.getPutaway(),goods.getAuditType(),goods.getCreateTime(),goods.getUpdateTime());
+        return new GoodsOpenDto(gid, goods.getUid(), goods.getSid(), store.getBusinessLicense(), store.getServicePhone(), goods.getTitle(), goods.getCover(), goods.getClassify(), goods.getSalesVolume(), goods.getDefaultPrice(), goods.getPostage(), goodsDetail.getSlideshow(), goodsDetail.getDetailLabel(), goodsDetail.getDetailPhotos(), goodsDetail.getGoodsType(), goodsDetail.getGoodsTypeClass(), goodsSpecs, goods.getPutaway(), goods.getAuditType(), goods.getCreateTime(), goods.getUpdateTime());
     }
 
 
     /**
      * 获取所有商品详情的list
+     *
      * @param pageable
      * @return
      */
@@ -258,25 +260,28 @@ public class GoodsService {
 
     /**
      * 根据用户id获取所有发布商品
+     *
      * @param uid
      * @param pageable
      * @return
      */
-    public PageDto<GoodsOpenDto> getGoodsPageByUid(int uid, Pageable pageable){
-        Page<Goods> goods = goodsRepository.findByUid(uid,pageable);
+    public PageDto<GoodsOpenDto> getGoodsPageByUid(int uid, Pageable pageable) {
+        Page<Goods> goods = goodsRepository.findByUid(uid, pageable);
         return getByGoodsPage(goods);
     }
 
-    private PageDto<GoodsOpenDto> getByGoodsPage(Page<Goods> goods){
+    private PageDto<GoodsOpenDto> getByGoodsPage(Page<Goods> goods) {
         List<GoodsOpenDto> goodsOpenList = new ArrayList<>();
         PageDto<GoodsOpenDto> goodsOpenDtos = new PageDto<>();
-        goods.forEach(e->{
+        goods.forEach(e -> {
             goodsOpenList.add(getGoodsOpenDto(e.getGid()));
         });
         goodsOpenDtos.setContent(goodsOpenList);
         goodsOpenDtos.setTotal(goods.getTotalElements());
         return goodsOpenDtos;
     }
+
+//    private PageDto<GoodsSimpleDto>
 
     /**
      * 根据商品目录id获取商品目录json字符串
