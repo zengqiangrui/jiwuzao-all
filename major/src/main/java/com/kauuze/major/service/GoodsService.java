@@ -18,6 +18,7 @@ import com.kauuze.major.domain.mysql.repository.UserRepository;
 import com.kauuze.major.include.DateTimeUtil;
 import com.kauuze.major.include.PageDto;
 import com.kauuze.major.service.dto.goods.GoodsOpenDto;
+import com.kauuze.major.service.dto.goods.GoodsSimpleDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -279,6 +280,8 @@ public class GoodsService {
         goodsOpenDtos.setTotal(goods.getTotalElements());
         return goodsOpenDtos;
     }
+
+//    private PageDto<GoodsSimpleDto>
 
     /**
      * 根据商品目录id获取商品目录json字符串
