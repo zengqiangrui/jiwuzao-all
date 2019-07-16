@@ -1,5 +1,6 @@
 package com.jiwuzao.common.domain.mongo.entity;
 
+import com.jiwuzao.common.domain.enumType.ShopCartEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,6 +30,7 @@ public class ShopCart {
     @Indexed
     private String gid;
     private String specId;
+    private ShopCartEnum shopCartStatus;
     @Indexed
     private String createTime;
 }

@@ -26,6 +26,11 @@
 			<artifactId>weixin-java-pay</artifactId>
 			<version>3.3.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.jiwuzao</groupId>
+			<artifactId>common</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<build>
