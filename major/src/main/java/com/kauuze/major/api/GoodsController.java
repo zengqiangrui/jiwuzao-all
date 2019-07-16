@@ -39,6 +39,12 @@ public class GoodsController {
     private GoodsService goodsService;
 
 
+    /**
+     * 添加商品
+     * @param uid
+     * @param addGoodsPojo
+     * @return
+     */
     @RequestMapping("/addGoods")
     @Merchant
     public JsonResult addGoods(@RequestAttribute int uid, @Valid @RequestBody AddGoodsPojo addGoodsPojo) {
