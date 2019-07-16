@@ -1,7 +1,7 @@
 package com.kauuze.manager.include;
 
 
-import com.kauuze.manager.config.contain.SpringContext;
+import com.jiwuzao.common.config.contain.SpringContext;
 import com.kauuze.manager.domain.common.MongoUtil;
 import com.kauuze.manager.domain.enumType.BackRoleEnum;
 import com.kauuze.manager.domain.enumType.RoleEnum;

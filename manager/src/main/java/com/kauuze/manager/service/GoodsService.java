@@ -1,11 +1,11 @@
 package com.kauuze.manager.service;
 
+import com.jiwuzao.common.domain.common.MongoUtil;
 import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.jiwuzao.common.domain.mongo.entity.GoodsDetail;
 import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
 import com.jiwuzao.common.dto.goods.GoodsOpenDto;
-import com.kauuze.manager.domain.common.MongoUtil;
 import com.kauuze.manager.domain.enumType.SystemGoodsNameEnum;
 import com.kauuze.manager.domain.mongo.entity.userBastic.Store;
 import com.kauuze.manager.domain.mongo.repository.*;
@@ -55,7 +55,9 @@ public class GoodsService {
         Goods goods1 = new Goods();
         goods1.setGid(goods.getGid());
         goods1.setAuditType(auditTypeEnum);
+        System.out.println("out:1");
         MongoUtil.updateNotNon("gid", goods1, Goods.class);
+        System.out.println("out:2");
         return null;
     }
 

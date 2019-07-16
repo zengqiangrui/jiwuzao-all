@@ -1,9 +1,9 @@
-package com.kauuze.manager.domain.common;
+package com.jiwuzao.common.domain.common;
 
 
 import com.jiwuzao.common.config.contain.SpringContext;
-import com.kauuze.manager.include.JsonUtil;
-import com.kauuze.manager.include.ObjectUtil;
+import com.jiwuzao.common.include.JsonUtil;
+import com.jiwuzao.common.include.ObjectUtil;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -26,7 +26,9 @@ public class MongoUtil {
      * @param type
      */
     public static <T> T updateNotNon(String queryKey,T entity,Class<T> type){
+        System.out.println("out:3");
         MongoTemplate mongoTemplate = SpringContext.getBean(MongoTemplate.class);
+        System.out.println("out:4");
         Query query = new Query();
         Object queryValue = ObjectUtil.getValueByPropName(entity,queryKey);
         if(queryKey == null){
