@@ -1,8 +1,7 @@
 package com.kauuze.manager.api;
 
-import com.kauuze.manager.api.pojo.common.NamePojo;
-import com.kauuze.manager.api.pojo.common.SidPojo;
-import com.kauuze.manager.api.pojo.common.UidPojo;
+import com.jiwuzao.common.pojo.common.NamePojo;
+import com.jiwuzao.common.pojo.common.UidPojo;
 import com.kauuze.manager.api.pojo.storeView.StoreForbidPojo;
 import com.kauuze.manager.config.permission.Cms;
 import com.kauuze.manager.include.JsonResult;

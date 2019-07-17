@@ -1,15 +1,17 @@
 package com.kauuze.manager.api;
 
-import com.kauuze.manager.api.pojo.common.*;
+import com.jiwuzao.common.pojo.common.PhonePojo;
+import com.jiwuzao.common.pojo.common.UidPojo;
 import com.kauuze.manager.api.pojo.userView.FindByNickNamePojo;
 import com.kauuze.manager.config.permission.Cms;
 import com.kauuze.manager.config.permission.Root;
-import com.kauuze.manager.domain.mongo.entity.userBastic.VerifyActor;
 import com.kauuze.manager.include.JsonResult;
-import com.kauuze.manager.include.PageDto;
 import com.kauuze.manager.service.UserViewService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 

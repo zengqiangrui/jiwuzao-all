@@ -1,7 +1,7 @@
 package com.kauuze.manager.config.contain;
 
 
-import com.kauuze.manager.api.pojo.common.GidPojo;
+import com.jiwuzao.common.pojo.common.GidPojo;
 import com.kauuze.manager.config.permission.GreenWay;
 import com.kauuze.manager.config.permission.Root;
 import com.kauuze.manager.domain.common.EsUtil;

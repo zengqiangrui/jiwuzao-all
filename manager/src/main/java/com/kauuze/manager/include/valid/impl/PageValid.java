@@ -1,7 +1,7 @@
 package com.kauuze.manager.include.valid.impl;
 
 
-import com.kauuze.manager.api.pojo.common.PagePojo;
+import com.jiwuzao.common.pojo.common.PagePojo;
 import com.kauuze.manager.include.JsonUtil;
 import com.kauuze.manager.include.Pattern;
 import com.kauuze.manager.include.valid.Page;
