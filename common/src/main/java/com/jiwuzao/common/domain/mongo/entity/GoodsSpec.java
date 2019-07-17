@@ -27,7 +27,7 @@ public class GoodsSpec {
     @Indexed
     private String gid;
     /**
-     * 规格分类(逗号分隔)
+     * 规格分类(该分类选择detail中的一个属性)
      */
     @Indexed
     private String specClass;

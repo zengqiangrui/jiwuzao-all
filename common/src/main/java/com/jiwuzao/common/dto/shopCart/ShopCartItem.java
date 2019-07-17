@@ -11,8 +11,8 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 public class ShopCartItem {
 
+    private String cid;//shopcart id
     private String gid;//goods id
-    private Integer uid;//user id
     private String sid;//store id
     /**
      * 商品显示标题

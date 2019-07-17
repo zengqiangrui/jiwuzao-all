@@ -1,14 +1,14 @@
 package com.kauuze.major.api;
 
+import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
 import com.jiwuzao.common.pojo.common.IpAddressPojo;
 import com.jiwuzao.common.pojo.merchant.OpenStorePojo;
 import com.jiwuzao.common.pojo.merchant.VerifyActorPojo;
 import com.jiwuzao.common.pojo.systemOrder.WithdrawPojo;
 import com.kauuze.major.config.permission.Authorization;
 import com.kauuze.major.config.permission.Merchant;
-import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
-import com.jiwuzao.common.include.JsonResult;
-import com.jiwuzao.common.include.StringUtil;
+import com.kauuze.major.include.JsonResult;
+import com.kauuze.major.include.StringUtil;
 import com.kauuze.major.service.MerchantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestAttribute;
