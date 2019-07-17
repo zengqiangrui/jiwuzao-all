@@ -1,8 +1,8 @@
 package com.kauuze.major.service.dto.userBasic;
 
-import com.kauuze.major.domain.enumType.RoleEnum;
-import com.kauuze.major.domain.enumType.SexEnum;
-import com.kauuze.major.domain.enumType.UserStateEnum;
+import com.jiwuzao.common.domain.enumType.RoleEnum;
+import com.jiwuzao.common.domain.enumType.SexEnum;
+import com.jiwuzao.common.domain.enumType.UserStateEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

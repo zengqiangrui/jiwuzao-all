@@ -1,8 +1,8 @@
 package com.kauuze.major.domain.common;
 
 
+import com.jiwuzao.common.config.contain.SpringContext;
 import com.kauuze.major.ConfigUtil;
-import com.kauuze.major.config.contain.SpringContext;
 import com.kauuze.major.domain.es.entity.GoodsEs;
 import com.kauuze.major.include.HttpUtils;
 import com.kauuze.major.include.ObjectUtil;

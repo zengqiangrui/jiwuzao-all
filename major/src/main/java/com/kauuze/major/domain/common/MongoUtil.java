@@ -1,6 +1,6 @@
 package com.kauuze.major.domain.common;
 
-import com.kauuze.major.config.contain.SpringContext;
+import com.jiwuzao.common.config.contain.SpringContext;
 import com.kauuze.major.include.JsonUtil;
 import com.kauuze.major.include.ObjectUtil;
 import org.springframework.data.mongodb.core.MongoTemplate;

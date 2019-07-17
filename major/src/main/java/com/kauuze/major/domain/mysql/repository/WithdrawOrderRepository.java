@@ -1,7 +1,7 @@
 package com.kauuze.major.domain.mysql.repository;
 
-import com.kauuze.major.domain.enumType.WithdrawStatusEnum;
-import com.kauuze.major.domain.mysql.entity.WithdrawOrder;
+import com.jiwuzao.common.domain.enumType.WithdrawStatusEnum;
+import com.jiwuzao.common.domain.mysql.entity.WithdrawOrder;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;

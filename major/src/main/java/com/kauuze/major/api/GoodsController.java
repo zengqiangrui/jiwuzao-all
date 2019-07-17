@@ -1,17 +1,17 @@
 package com.kauuze.major.api;
 
-import com.kauuze.major.api.pojo.common.GidPojo;
-import com.kauuze.major.api.pojo.goods.AddGoodsPojo;
-import com.kauuze.major.api.pojo.goods.CategoryPojo;
-import com.kauuze.major.api.pojo.goods.GoodsPagePojo;
+import com.jiwuzao.common.pojo.common.GidPojo;
+import com.jiwuzao.common.pojo.goods.AddGoodsPojo;
+import com.jiwuzao.common.pojo.goods.CategoryPojo;
+import com.jiwuzao.common.pojo.goods.GoodsPagePojo;
 import com.kauuze.major.config.contain.ParamMismatchException;
 import com.kauuze.major.config.permission.Merchant;
-import com.kauuze.major.domain.mongo.entity.Category;
-import com.kauuze.major.include.JsonResult;
-import com.kauuze.major.include.JsonUtil;
-import com.kauuze.major.include.PageDto;
+import com.jiwuzao.common.domain.mongo.entity.Category;
+import com.jiwuzao.common.include.JsonResult;
+import com.jiwuzao.common.include.JsonUtil;
+import com.jiwuzao.common.include.PageDto;
 import com.kauuze.major.service.GoodsService;
-import com.kauuze.major.service.dto.goods.GoodsOpenDto;
+import com.jiwuzao.common.dto.goods.GoodsOpenDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -69,6 +69,7 @@ public class GoodsController {
 
     /**
      * 商品上架
+     *
      * @param uid
      * @param gidPojo
      * @return
@@ -102,19 +103,20 @@ public class GoodsController {
 
     /**
      * 获取商品列表分页显示
+     *
      * @param goodsPagePojo
      * @return
      */
     @RequestMapping("/getGoodsList")
     @Merchant
-    public JsonResult getGoodsList(@RequestAttribute int uid,@Valid @RequestBody GoodsPagePojo goodsPagePojo) {
+    public JsonResult getGoodsList(@RequestAttribute int uid, @Valid @RequestBody GoodsPagePojo goodsPagePojo) {
         Pageable pageAble;
         if (goodsPagePojo.getIsAsc()) {
             pageAble = PageRequest.of(goodsPagePojo.getCurrentPage(), goodsPagePojo.getPageSize(), Sort.Direction.ASC, goodsPagePojo.getSortBy());
         } else {
             pageAble = PageRequest.of(goodsPagePojo.getCurrentPage(), goodsPagePojo.getPageSize(), Sort.Direction.DESC, goodsPagePojo.getSortBy());
         }
-        PageDto<GoodsOpenDto> page = goodsService.getGoodsPageByUid(uid,pageAble);
+        PageDto<GoodsOpenDto> page = goodsService.getGoodsPageByUid(uid, pageAble);
         if (page.getContent().size() != 0)
             return JsonResult.success(page);
         return JsonResult.failure("没找到商品信息");

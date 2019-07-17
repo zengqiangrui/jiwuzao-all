@@ -1,6 +1,7 @@
 package com.kauuze.major.domain.mongo.repository;
 
-import com.kauuze.major.domain.mongo.entity.userBastic.UserToken;
+
+import com.jiwuzao.common.domain.mongo.entity.userBastic.UserToken;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,6 +1,6 @@
 package com.kauuze.major.domain.mongo.repository;
 
-import com.kauuze.major.domain.mongo.entity.GoodsSpec;
+import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;

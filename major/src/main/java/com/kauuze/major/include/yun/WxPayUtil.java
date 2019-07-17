@@ -5,7 +5,7 @@ import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.bean.result.WxPayOrderQueryResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
-import com.kauuze.major.config.contain.SpringContext;
+import com.jiwuzao.common.config.contain.SpringContext;
 import com.kauuze.major.include.DateTimeUtil;
 import com.kauuze.major.include.JsonUtil;
 import com.kauuze.major.include.StringUtil;

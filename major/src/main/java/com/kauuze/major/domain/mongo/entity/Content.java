@@ -21,8 +21,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 public class Content {
     @Id
-    private String id;
-    @Indexed(unique = true)
+    private String id;    @Indexed(unique = true)
     private Integer uid;
 
     /**

@@ -1,5 +1,6 @@
-package com.kauuze.major.service.dto.goods;
+package com.jiwuzao.common.dto.goods;
 
+import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,4 +39,22 @@ public class GoodsSimpleDto {
      * 邮费
      */
     private BigDecimal postage;
+    /**
+     * 是否上架
+     */
+    private Boolean putaway;
+    /**
+     * 商品审核状态
+     */
+    private AuditTypeEnum auditType;
+    /**
+     * 创建时间
+     */
+    private Long createTime;
+
+    /**
+     * 更新时间
+     */
+    private Long updateTime;
+
 }
