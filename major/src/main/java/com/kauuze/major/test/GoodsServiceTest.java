@@ -1,7 +1,9 @@
 package com.kauuze.major.test;
 
 
+import com.jiwuzao.common.domain.mongo.entity.Category;
 import com.kauuze.major.domain.mongo.entity.Goods;
+import com.kauuze.major.domain.mongo.repository.CategoryRepository;
 import com.kauuze.major.service.GoodsService;
 import com.kauuze.major.service.dto.goods.GoodsOpenDto;
 import org.junit.Test;
@@ -23,6 +25,8 @@ import static org.junit.Assert.*;
 public class GoodsServiceTest {
     @Autowired
     private GoodsService goodsService;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Test
     public void showGoods() {
@@ -32,9 +36,6 @@ public class GoodsServiceTest {
     @Test
     public void showPage() {
 
-//        goodsService.getGoodsPage(PageRequest.of(0,10,Sort.by(Sort.Order.desc("defaultPrice")))).forEach(res -> {
-//            System.out.println(res.getDefaultPrice());
-//        });
 
     }
 
