@@ -1,14 +1,14 @@
 package com.kauuze.major.domain.mysql.repository;
 
-import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
+import com.jiwuzao.common.domain.mysql.entity.GoodsOrderDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
  * @author kauuze
  * @email 3412879785@qq.com
- * @time 2019-05-28 11:08
+ * @time 2019-06-04 14:19
  */
 @Repository
-public interface GoodsOrderRepository extends JpaRepository<GoodsOrder,Integer> {
+public interface GoodsOrderDetailRepository extends JpaRepository<GoodsOrderDetail,Integer> {
 }

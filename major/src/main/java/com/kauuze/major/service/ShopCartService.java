@@ -21,15 +21,15 @@ import java.util.Map;
 @Transactional(rollbackOn = Exception.class)
 public class ShopCartService {
     @Autowired
-    ShopCartRepository shopCartRepository;
+    private ShopCartRepository shopCartRepository;
     @Autowired
-    GoodsRepository goodsRepository;
+    private GoodsRepository goodsRepository;
     @Autowired
-    GoodsSpecRepository goodsSpecRepository;
+    private GoodsSpecRepository goodsSpecRepository;
     @Autowired
-    GoodsDetailRepository goodsDetailRepository;
+    private GoodsDetailRepository goodsDetailRepository;
     @Autowired
-    StoreRepository storeRepository;
+    private StoreRepository storeRepository;
 
     public String addItem(int uid, String gid, String specId, Integer num) {
         if (num > 10000)
