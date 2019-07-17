@@ -26,9 +26,7 @@ public class MongoUtil {
      * @param type
      */
     public static <T> T updateNotNon(String queryKey,T entity,Class<T> type){
-        System.out.println("out:3");
         MongoTemplate mongoTemplate = SpringContext.getBean(MongoTemplate.class);
-        System.out.println("out:4");
         Query query = new Query();
         Object queryValue = ObjectUtil.getValueByPropName(entity,queryKey);
         if(queryKey == null){

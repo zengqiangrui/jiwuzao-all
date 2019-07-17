@@ -1,11 +1,11 @@
 package com.kauuze.major.config;
 
 import com.kauuze.major.config.permission.*;
-import com.kauuze.major.domain.common.MongoUtil;
-import com.kauuze.major.domain.mongo.entity.userBastic.UserToken;
-import com.kauuze.major.include.DateTimeUtil;
-import com.kauuze.major.include.StateModel;
-import com.kauuze.major.include.StringUtil;
+import com.jiwuzao.common.domain.common.MongoUtil;
+import com.jiwuzao.common.domain.mongo.entity.userBastic.UserToken;
+import com.jiwuzao.common.include.DateTimeUtil;
+import com.jiwuzao.common.include.StateModel;
+import com.jiwuzao.common.include.StringUtil;
 import com.kauuze.major.include.TokenUtil;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;

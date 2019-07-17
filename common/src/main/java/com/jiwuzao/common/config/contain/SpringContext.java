@@ -23,8 +23,6 @@ public class SpringContext implements ApplicationContextAware {
         return applicationContext;
     }
     public static <T> T getBean(Class<T> clazz) {
-        System.out.println("out:5");
-        System.out.println("out:6"+getApplicationContext().toString());
 
         return getApplicationContext().getBean(clazz);
     }

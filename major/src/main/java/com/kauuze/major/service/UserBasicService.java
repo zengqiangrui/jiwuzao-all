@@ -1,5 +1,6 @@
 package com.kauuze.major.service;
 
+import com.jiwuzao.common.include.yun.QiniuUtil;
 import com.kauuze.major.domain.common.MongoUtil;
 import com.jiwuzao.common.domain.enumType.*;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
@@ -14,7 +15,6 @@ import com.kauuze.major.domain.mysql.repository.SmsRepository;
 import com.kauuze.major.domain.mysql.repository.UserRepository;
 import com.kauuze.major.domain.mysql.repository.WithdrawOrderRepository;
 import com.kauuze.major.include.*;
-import com.kauuze.major.include.yun.QiniuUtil;
 import com.kauuze.major.include.yun.SmsUtil;
 import com.kauuze.major.service.dto.userBasic.*;
 import org.springframework.beans.factory.annotation.Autowired;

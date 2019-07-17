@@ -1,7 +1,7 @@
 package com.kauuze.major.include;
 
 
-import com.kauuze.major.config.contain.SpringContext;
+import com.jiwuzao.common.config.contain.SpringContext;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.LinkedMultiValueMap;

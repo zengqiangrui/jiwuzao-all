@@ -1,17 +1,17 @@
 package com.kauuze.major.api;
 
-import com.kauuze.major.api.pojo.common.GidPojo;
-import com.kauuze.major.api.pojo.goods.AddGoodsPojo;
-import com.kauuze.major.api.pojo.goods.CategoryPojo;
-import com.kauuze.major.api.pojo.goods.GoodsPagePojo;
+import com.jiwuzao.common.pojo.common.GidPojo;
+import com.jiwuzao.common.pojo.goods.AddGoodsPojo;
+import com.jiwuzao.common.pojo.goods.CategoryPojo;
+import com.jiwuzao.common.pojo.goods.GoodsPagePojo;
 import com.kauuze.major.config.contain.ParamMismatchException;
 import com.kauuze.major.config.permission.Merchant;
-import com.kauuze.major.domain.mongo.entity.Category;
-import com.kauuze.major.include.JsonResult;
-import com.kauuze.major.include.JsonUtil;
-import com.kauuze.major.include.PageDto;
+import com.jiwuzao.common.domain.mongo.entity.Category;
+import com.jiwuzao.common.include.JsonResult;
+import com.jiwuzao.common.include.JsonUtil;
+import com.jiwuzao.common.include.PageDto;
 import com.kauuze.major.service.GoodsService;
-import com.kauuze.major.service.dto.goods.GoodsOpenDto;
+import com.jiwuzao.common.dto.goods.GoodsOpenDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;

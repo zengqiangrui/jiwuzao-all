@@ -1,11 +1,11 @@
 package com.kauuze.major.api;
 
 
-import com.kauuze.major.api.pojo.common.SuffixPojo;
-import com.kauuze.major.api.pojo.common.UrlPojo;
-import com.kauuze.major.api.pojo.common.UrlsPojo;
-import com.kauuze.major.include.JsonResult;
-import com.kauuze.major.include.yun.QiniuUtil;
+import com.jiwuzao.common.include.yun.QiniuUtil;
+import com.jiwuzao.common.pojo.common.SuffixPojo;
+import com.jiwuzao.common.pojo.common.UrlPojo;
+import com.jiwuzao.common.pojo.common.UrlsPojo;
+import com.jiwuzao.common.include.JsonResult;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

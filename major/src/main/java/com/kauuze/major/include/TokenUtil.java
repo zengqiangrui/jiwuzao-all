@@ -1,6 +1,6 @@
 package com.kauuze.major.include;
 
-import com.kauuze.major.config.contain.SpringContext;
+import com.jiwuzao.common.config.contain.SpringContext;
 import com.kauuze.major.domain.common.MongoUtil;
 import com.jiwuzao.common.domain.enumType.BackRoleEnum;
 import com.jiwuzao.common.domain.enumType.RoleEnum;
@@ -12,8 +12,6 @@ import com.jiwuzao.common.domain.mysql.entity.User;
 import com.kauuze.major.domain.mysql.repository.UserRepository;
 
 import java.util.List;
-
-
 
 /**
  * 权限验证工具

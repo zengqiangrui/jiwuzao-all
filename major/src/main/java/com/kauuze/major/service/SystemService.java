@@ -1,10 +1,10 @@
 package com.kauuze.major.service;
 
-import com.kauuze.major.domain.mongo.entity.AppVersion;
-import com.kauuze.major.domain.mongo.entity.SystemNotice;
+import com.jiwuzao.common.domain.mongo.entity.AppVersion;
+import com.jiwuzao.common.domain.mongo.entity.SystemNotice;
 import com.kauuze.major.domain.mongo.repository.AppVersionRepository;
 import com.kauuze.major.domain.mongo.repository.SystemNoticeRepository;
-import com.kauuze.major.include.PageUtil;
+import com.jiwuzao.common.include.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

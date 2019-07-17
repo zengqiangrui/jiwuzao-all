@@ -1,7 +1,7 @@
 package com.kauuze.major.config;
 
+import com.jiwuzao.common.config.contain.SpringContext;
 import com.kauuze.major.ConfigUtil;
-import com.kauuze.major.config.contain.SpringContext;
 import com.jiwuzao.common.domain.enumType.BackRoleEnum;
 import com.jiwuzao.common.domain.enumType.SystemGoodsNameEnum;
 import com.jiwuzao.common.domain.mongo.entity.AppVersion;
