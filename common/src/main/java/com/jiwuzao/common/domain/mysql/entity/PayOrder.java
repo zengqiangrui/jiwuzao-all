@@ -29,8 +29,7 @@ import java.math.BigDecimal;
         @Index(name = "index_payOrder_systemGoods",columnList = "systemGoods"),
         @Index(name = "index_payOrder_payTime",columnList = "payTime"),
         @Index(name = "index_payOrder_payChannel",columnList = "payChannel"),
-        @Index(name = "index_payOrder_pay",columnList = "pay"),
-        @Index(name = "index_payOrder_transactionId",columnList = "transactionId")
+        @Index(name = "index_payOrder_pay",columnList = "pay")
 
 })
 public class PayOrder {
@@ -39,6 +38,9 @@ public class PayOrder {
     private Integer id;
     private Integer uid;
     private Long createTime;
+    /**
+     * 订单编号，uuid，对应支付文档中的out_trade_no
+     */
     private String payOrderNo;
     /**
      * 是否二维码支付:二维码支付不再次显示
@@ -83,10 +85,6 @@ public class PayOrder {
      * 是否支付
      */
     private Boolean pay;
-    /**
-     * 外部交易号
-     */
-    private String transactionId;
     /**
      * 预支付会话标识
      */

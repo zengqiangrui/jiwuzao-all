@@ -24,7 +24,7 @@ public class OrderController {
     @RequestMapping("/genOrder")
     @Authorization
     public JsonResult genOrder(@RequestAttribute int uid, @Valid @RequestBody GenOrderPojo genOrderPojo){
-        String result = orderService.genOrder(genOrderPojo.getItemList(),
+        String result = orderService.genOrder(uid, genOrderPojo.getItemList(),
                 genOrderPojo.getCity(), genOrderPojo.getAddress(),
                 genOrderPojo.getPhone(),genOrderPojo.getTrueName());
         if (result == null) {

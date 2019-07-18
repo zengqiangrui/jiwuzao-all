@@ -45,11 +45,7 @@ public class GoodsOrderDetail {
      */
     private String trackingNo;
     /**
-     * 收货省份
-     */
-    private String receiverProvince;
-    /**
-     * 收货城市
+     * 收货省市区
      */
     private String receiverCity;
     /**
