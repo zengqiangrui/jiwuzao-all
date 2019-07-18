@@ -245,6 +245,11 @@ public class GoodsService {
         return new GoodsOpenDto(gid, goods.getUid(), goods.getSid(), store.getBusinessLicense(), store.getServicePhone(), goods.getTitle(), goods.getCover(), goods.getClassify(), goods.getSalesVolume(), goods.getDefaultPrice(), goods.getPostage(), goodsDetail.getSlideshow(), goodsDetail.getDetailLabel(), goodsDetail.getDetailPhotos(), goodsDetail.getGoodsType(), goodsDetail.getGoodsTypeClass(), goodsSpecs, goods.getPutaway(), goods.getAuditType(), goods.getCreateTime(), goods.getUpdateTime());
     }
 
+    /**
+     * 获取商品简略信息
+     * @param gid
+     * @return
+     */
     public GoodsSimpleDto getGoodsSimpleDto(String gid) {
         Goods goods = goodsRepository.findByGid(gid);
         return new GoodsSimpleDto(gid, goods.getTitle(), goods.getCover(), goods.getSalesVolume(), goods.getDefaultPrice(), goods.getPostage(), goods.getPutaway(), goods.getAuditType(), goods.getCreateTime(), goods.getUpdateTime());
@@ -273,6 +278,27 @@ public class GoodsService {
         return getByGoodsPage(goods);
     }
 
+    /**
+     * 获取简单用户信息，效率高
+     * @param uid
+     * @param pageable
+     * @return
+     */
+    public PageDto<GoodsSimpleDto> getGoodsSimple(int uid,Pageable pageable){
+        Page<Goods> goods = goodsRepository.findByUid(uid,pageable);
+        return getGoodsSimplePage(goods);
+    }
+
+    /**
+     * 根据商品目录id获取商品目录json字符串
+     *
+     * @param categoryId
+     * @return
+     */
+    public Category getCategoryById(Integer categoryId) {
+        Optional<Category> opt = categoryRepository.findById(categoryId);
+        return opt.orElse(null);
+    }
 
     /**
      * 获取用户所有信息
@@ -291,19 +317,19 @@ public class GoodsService {
         return goodsOpenDtos;
     }
 
-//    private PageDto<GoodsSimpleDto> getGoodsSimplePage(Page<Goods> goods) {
-//        List<GoodsSimpleDto> goodsSimpleDtos = new ArrayList<>();
-//
-//    }
-
     /**
-     * 根据商品目录id获取商品目录json字符串
-     *
-     * @param categoryId
+     * 获取用户商品简单分页
+     * @param goods
      * @return
      */
-    public Category getCategoryById(Integer categoryId) {
-        Optional<Category> opt = categoryRepository.findById(categoryId);
-        return opt.orElse(null);
+    private PageDto<GoodsSimpleDto> getGoodsSimplePage(Page<Goods> goods) {
+        List<GoodsSimpleDto> goodsSimpleDtos = new ArrayList<>();
+        PageDto<GoodsSimpleDto> dto = new PageDto<>();
+        goods.forEach(e->{
+            goodsSimpleDtos.add(getGoodsSimpleDto(e.getGid()));
+        });
+        dto.setContent(goodsSimpleDtos);
+        dto.setTotal(goods.getTotalElements());
+        return dto;
     }
 }

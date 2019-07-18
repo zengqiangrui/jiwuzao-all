@@ -1,7 +1,7 @@
 package com.kauuze.major.include;
 
 
-import com.kauuze.major.api.pojo.common.PagePojo;
+import com.jiwuzao.common.pojo.common.PagePojo;
 
 import java.math.BigDecimal;
 import java.util.List;

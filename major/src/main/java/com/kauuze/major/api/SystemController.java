@@ -1,8 +1,8 @@
 package com.kauuze.major.api;
 
 
-import com.kauuze.major.api.pojo.system.AppVersionPojo;
-import com.kauuze.major.include.JsonResult;
+import com.jiwuzao.common.include.JsonResult;
+import com.jiwuzao.common.pojo.system.AppVersionPojo;
 import com.kauuze.major.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;

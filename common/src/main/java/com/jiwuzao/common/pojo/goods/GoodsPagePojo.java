@@ -27,6 +27,12 @@ public class GoodsPagePojo {
     private Boolean isAsc = true;
 
     /**
+     * 是否是详情列表，默认否。
+     * 详情列表显示所有信息，效率可能比较低
+     */
+    private Boolean isDetail = false;
+
+    /**
      * 根据数据库中的字段排列默认为时间排序
      */
     private String sortBy = "createTime";

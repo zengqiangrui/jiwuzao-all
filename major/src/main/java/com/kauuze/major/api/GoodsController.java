@@ -1,5 +1,6 @@
 package com.kauuze.major.api;
 
+import com.jiwuzao.common.dto.goods.GoodsSimpleDto;
 import com.jiwuzao.common.pojo.common.GidPojo;
 import com.jiwuzao.common.pojo.goods.AddGoodsPojo;
 import com.jiwuzao.common.pojo.goods.CategoryPojo;
@@ -41,6 +42,7 @@ public class GoodsController {
 
     /**
      * 添加商品
+     *
      * @param uid
      * @param addGoodsPojo
      * @return
@@ -109,16 +111,23 @@ public class GoodsController {
      */
     @RequestMapping("/getGoodsList")
     @Merchant
-    public JsonResult getGoodsList(@RequestAttribute int uid, @Valid @RequestBody GoodsPagePojo goodsPagePojo) {
+    public <T> JsonResult getGoodsList(@RequestAttribute int uid, @Valid @RequestBody GoodsPagePojo goodsPagePojo) {
         Pageable pageAble;
         if (goodsPagePojo.getIsAsc()) {
             pageAble = PageRequest.of(goodsPagePojo.getCurrentPage(), goodsPagePojo.getPageSize(), Sort.Direction.ASC, goodsPagePojo.getSortBy());
         } else {
             pageAble = PageRequest.of(goodsPagePojo.getCurrentPage(), goodsPagePojo.getPageSize(), Sort.Direction.DESC, goodsPagePojo.getSortBy());
         }
-        PageDto<GoodsOpenDto> page = goodsService.getGoodsPageByUid(uid, pageAble);
+        PageDto page;
+        if (goodsPagePojo.getIsDetail()) {
+            page = goodsService.getGoodsPageByUid(uid, pageAble);
+        } else {
+            page = goodsService.getGoodsSimple(uid, pageAble);
+        }
         if (page.getContent().size() != 0)
             return JsonResult.success(page);
         return JsonResult.failure("没找到商品信息");
     }
+
+
 }

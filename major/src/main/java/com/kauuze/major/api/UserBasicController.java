@@ -1,7 +1,7 @@
 package com.kauuze.major.api;
 
-import com.kauuze.major.api.pojo.common.*;
-import com.kauuze.major.api.pojo.userBasic.*;
+import com.jiwuzao.common.pojo.common.*;
+import com.jiwuzao.common.pojo.userBasic.*;
 import com.kauuze.major.config.permission.Authorization;
 import com.kauuze.major.include.*;
 import com.kauuze.major.service.UserBasicService;
