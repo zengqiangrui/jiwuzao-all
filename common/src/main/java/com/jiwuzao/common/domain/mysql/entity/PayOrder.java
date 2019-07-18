@@ -37,6 +37,9 @@ public class PayOrder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private Integer uid;
+    /**
+     * 创建时间
+     */
     private Long createTime;
     /**
      * 订单编号，uuid，对应支付文档中的out_trade_no

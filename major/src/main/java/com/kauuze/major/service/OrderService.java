@@ -7,6 +7,8 @@ import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrderDetail;
 import com.jiwuzao.common.domain.mysql.entity.PayOrder;
+import com.jiwuzao.common.dto.order.GoodsOrderDto;
+import com.jiwuzao.common.dto.order.GoodsOrderSimpleDto;
 import com.jiwuzao.common.pojo.shopcart.AddItemPojo;
 import com.kauuze.major.domain.mongo.repository.GoodsRepository;
 import com.kauuze.major.domain.mongo.repository.GoodsSpecRepository;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -74,5 +77,23 @@ public class OrderService {
         payOrder.setFinalPay(price);
         payOrderRepository.save(payOrder);
         return "添加成功";
+    }
+
+    public List<GoodsOrderSimpleDto> getOrderSample(int uid) {
+        List<GoodsOrder> goodsOrder = goodsOrderRepository.findByUid(uid);
+        List<GoodsOrderSimpleDto> list = new ArrayList<>();
+        goodsOrder.forEach(e->{
+            GoodsOrderSimpleDto goodsOrderSimpleDto = new GoodsOrderSimpleDto(
+                    e.getSid(),e.getGoodsOrderNo(),e.getGoodsTitle(),e.getCover(),
+                    e.getSpecClass(),e.getBuyCount(),e.getFreight(),e.getFinalPay(),
+                    e.getOrderStatus()
+            );
+            list.add(goodsOrderSimpleDto);
+        });
+        return list;
+    }
+
+    public GoodsOrderDto getOrderDetail(int uid) {
+        return null;
     }
 }
