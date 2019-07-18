@@ -1,7 +1,7 @@
 package com.kauuze.manager.include;
 
 
-import com.kauuze.manager.api.pojo.common.PagePojo;
+import com.jiwuzao.common.pojo.common.PagePojo;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -222,7 +222,7 @@ public class Pattern {
      * @return
      */
     public static boolean validPage(PagePojo pagePojo){
-        if(isPositive(String.valueOf(pagePojo.getPage()),false)
+        if(isPositive(String.valueOf(pagePojo.getNum()),false)
                 && isPositive(String.valueOf(pagePojo.getSize()),false)){
             return true;
         }

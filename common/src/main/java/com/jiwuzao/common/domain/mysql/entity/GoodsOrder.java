@@ -56,7 +56,19 @@ public class GoodsOrder {
     /**
      * 商品规格(多个逗号规格)
      */
-    private String specOrderIds;
+    //private String specOrderIds;
+    /**
+     * 规格分类
+     */
+    private String specClass;
+    /**
+     * 规格单价
+     */
+    private BigDecimal specPrice;
+    /**
+     * 购买数量
+     */
+    private Integer buyCount;
     /**
      * 运费
      */

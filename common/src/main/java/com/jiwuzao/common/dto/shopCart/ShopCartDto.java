@@ -12,12 +12,13 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ShopCartDto {
-
-    private Integer uid;
+    /**
+     * 店铺id
+     */
     private String sid;
 
     /**
-     * 
+     * 店铺名称
      */
     private String storeName;
 

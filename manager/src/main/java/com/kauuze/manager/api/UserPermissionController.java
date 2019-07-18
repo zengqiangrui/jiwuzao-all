@@ -1,6 +1,6 @@
 package com.kauuze.manager.api;
 
-import com.kauuze.manager.api.pojo.common.UidPojo;
+import com.jiwuzao.common.pojo.common.UidPojo;
 import com.kauuze.manager.api.pojo.userPermission.ForbidPojo;
 import com.kauuze.manager.config.permission.Cms;
 import com.kauuze.manager.config.permission.Root;

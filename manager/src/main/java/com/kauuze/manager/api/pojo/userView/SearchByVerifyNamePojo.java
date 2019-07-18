@@ -1,6 +1,6 @@
 package com.kauuze.manager.api.pojo.userView;
 
-import com.kauuze.manager.api.pojo.common.PagePojo;
+import com.jiwuzao.common.pojo.common.PagePojo;
 import com.kauuze.manager.include.valid.NickName;
 import com.kauuze.manager.include.valid.Page;
 import lombok.AllArgsConstructor;

@@ -32,5 +32,5 @@ public class ShopCart {
     private String specId;
     private ShopCartEnum shopCartStatus;
     @Indexed
-    private String createTime;
+    private long createTime;
 }

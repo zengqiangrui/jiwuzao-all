@@ -1,9 +1,9 @@
 package com.kauuze.manager.api;
 
 import com.jiwuzao.common.dto.goods.GoodsOpenDto;
-import com.kauuze.manager.api.pojo.common.AuditGoodsPojo;
-import com.kauuze.manager.api.pojo.common.AuditTypePojo;
-import com.kauuze.manager.api.pojo.common.PagePojo;
+import com.jiwuzao.common.pojo.common.AuditGoodsPojo;
+import com.jiwuzao.common.pojo.common.AuditTypePojo;
+import com.jiwuzao.common.pojo.common.PagePojo;
 import com.kauuze.manager.config.permission.Cms;
 import com.kauuze.manager.include.JsonResult;
 import com.kauuze.manager.include.PageDto;
@@ -32,7 +32,7 @@ public class GoodsController {
     public JsonResult findGoodsByAuditType(@Valid @RequestBody AuditTypePojo auditTypePojo){
         PagePojo pagePojo = auditTypePojo.getPage();
         PageDto<GoodsOpenDto> pageDto = goodsService.findGoodsByAuditType(auditTypePojo.getAuditType(),
-                pagePojo.getPage(), 20);
+                pagePojo.getNum(), 20);
         if (pageDto.getTotal() != 0)
             return JsonResult.success(pageDto);
         return JsonResult.failure("没找到商品信息");
