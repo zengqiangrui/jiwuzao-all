@@ -37,7 +37,7 @@ public class GoodsOrder {
     private Integer uid;
     private String sid;
     private String gid;
-    private Integer pid;
+    private String pid;
     private Integer goodsOrderDetailId;
     private Long createTime;
 
@@ -61,10 +61,6 @@ public class GoodsOrder {
      * 规格分类
      */
     private String specClass;
-    /**
-     * 规格单价
-     */
-    private BigDecimal specPrice;
     /**
      * 购买数量
      */

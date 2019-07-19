@@ -4,6 +4,8 @@ import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * @author kauuze
  * @email 3412879785@qq.com
@@ -11,4 +13,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface GoodsOrderRepository extends JpaRepository<GoodsOrder,Integer> {
+    List<GoodsOrder> findByUid(int uid);
 }

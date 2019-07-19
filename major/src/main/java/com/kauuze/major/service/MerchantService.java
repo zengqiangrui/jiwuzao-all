@@ -1,21 +1,20 @@
 package com.kauuze.major.service;
 
-import com.kauuze.major.ConfigUtil;
-import com.kauuze.major.domain.common.EsUtil;
 import com.jiwuzao.common.domain.common.OrderUtil;
 import com.jiwuzao.common.domain.enumType.*;
-import com.kauuze.major.domain.es.entity.GoodsEs;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.jiwuzao.common.domain.mongo.entity.SystemGoods;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.VerifyActor;
+import com.jiwuzao.common.domain.mysql.entity.PayOrder;
+import com.jiwuzao.common.domain.mysql.entity.User;
+import com.jiwuzao.common.domain.mysql.entity.WithdrawOrder;
+import com.kauuze.major.ConfigUtil;
+import com.kauuze.major.domain.common.EsUtil;
 import com.kauuze.major.domain.mongo.repository.GoodsRepository;
 import com.kauuze.major.domain.mongo.repository.StoreRepository;
 import com.kauuze.major.domain.mongo.repository.SystemGoodsRepository;
 import com.kauuze.major.domain.mongo.repository.VerifyActorRepository;
-import com.jiwuzao.common.domain.mysql.entity.PayOrder;
-import com.jiwuzao.common.domain.mysql.entity.User;
-import com.jiwuzao.common.domain.mysql.entity.WithdrawOrder;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
 import com.kauuze.major.domain.mysql.repository.UserRepository;
 import com.kauuze.major.domain.mysql.repository.WithdrawOrderRepository;
@@ -155,7 +154,7 @@ public class MerchantService {
      */
     public String getDepositQrCode(int uid, String userIp) {
         SystemGoods systemGoods = systemGoodsRepository.findByName(SystemGoodsNameEnum.deposit);
-        PayOrder payOrder = new PayOrder(null, uid, System.currentTimeMillis(), null, true, false, true, null, systemGoods.getId(), systemGoods.getPrice(), systemGoods.getName().name, null, null, false, null, null);
+        PayOrder payOrder = new PayOrder(null, uid, System.currentTimeMillis(), null, true, false, true, null, systemGoods.getId(), systemGoods.getPrice(), systemGoods.getName().name, null, null, false, null);
         payOrderRepository.save(payOrder);
         payOrderRepository.save(payOrderRepository.findByIdForUpdate(payOrder.getId()).setPayOrderNo(OrderUtil.getOrderNo(payOrder.getId(), "p")));
         return WxPayUtil.generateWxPayQrCode(systemGoods.getId(), systemGoods.getName().name, payOrder.getPayOrderNo(), payOrder.getFinalPay(), ConfigUtil.payCallBackDomain + PayCallBackUrl.systemGoodsWxNoticeWxQrCode, userIp);
