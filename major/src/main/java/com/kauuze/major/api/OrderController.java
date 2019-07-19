@@ -1,5 +1,6 @@
 package com.kauuze.major.api;
 
+import com.github.binarywang.wxpay.exception.WxPayException;
 import com.jiwuzao.common.dto.order.GoodsOrderDto;
 import com.jiwuzao.common.dto.order.GoodsOrderSimpleDto;
 import com.jiwuzao.common.include.JsonResult;
@@ -51,9 +52,10 @@ public class OrderController {
      */
     @RequestMapping("/comfirmOrder")
     @Authorization
-    public JsonResult comfirmOrder(@Valid @RequestBody ComfirmOrderPojo pojo){
-        String result = orderService.comfirmOrder(pojo.getGoodsOrderNo(), pojo.getCity(),
-                pojo.getAddress(), pojo.getPhone(), pojo.getTrueName());
+    public JsonResult comfirmOrder(@RequestAttribute("ip") String ip,
+                                   @Valid @RequestBody ComfirmOrderPojo pojo) throws WxPayException {
+        Object result = orderService.comfirmOrder(pojo.getGoodsOrderNo(), pojo.getCity(),
+                pojo.getAddress(), pojo.getPhone(), pojo.getTrueName(), ip);
         if (result == null) {
             return JsonResult.failure();
         } else {
@@ -67,7 +69,7 @@ public class OrderController {
      */
     @RequestMapping("/getOrderSample")
     @Authorization
-    public JsonResult getOrderSample(@RequestAttribute int uid) {
+    public JsonResult getOrderSample(@RequestAttribute("uid") int uid) {
         List<GoodsOrderSimpleDto> result = orderService.getOrderSample(uid);
         if (result == null) {
             return JsonResult.failure();

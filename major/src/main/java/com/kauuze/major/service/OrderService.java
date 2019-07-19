@@ -1,5 +1,8 @@
 package com.kauuze.major.service;
 
+import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
+import com.github.binarywang.wxpay.exception.WxPayException;
+import com.github.binarywang.wxpay.service.WxPayService;
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
 import com.jiwuzao.common.domain.enumType.PayChannelEnum;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
@@ -15,6 +18,7 @@ import com.kauuze.major.domain.mongo.repository.GoodsSpecRepository;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderDetailRepository;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +31,7 @@ import java.util.UUID;
 
 @Service
 @Transactional(rollbackOn = Exception.class)
+@Slf4j
 public class OrderService {
 
     @Autowired
@@ -76,19 +81,20 @@ public class OrderService {
         return payOrder.getPayOrderNo();
     }
 
-    public String comfirmOrder(String payOrderNo, String city, String address,
-                               String phone, String name){
+    public Object comfirmOrder(String payOrderNo, String city, String address,
+                               String phone, String name, String ip) throws WxPayException {
         List<GoodsOrder> list = goodsOrderRepository.findByPid(payOrderNo);
-
-        list.forEach(e->{
+        String body = new String("极物造-商品支付");
+        for (GoodsOrder e : list){
             GoodsOrderDetail detail = goodsOrderDetailRepository.findById(e.getGoodsOrderDetailId()).get();
             detail.setCancelTime(System.currentTimeMillis())
                     .setReceiverCity(city).setReceiverAddress(address).setReceiverPhone(phone)
                     .setReceiverTrueName(name);
-        });
-        //调起统一下单接口
-
-        return "下单成功";
+        };
+        PayOrder payOrder = payOrderRepository.findByPayOrderNo(payOrderNo);
+        //调统一下单接口
+        ;
+        return createOrder(ip, body, payOrderNo, payOrder.getFinalPay());
     }
 
     public List<GoodsOrderSimpleDto> getOrderSample(int uid) {
@@ -122,5 +128,30 @@ public class OrderService {
                 .setCreateTime(go.getCreateTime()).setPayTime(po.getPayTime())
                 .setDeliverTime(go.getDeliverTime()).setTakeTime(go.getTakeTime());
         return goodsOrderDto;
+    }
+
+    @Autowired
+    private WxPayService wxPayService;
+
+    /**
+     * 根据支付方式调用统一下单接口
+     * @param <T>
+     * @return
+     * @throws WxPayException
+     */
+    public <T> T createOrder(String ip, String body, String payOrderNo, BigDecimal price) throws WxPayException {
+        //必填项appid，mchid,随机字符串nonce_str,签名sign,已经根据配置给出
+        /**
+         * 以下为必填，其中ip从前端传入
+         */
+        WxPayUnifiedOrderRequest req = new WxPayUnifiedOrderRequest();
+        req.setSpbillCreateIp(ip);
+        req.setNotifyUrl("http://api.jiwuzao.com/pay/notify/order");
+        req.setTradeType("APP");//支付类型,jsapi需要传openid
+        req.setBody(body);//商品介绍
+        req.setOutTradeNo(payOrderNo);//传给微信的订单号
+        req.setTotalFee(price.multiply(BigDecimal.valueOf(100)).intValue());//金额,分
+        log.info("请求参数",req);
+        return this.wxPayService.createOrder(req);
     }
 }
