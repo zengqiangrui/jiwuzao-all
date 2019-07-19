@@ -25,6 +25,7 @@ public class UserBasicController {
     @Autowired
     private UserBasicService userBasicService;
 
+
     @RequestMapping("/sendSms")
     public JsonResult sendSms(@Valid @RequestBody SendSmsPojo sendSmsPojo){
         if(!StringUtil.isEq(SHA256.encryptAddSalt(sendSmsPojo.getPhone(),"sendSms-kboot"),sendSmsPojo.getSha256())){
@@ -176,4 +177,5 @@ public class UserBasicController {
     public JsonResult findBySid(@Valid @RequestBody SidPojo sidPojo){
         return JsonResult.success(userBasicService.findBySid(sidPojo.getSid()));
     }
+
 }

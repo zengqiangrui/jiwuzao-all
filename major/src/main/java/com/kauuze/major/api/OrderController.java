@@ -8,6 +8,7 @@ import com.jiwuzao.common.pojo.order.ComfirmOrderPojo;
 import com.jiwuzao.common.pojo.order.GenOrderPojo;
 import com.jiwuzao.common.pojo.order.GetOrderPojo;
 import com.kauuze.major.config.permission.Authorization;
+import com.kauuze.major.service.AddressService;
 import com.kauuze.major.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,8 @@ public class OrderController {
 
     @Autowired
     OrderService orderService;
+    @Autowired
+    private AddressService addressService;
 
     /**
      * 用户通过购物车或者单个商品结算，传入商品数组生成订单
