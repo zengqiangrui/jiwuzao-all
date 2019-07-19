@@ -3,6 +3,7 @@ package com.kauuze.major.api;
 import com.jiwuzao.common.include.JsonResult;
 import com.jiwuzao.common.pojo.order.GenOrderPojo;
 import com.kauuze.major.config.permission.Authorization;
+import com.kauuze.major.service.AddressService;
 import com.kauuze.major.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ public class OrderController {
 
     @Autowired
     OrderService orderService;
+    @Autowired
+    private AddressService addressService;
 
     @RequestMapping("/genOrder")
     @Authorization

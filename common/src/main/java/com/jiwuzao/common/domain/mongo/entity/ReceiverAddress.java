@@ -1,12 +1,17 @@
 package com.jiwuzao.common.domain.mongo.entity;
 
+import com.jiwuzao.common.domain.enumType.AddressEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.Date;
 
 /**
  * 收货地址
@@ -22,29 +27,34 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class ReceiverAddress {
     @Id
     private String id;
-    @Indexed(unique = true)
+    @Indexed
     private Integer uid;
 
     /**
-     * 默认收货省份
+     * 默认收货省,市,区
      */
-    private String defaultReceiverProvince;
-    /**
-     * 默认收货城市
-     */
-    private String defaultReceiverCity;
+    private String receiveProvinces;
     /**
      *默认收货详细地址
      */
-    private String defaultReceiverAddress;
+    private String receiverAddress;
 
     /**
      * 默认收货手机
      */
-    private String defaultReceiverPhone;
+    private String receiverPhone;
 
     /**
      * 默认收货姓名
      */
-    private String defaultReceiverTrueName;
+    private String receiverTrueName;
+
+    /**
+     * 枚举，地址状态,默认为普通地址
+     */
+    private AddressEnum addressStatus = AddressEnum.USUAL;
+
+    private Long createTime;
+
+    private Long updateTime;
 }

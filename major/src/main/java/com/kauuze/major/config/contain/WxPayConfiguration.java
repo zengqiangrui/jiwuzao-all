@@ -28,7 +28,7 @@ public class WxPayConfiguration {
     payConfig.setKeyPath(StringUtils.trimToNull(this.properties.getKeyPath()));
 
     // 可以指定是否使用沙箱环境
-    payConfig.setUseSandboxEnv(false);
+    payConfig.setUseSandboxEnv(true);
 
     WxPayService wxPayService = new WxPayServiceImpl();
     wxPayService.setConfig(payConfig);
