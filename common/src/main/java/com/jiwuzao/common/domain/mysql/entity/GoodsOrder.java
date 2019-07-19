@@ -68,7 +68,7 @@ public class GoodsOrder {
     /**
      * 运费
      */
-    private BigDecimal freight;
+    private BigDecimal postage;
     /**
      * 最终实付款
      */

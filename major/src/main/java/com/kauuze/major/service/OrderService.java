@@ -40,8 +40,7 @@ public class OrderService {
     @Autowired
     private PayOrderRepository payOrderRepository;
 
-    public String genOrder(int uid, List<AddItemPojo> itemList, String city, String address,
-                           String phone, String name) {
+    public String genOrder(int uid, List<AddItemPojo> itemList) {
         BigDecimal price = new BigDecimal(BigInteger.ZERO);
         //生成支付订单
         PayOrder payOrder = new PayOrder().setPay(false)
@@ -55,9 +54,7 @@ public class OrderService {
             GoodsSpec goodsSpec = goodsSpecRepository.findById(e.getSpecId()).get();
 
             //生成GoodsOrderDetail
-            GoodsOrderDetail detail = new GoodsOrderDetail().setCancelTime(System.currentTimeMillis())
-                    .setReceiverCity(city).setReceiverAddress(address).setReceiverPhone(phone)
-                    .setReceiverTrueName(name).setComplaint(false);
+            GoodsOrderDetail detail = new GoodsOrderDetail().setComplaint(false);
 
             detail = goodsOrderDetailRepository.save(detail);
 
@@ -67,7 +64,7 @@ public class OrderService {
             GoodsOrder goodsOrder = new GoodsOrder().setGoodsOrderDetailId(detail.getId()).setGoodsTitle(goods.getTitle())
                     .setOrderStatus(OrderStatusEnum.waitPay).setBuyCount(e.getNum())
                     .setCover(goods.getCover()).setCreateTime(System.currentTimeMillis())
-                    .setFreight(goods.getPostage()).setSpecClass(goodsSpec.getSpecClass())
+                    .setPostage(goods.getPostage()).setSpecClass(goodsSpec.getSpecClass())
                     .setFinalPay(finalPay).setUid(uid).setSid(goods.getSid())
                     .setGid(goods.getGid()).setPid(payOrder.getPayOrderNo());
             goodsOrderRepository.save(goodsOrder);
@@ -76,7 +73,22 @@ public class OrderService {
         }
         payOrder.setFinalPay(price);
         payOrderRepository.save(payOrder);
-        return "添加成功";
+        return payOrder.getPayOrderNo();
+    }
+
+    public String comfirmOrder(String payOrderNo, String city, String address,
+                               String phone, String name){
+        List<GoodsOrder> list = goodsOrderRepository.findByPid(payOrderNo);
+
+        list.forEach(e->{
+            GoodsOrderDetail detail = goodsOrderDetailRepository.findById(e.getGoodsOrderDetailId()).get();
+            detail.setCancelTime(System.currentTimeMillis())
+                    .setReceiverCity(city).setReceiverAddress(address).setReceiverPhone(phone)
+                    .setReceiverTrueName(name);
+        });
+        //调起统一下单接口
+
+        return "下单成功";
     }
 
     public List<GoodsOrderSimpleDto> getOrderSample(int uid) {
@@ -85,7 +97,7 @@ public class OrderService {
         goodsOrder.forEach(e->{
             GoodsOrderSimpleDto goodsOrderSimpleDto = new GoodsOrderSimpleDto(
                     e.getSid(),e.getGoodsOrderNo(),e.getGoodsTitle(),e.getCover(),
-                    e.getSpecClass(),e.getBuyCount(),e.getFreight(),e.getFinalPay(),
+                    e.getSpecClass(),e.getBuyCount(),e.getPostage(),e.getFinalPay(),
                     e.getOrderStatus()
             );
             list.add(goodsOrderSimpleDto);
@@ -93,7 +105,22 @@ public class OrderService {
         return list;
     }
 
-    public GoodsOrderDto getOrderDetail(int uid) {
-        return null;
+    public GoodsOrderDto getOrderDetail(int uid, String goodsOrderNo) {
+        GoodsOrder go = goodsOrderRepository.findByGoodsOrderNo(goodsOrderNo);
+        GoodsOrderDetail god = goodsOrderDetailRepository
+                .findById(go.getGoodsOrderDetailId()).get();
+        PayOrder po = payOrderRepository.findByPayOrderNo(go.getPid());
+
+        GoodsOrderDto goodsOrderDto = new GoodsOrderDto();
+        goodsOrderDto.setSid(go.getSid()).setGid(go.getGid()).setPid(go.getPid())
+                .setTrackingNo(god.getTrackingNo()).setReceiverCity(god.getReceiverCity())
+                .setReceiverAddress(god.getReceiverAddress()).setReceiverTrueName(god.getReceiverTrueName())
+                .setReceiverPhone(god.getReceiverPhone()).setGoodsTitle(go.getGoodsTitle())
+                .setCover(go.getCover()).setSpecString(go.getSpecClass())
+                .setBuyCount(go.getBuyCount()).setPostage(go.getPostage())
+                .setFinalPay(go.getFinalPay()).setOrderStatus(go.getOrderStatus())
+                .setCreateTime(go.getCreateTime()).setPayTime(po.getPayTime())
+                .setDeliverTime(go.getDeliverTime()).setTakeTime(go.getTakeTime());
+        return goodsOrderDto;
     }
 }
