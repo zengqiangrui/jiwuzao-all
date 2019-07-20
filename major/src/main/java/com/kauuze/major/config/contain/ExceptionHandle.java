@@ -1,7 +1,7 @@
 package com.kauuze.major.config.contain;
 
 
-import com.kauuze.major.domain.mongo.entity.Log;
+import com.jiwuzao.common.domain.mongo.entity.Log;
 import com.kauuze.major.domain.mongo.repository.LogRepository;
 import com.kauuze.major.include.DateTimeUtil;
 import com.kauuze.major.include.StateModel;
