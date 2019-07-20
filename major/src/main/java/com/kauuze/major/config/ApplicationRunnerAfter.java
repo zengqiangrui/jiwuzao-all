@@ -70,7 +70,7 @@ public class ApplicationRunnerAfter implements ApplicationRunner {
             Integer msCode3 = userBasicService.sendSms("10000000002");
             String accessToken = (String) userBasicService.register("10000000000", "qq1501643251", "kauuze", msCode).getData();
             String accessToken2 = (String) userBasicService.register("10000000001", "qq1501643251", "kauuze2", msCode2).getData();
-            String accessToken3 = (String) userBasicService.register("10000000002", "qq1501643251", "kauuze3", msCode3).getData();
+                String accessToken3 = (String) userBasicService.register("10000000002", "qq1501643251", "kauuze3", msCode3).getData();
             UserToken userToken = userTokenRepository.findByAccessToken(accessToken);
             UserToken userToken2 = userTokenRepository.findByAccessToken(accessToken2);
             UserToken userToken3 = userTokenRepository.findByAccessToken(accessToken3);
