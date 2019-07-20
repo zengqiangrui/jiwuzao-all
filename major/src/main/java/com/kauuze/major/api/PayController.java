@@ -6,6 +6,7 @@ import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.jiwuzao.common.include.Rand;
+import com.kauuze.major.service.PayService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,8 @@ public class PayController {
 
     @Autowired
     private WxPayService wxPayService;
+    @Autowired
+    private PayService payService;
 
     /**
      * 根据支付方式调用统一下单接口
@@ -59,6 +62,7 @@ public class PayController {
          */
         final WxPayOrderNotifyResult notifyResult = wxPayService.parseOrderNotifyResult(xmlData);
         log.info("回调信息",notifyResult);
+        payService.handleNotify(notifyResult);
         // TODO 根据自己业务场景需要构造返回对象
         return WxPayNotifyResponse.success("成功");
     }

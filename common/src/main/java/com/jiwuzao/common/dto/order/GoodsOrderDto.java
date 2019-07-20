@@ -22,10 +22,6 @@ public class GoodsOrderDto {
      */
     private String gid;
     /**
-     * payorderid
-     */
-    private String pid;
-    /**
      * 物流单号
      */
     private String trackingNo;

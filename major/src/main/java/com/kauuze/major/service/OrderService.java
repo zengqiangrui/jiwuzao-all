@@ -19,6 +19,7 @@ import com.kauuze.major.domain.mysql.repository.GoodsOrderDetailRepository;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -92,9 +93,36 @@ public class OrderService {
                     .setReceiverTrueName(name);
         };
         PayOrder payOrder = payOrderRepository.findByPayOrderNo(payOrderNo);
-        //调统一下单接口
-        ;
-        return createOrder(ip, body, payOrderNo, payOrder.getFinalPay());
+        if (payOrder.getPrepayId() == null) {
+            //调统一下单接口
+            return createOrder(ip, body, payOrderNo, payOrder.getFinalPay());
+        } else {
+            //为过期订单设置overTime按老的订单建立新的订单,并与goodsorder关联。
+            payOrder = renewOrder(payOrder);
+            return createOrder(ip, body, payOrderNo, payOrder.getFinalPay());
+        }
+    }
+
+    /**
+     * 刷新订单，将老的订单作废
+     * @param payOrder
+     * @return
+     */
+    private PayOrder renewOrder(PayOrder payOrder) {
+        PayOrder newOrder = new PayOrder();
+        BeanUtils.copyProperties(payOrder, newOrder);
+
+        payOrder.setOvertime(true);
+        newOrder.setId(null).setPayOrderNo(UUID.randomUUID().toString().replace("-", ""));
+        payOrderRepository.save(payOrder);
+        payOrderRepository.save(newOrder);
+
+        List<GoodsOrder> list = goodsOrderRepository.findByPid(payOrder.getPrepayId());
+        list.forEach(e->{
+            e.setPid(newOrder.getPrepayId());
+            goodsOrderRepository.save(e);
+        });
+        return newOrder;
     }
 
     public List<GoodsOrderSimpleDto> getOrderSample(int uid) {
@@ -118,7 +146,7 @@ public class OrderService {
         PayOrder po = payOrderRepository.findByPayOrderNo(go.getPid());
 
         GoodsOrderDto goodsOrderDto = new GoodsOrderDto();
-        goodsOrderDto.setSid(go.getSid()).setGid(go.getGid()).setPid(go.getPid())
+        goodsOrderDto.setSid(go.getSid()).setGid(go.getGid())
                 .setTrackingNo(god.getTrackingNo()).setReceiverCity(god.getReceiverCity())
                 .setReceiverAddress(god.getReceiverAddress()).setReceiverTrueName(god.getReceiverTrueName())
                 .setReceiverPhone(god.getReceiverPhone()).setGoodsTitle(go.getGoodsTitle())
