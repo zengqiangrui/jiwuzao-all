@@ -1,10 +1,10 @@
 package com.kauuze.manager.service.dto.userView;
 
 
-import com.kauuze.manager.domain.enumType.BackRoleEnum;
-import com.kauuze.manager.domain.enumType.RoleEnum;
-import com.kauuze.manager.domain.enumType.SexEnum;
-import com.kauuze.manager.domain.enumType.UserStateEnum;
+import com.jiwuzao.common.domain.enumType.BackRoleEnum;
+import com.jiwuzao.common.domain.enumType.RoleEnum;
+import com.jiwuzao.common.domain.enumType.SexEnum;
+import com.jiwuzao.common.domain.enumType.UserStateEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

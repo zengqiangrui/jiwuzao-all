@@ -1,7 +1,7 @@
 package com.kauuze.manager.domain.mongo.repository;
 
-import com.kauuze.manager.domain.enumType.BackRoleEnum;
-import com.kauuze.manager.domain.mongo.entity.userBastic.UserToken;
+import com.jiwuzao.common.domain.enumType.BackRoleEnum;
+import com.jiwuzao.common.domain.mongo.entity.userBastic.UserToken;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;

@@ -1,8 +1,8 @@
 package com.kauuze.manager.domain.mongo.repository;
 
 
-import com.kauuze.manager.domain.enumType.SystemGoodsNameEnum;
-import com.kauuze.manager.domain.mongo.entity.SystemGoods;
+import com.jiwuzao.common.domain.enumType.SystemGoodsNameEnum;
+import com.jiwuzao.common.domain.mongo.entity.SystemGoods;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

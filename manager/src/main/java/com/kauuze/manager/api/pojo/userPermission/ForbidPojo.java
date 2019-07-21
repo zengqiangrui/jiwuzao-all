@@ -1,6 +1,6 @@
 package com.kauuze.manager.api.pojo.userPermission;
 
-import com.kauuze.manager.domain.enumType.UserStateEnum;
+import com.jiwuzao.common.domain.enumType.UserStateEnum;
 import com.kauuze.manager.include.valid.Idv;
 import com.kauuze.manager.include.valid.Mill;
 import lombok.AllArgsConstructor;

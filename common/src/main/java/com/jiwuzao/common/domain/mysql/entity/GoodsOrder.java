@@ -1,6 +1,7 @@
 package com.jiwuzao.common.domain.mysql.entity;
 
 
+import com.jiwuzao.common.domain.enumType.OrderExStatusEnum;
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -78,6 +79,11 @@ public class GoodsOrder {
      */
     @Enumerated(EnumType.STRING)
     private OrderStatusEnum orderStatus;
+    /**
+     * 订单异常状态
+     */
+    @Enumerated(EnumType.STRING)
+    private OrderExStatusEnum orderExStatus;
     /**
      * 发货时间
      */
