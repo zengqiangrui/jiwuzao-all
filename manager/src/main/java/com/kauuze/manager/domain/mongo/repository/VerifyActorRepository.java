@@ -2,7 +2,7 @@ package com.kauuze.manager.domain.mongo.repository;
 
 
 import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
-import com.kauuze.manager.domain.mongo.entity.userBastic.VerifyActor;
+import com.jiwuzao.common.domain.mongo.entity.userBastic.VerifyActor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;

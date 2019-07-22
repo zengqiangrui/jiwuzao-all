@@ -1,8 +1,7 @@
 package com.kauuze.manager.domain.mysql.repository;
 
 
-
-import com.kauuze.manager.domain.mysql.entity.User;
+import com.jiwuzao.common.domain.mysql.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;

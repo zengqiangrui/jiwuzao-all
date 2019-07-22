@@ -1,5 +1,6 @@
 package com.kauuze.major.service;
 
+import com.github.binarywang.wxpay.bean.order.WxPayAppOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
@@ -19,6 +20,7 @@ import com.kauuze.major.domain.mysql.repository.GoodsOrderDetailRepository;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +47,12 @@ public class OrderService {
     @Autowired
     private PayOrderRepository payOrderRepository;
 
+    /**
+     * 用户通过购物车或者单个商品结算，传入商品数组生成订单
+     * @param uid
+     * @param itemList
+     * @return 返回订单id
+     */
     public String genOrder(int uid, List<AddItemPojo> itemList) {
         BigDecimal price = new BigDecimal(BigInteger.ZERO);
         //生成支付订单
@@ -81,6 +89,11 @@ public class OrderService {
         return payOrder.getPayOrderNo();
     }
 
+    /**
+     * 用户传入收货信息确认订单
+     * @param
+     * @return
+     */
     public Object comfirmOrder(String payOrderNo, String city, String address,
                                String phone, String name, String ip) throws WxPayException {
         List<GoodsOrder> list = goodsOrderRepository.findByPid(payOrderNo);
@@ -92,11 +105,47 @@ public class OrderService {
                     .setReceiverTrueName(name);
         };
         PayOrder payOrder = payOrderRepository.findByPayOrderNo(payOrderNo);
+        if (payOrder.getPrepayId() != null) {
+            //为过期订单设置overTime按老的订单建立新的订单,并与goodsorder关联。
+            payOrder = renewOrder(payOrder);
+        }
         //调统一下单接口
-        ;
-        return createOrder(ip, body, payOrderNo, payOrder.getFinalPay());
+        Object res = createOrder(ip, body, payOrderNo, payOrder.getFinalPay());
+        if (res instanceof WxPayAppOrderResult){
+            WxPayAppOrderResult wxres = (WxPayAppOrderResult)res;
+            payOrder.setPrepayId(wxres.getPrepayId());
+            payOrderRepository.save(payOrder);
+        }
+        return res;
     }
 
+    /**
+     * 刷新订单，将老的订单作废
+     * @param payOrder
+     * @return
+     */
+    private PayOrder renewOrder(PayOrder payOrder) {
+        PayOrder newOrder = new PayOrder();
+        BeanUtils.copyProperties(payOrder, newOrder);
+
+        payOrder.setOvertime(true);
+        newOrder.setId(null).setPayOrderNo(UUID.randomUUID().toString().replace("-", ""));
+        payOrderRepository.save(payOrder);
+        payOrderRepository.save(newOrder);
+
+        List<GoodsOrder> list = goodsOrderRepository.findByPid(payOrder.getPrepayId());
+        list.forEach(e->{
+            e.setPid(newOrder.getPrepayId());
+            goodsOrderRepository.save(e);
+        });
+        return newOrder;
+    }
+
+    /**
+     * 获取订单简略信息
+     * @param uid
+     * @return
+     */
     public List<GoodsOrderSimpleDto> getOrderSample(int uid) {
         List<GoodsOrder> goodsOrder = goodsOrderRepository.findByUid(uid);
         List<GoodsOrderSimpleDto> list = new ArrayList<>();
@@ -111,6 +160,9 @@ public class OrderService {
         return list;
     }
 
+    /**
+     * 获取订单详细信息
+     */
     public GoodsOrderDto getOrderDetail(int uid, String goodsOrderNo) {
         GoodsOrder go = goodsOrderRepository.findByGoodsOrderNo(goodsOrderNo);
         GoodsOrderDetail god = goodsOrderDetailRepository
@@ -118,7 +170,7 @@ public class OrderService {
         PayOrder po = payOrderRepository.findByPayOrderNo(go.getPid());
 
         GoodsOrderDto goodsOrderDto = new GoodsOrderDto();
-        goodsOrderDto.setSid(go.getSid()).setGid(go.getGid()).setPid(go.getPid())
+        goodsOrderDto.setSid(go.getSid()).setGid(go.getGid())
                 .setTrackingNo(god.getTrackingNo()).setReceiverCity(god.getReceiverCity())
                 .setReceiverAddress(god.getReceiverAddress()).setReceiverTrueName(god.getReceiverTrueName())
                 .setReceiverPhone(god.getReceiverPhone()).setGoodsTitle(go.getGoodsTitle())

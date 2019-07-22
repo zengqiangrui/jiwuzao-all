@@ -1,11 +1,11 @@
 package com.kauuze.manager.api;
 
+import com.jiwuzao.common.domain.mongo.entity.userBastic.VerifyActor;
 import com.jiwuzao.common.pojo.common.AuditTypePojo;
 import com.jiwuzao.common.pojo.common.PagePojo;
 import com.jiwuzao.common.pojo.common.UidPojo;
 import com.kauuze.manager.api.pojo.userPermission.AuditVerifyActorPojo;
 import com.kauuze.manager.config.permission.Cms;
-import com.kauuze.manager.domain.mongo.entity.userBastic.VerifyActor;
 import com.kauuze.manager.include.JsonResult;
 import com.kauuze.manager.include.PageDto;
 import com.kauuze.manager.service.MerchantService;

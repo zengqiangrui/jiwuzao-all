@@ -1,7 +1,7 @@
 package com.kauuze.manager.domain.mysql.repository;
 
 
-import com.kauuze.manager.domain.mysql.entity.WithdrawOrder;
+import com.jiwuzao.common.domain.mysql.entity.WithdrawOrder;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

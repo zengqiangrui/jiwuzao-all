@@ -1,12 +1,12 @@
 package com.kauuze.manager.service;
 
 
+import com.jiwuzao.common.domain.enumType.BackRoleEnum;
+import com.jiwuzao.common.domain.enumType.UserStateEnum;
+import com.jiwuzao.common.domain.mongo.entity.userBastic.UserToken;
+import com.jiwuzao.common.domain.mysql.entity.User;
 import com.kauuze.manager.domain.common.MongoUtil;
-import com.kauuze.manager.domain.enumType.BackRoleEnum;
-import com.kauuze.manager.domain.enumType.UserStateEnum;
-import com.kauuze.manager.domain.mongo.entity.userBastic.UserToken;
 import com.kauuze.manager.domain.mongo.repository.UserTokenRepository;
-import com.kauuze.manager.domain.mysql.entity.User;
 import com.kauuze.manager.domain.mysql.repository.UserRepository;
 import com.kauuze.manager.include.TokenUtil;
 import com.kauuze.manager.service.dto.userView.UserShowDto;
@@ -36,7 +36,7 @@ public class UserPermissionService {
      * @param userState
      * @param userStateEndTime
      */
-    public String forbid(int uid,UserStateEnum userState,long userStateEndTime){
+    public String forbid(int uid, UserStateEnum userState, long userStateEndTime){
         UserShowDto userShowDto = userViewService.findByUid(uid);
         if(userShowDto == null){
             return "操作失败";

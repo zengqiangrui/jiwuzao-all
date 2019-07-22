@@ -2,8 +2,8 @@ package com.kauuze.manager.domain.es.entity;
 
 
 import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
+import com.jiwuzao.common.domain.enumType.GoodsClassifyEnum;
 import com.kauuze.manager.ConfigUtil;
-import com.kauuze.manager.domain.enumType.GoodsClassifyEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
