@@ -8,30 +8,28 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
+import java.security.MessageDigest;
 
 /**
- * 快递鸟物流轨迹即时查询接口
+ * 快递鸟订阅推送2.0接口
  *
- * @技术QQ群: 456320272
- * @see: http://www.kdniao.com/YundanChaxunAPI.aspx
+ * @技术QQ: 4009633321
+ * @技术QQ群: 200121393
+ * @see: http://www.kdniao.com/api-subscribe
  * @copyright: 深圳市快金数据技术服务有限公司
- * <p>
- * DEMO中的电商ID与私钥仅限测试使用，正式环境请单独注册账号
- * 单日超过500单查询量，建议接入我方物流轨迹订阅推送接口
  * <p>
  * ID和Key请到官网申请：http://www.kdniao.com/ServiceApply.aspx
  */
 
-public class KdniaoTrackQueryAPI {
+public class KdniaoSubscribeAPI {
 
     //DEMO
     public static void main(String[] args) {
-        KdniaoTrackQueryAPI api = new KdniaoTrackQueryAPI();
+        KdniaoSubscribeAPI api = new KdniaoSubscribeAPI();
         try {
-            String result = api.getOrderTracesByJson("ANE", "210001633605");
+            String result = api.orderTracesSubByJson();
             System.out.print(result);
 
         } catch (Exception e) {
@@ -39,25 +37,55 @@ public class KdniaoTrackQueryAPI {
         }
     }
 
+//	//电商ID
+//	private String EBusinessID="请到快递鸟官网申请http://www.kdniao.com/ServiceApply.aspx";
+//	//电商加密私钥，快递鸟提供，注意保管，不要泄漏
+//	private String AppKey="请到快递鸟官网申请http://www.kdniao.com/ServiceApply.aspx";
+
     //电商ID
     private String EBusinessID = "1554228";
     //电商加密私钥，快递鸟提供，注意保管，不要泄漏
     private String AppKey = "722af9da-4a11-4b08-ab43-7a1e91ae39f3";
-    //请求url
-    private String ReqURL = "http://api.kdniao.com/Ebusiness/EbusinessOrderHandle.aspx";
+    //测试请求url
+    private String ReqURL = "http://testapi.kdniao.com:8081/api/dist";
+    //正式请求url
+    //private String ReqURL = "http://api.kdniao.com/api/dist";
 
     /**
-     * Json方式 查询订单物流轨迹
+     * Json方式  物流信息订阅
      *
      * @throws Exception
      */
-    public String getOrderTracesByJson(String expCode, String expNo) throws Exception {
-        String requestData = "{'OrderCode':'','ShipperCode':'" + expCode + "','LogisticCode':'" + expNo + "'}";
+    public String orderTracesSubByJson() throws Exception {
+        String requestData = "{'OrderCode': 'SF201608081055208281'," +
+                "'ShipperCode':'SF'," +
+                "'LogisticCode':'3100707578976'," +
+                "'PayType':1," +
+                "'ExpType':1," +
+                "'CustomerName':''," +
+                "'CustomerPwd':''," +
+                "'MonthCode':''," +
+                "'IsNotice':0," +
+                "'Cost':1.0," +
+                "'OtherCost':1.0," +
+                "'Sender':" +
+                "{" +
+                "'Company':'LV','Name':'Taylor','Mobile':'15018442396','ProvinceName':'上海','CityName':'上海','ExpAreaName':'青浦区','Address':'明珠路73号'}," +
+                "'Receiver':" +
+                "{" +
+                "'Company':'GCCUI','Name':'Yann','Mobile':'15018442396','ProvinceName':'北京','CityName':'北京','ExpAreaName':'朝阳区','Address':'三里屯街道雅秀大厦'}," +
+                "'Commodity':" +
+                "[{" +
+                "'GoodsName':'鞋子','Goodsquantity':1,'GoodsWeight':1.0}]," +
+                "'Weight':1.0," +
+                "'Quantity':1," +
+                "'Volume':0.0," +
+                "'Remark':'小心轻放'}";
 
         Map<String, String> params = new HashMap<String, String>();
         params.put("RequestData", urlEncoder(requestData, "UTF-8"));
         params.put("EBusinessID", EBusinessID);
-        params.put("RequestType", "1002");
+        params.put("RequestType", "1008");
         String dataSign = encrypt(requestData, AppKey, "UTF-8");
         params.put("DataSign", urlEncoder(dataSign, "UTF-8"));
         params.put("DataType", "2");
@@ -156,7 +184,7 @@ public class KdniaoTrackQueryAPI {
             conn.connect();
             // 获取URLConnection对象对应的输出流
             out = new OutputStreamWriter(conn.getOutputStream(), "UTF-8");
-            // 发送请求参数            
+            // 发送请求参数
             if (params != null) {
                 StringBuilder param = new StringBuilder();
                 for (Map.Entry<String, String> entry : params.entrySet()) {
@@ -166,9 +194,9 @@ public class KdniaoTrackQueryAPI {
                     param.append(entry.getKey());
                     param.append("=");
                     param.append(entry.getValue());
-                    //System.out.println(entry.getKey()+":"+entry.getValue());
+                    System.out.println(entry.getKey() + ":" + entry.getValue());
                 }
-                //System.out.println("param:"+param.toString());
+                System.out.println("param:" + param.toString());
                 out.write(param.toString());
             }
             // flush输出流的缓冲
@@ -198,7 +226,6 @@ public class KdniaoTrackQueryAPI {
         }
         return result.toString();
     }
-
 
     private static char[] base64EncodeChars = new char[]{
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',

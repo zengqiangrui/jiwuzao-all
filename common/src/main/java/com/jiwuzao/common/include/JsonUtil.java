@@ -64,8 +64,7 @@ public class JsonUtil {
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         try {
-            T target = objectMapper.readValue(jsonString,targetType);
-            return target;
+            return objectMapper.readValue(jsonString,targetType);
         } catch (Exception e) {
             e.printStackTrace();
         }
