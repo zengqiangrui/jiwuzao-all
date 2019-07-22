@@ -38,7 +38,7 @@ public class GoodsOrder {
     private Integer uid;
     private String sid;
     private String gid;
-    private String pid;
+    private String payOrderNo;
     private Integer goodsOrderDetailId;
     private Long createTime;
 

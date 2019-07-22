@@ -79,7 +79,7 @@ public class OrderService {
                     .setCover(goods.getCover()).setCreateTime(System.currentTimeMillis())
                     .setPostage(goods.getPostage()).setSpecClass(goodsSpec.getSpecClass())
                     .setFinalPay(finalPay).setUid(uid).setSid(goods.getSid())
-                    .setGid(goods.getGid()).setPid(payOrder.getPayOrderNo());
+                    .setGid(goods.getGid()).setPayOrderNo(payOrder.getPayOrderNo());
             goodsOrderRepository.save(goodsOrder);
 
             price = price.add(finalPay);
@@ -96,7 +96,7 @@ public class OrderService {
      */
     public Object comfirmOrder(String payOrderNo, String city, String address,
                                String phone, String name, String ip) throws WxPayException {
-        List<GoodsOrder> list = goodsOrderRepository.findByPid(payOrderNo);
+        List<GoodsOrder> list = goodsOrderRepository.findByPayOrderNo(payOrderNo);
         String body = new String("极物造-商品支付");
         for (GoodsOrder e : list){
             GoodsOrderDetail detail = goodsOrderDetailRepository.findById(e.getGoodsOrderDetailId()).get();
@@ -133,9 +133,9 @@ public class OrderService {
         payOrderRepository.save(payOrder);
         payOrderRepository.save(newOrder);
 
-        List<GoodsOrder> list = goodsOrderRepository.findByPid(payOrder.getPrepayId());
+        List<GoodsOrder> list = goodsOrderRepository.findByPayOrderNo(payOrder.getPrepayId());
         list.forEach(e->{
-            e.setPid(newOrder.getPrepayId());
+            e.setPayOrderNo(newOrder.getPayOrderNo());
             goodsOrderRepository.save(e);
         });
         return newOrder;
@@ -167,7 +167,7 @@ public class OrderService {
         GoodsOrder go = goodsOrderRepository.findByGoodsOrderNo(goodsOrderNo);
         GoodsOrderDetail god = goodsOrderDetailRepository
                 .findById(go.getGoodsOrderDetailId()).get();
-        PayOrder po = payOrderRepository.findByPayOrderNo(go.getPid());
+        PayOrder po = payOrderRepository.findByPayOrderNo(go.getPayOrderNo());
 
         GoodsOrderDto goodsOrderDto = new GoodsOrderDto();
         goodsOrderDto.setSid(go.getSid()).setGid(go.getGid())

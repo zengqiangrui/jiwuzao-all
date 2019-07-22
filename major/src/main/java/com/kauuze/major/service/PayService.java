@@ -35,7 +35,7 @@ public class PayService {
         payOrder.setPayTime(System.currentTimeMillis());
         payOrderRepository.save(payOrder);
 
-        List<GoodsOrder> list = goodsOrderRepository.findByPid(pid);
+        List<GoodsOrder> list = goodsOrderRepository.findByPayOrderNo(pid);
         list.forEach(e->{
             e.setOrderStatus(OrderStatusEnum.waitDeliver);
         });
