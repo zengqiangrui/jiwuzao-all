@@ -50,6 +50,7 @@ public class OrderService {
 
     /**
      * 用户通过购物车或者单个商品结算，传入商品数组生成订单
+     *
      * @param uid
      * @param itemList
      * @return 返回订单id
@@ -63,7 +64,7 @@ public class OrderService {
                 .setCreateTime(System.currentTimeMillis()).setOvertime(false)
                 .setSystemGoods(false).setQrCode(false).setUid(uid);
         //遍历购买列表， 为每件物品生成goodsOrder,将所有费用相加放入payOrder
-        for (AddItemPojo e : itemList){
+        for (AddItemPojo e : itemList) {
             Goods goods = goodsRepository.findByGid(e.getGid());
             GoodsSpec goodsSpec = goodsSpecRepository.findById(e.getSpecId()).get();
 
@@ -100,7 +101,7 @@ public class OrderService {
                                String phone, String name, String ip) throws WxPayException {
         List<GoodsOrder> list = goodsOrderRepository.findByPayOrderNo(payOrderNo);
         String body = new String("极物造-商品支付");
-        for (GoodsOrder e : list){
+        for (GoodsOrder e : list) {
             GoodsOrderDetail detail = goodsOrderDetailRepository.findById(e.getGoodsOrderDetailId()).get();
             detail.setReceiverCity(city).setReceiverAddress(address).setReceiverPhone(phone)
                     .setReceiverTrueName(name);
@@ -129,6 +130,7 @@ public class OrderService {
 
     /**
      * 刷新订单，将老的订单作废
+     *
      * @param payOrder
      * @return
      */
@@ -142,8 +144,9 @@ public class OrderService {
         payOrderRepository.save(newOrder);
 
         List<GoodsOrder> list = goodsOrderRepository.findByPayOrderNo(payOrder.getPrepayId());
-        list.forEach(e->{
+        list.forEach(e -> {
             e.setPayOrderNo(newOrder.getPayOrderNo());
+
             goodsOrderRepository.save(e);
         });
         return newOrder;
@@ -151,16 +154,17 @@ public class OrderService {
 
     /**
      * 获取订单简略信息
+     *
      * @param uid
      * @return
      */
     public List<GoodsOrderSimpleDto> getOrderSample(int uid) {
         List<GoodsOrder> goodsOrder = goodsOrderRepository.findByUid(uid);
         List<GoodsOrderSimpleDto> list = new ArrayList<>();
-        goodsOrder.forEach(e->{
+        goodsOrder.forEach(e -> {
             GoodsOrderSimpleDto goodsOrderSimpleDto = new GoodsOrderSimpleDto(
-                    e.getSid(),e.getGoodsOrderNo(),e.getGoodsTitle(),e.getCover(),
-                    e.getSpecClass(),e.getBuyCount(),e.getPostage(),e.getFinalPay(),
+                    e.getSid(), e.getGoodsOrderNo(), e.getGoodsTitle(), e.getCover(),
+                    e.getSpecClass(), e.getBuyCount(), e.getPostage(), e.getFinalPay(),
                     e.getOrderStatus()
             );
             list.add(goodsOrderSimpleDto);
@@ -176,7 +180,18 @@ public class OrderService {
         GoodsOrderDetail god = goodsOrderDetailRepository
                 .findById(go.getGoodsOrderDetailId()).get();
         PayOrder po = payOrderRepository.findByPayOrderNo(go.getPayOrderNo());
+        return createOrderDto(go, po, god);
+    }
 
+    /**
+     * 封装单个商品订单的显示对象
+     *
+     * @param go  订单
+     * @param po  支付
+     * @param god 订单详情
+     * @return 订单dto
+     */
+    private GoodsOrderDto createOrderDto(GoodsOrder go, PayOrder po, GoodsOrderDetail god) {
         GoodsOrderDto goodsOrderDto = new GoodsOrderDto();
         goodsOrderDto.setSid(go.getSid()).setGid(go.getGid())
                 .setTrackingNo(god.getTrackingNo()).setReceiverCity(god.getReceiverCity())
@@ -190,11 +205,79 @@ public class OrderService {
         return goodsOrderDto;
     }
 
+    /**
+     * 店铺查看所有下单信息
+     *
+     * @param sid 店铺id
+     * @return List<UserGoodsOrderDto>
+     */
+    public List<UserGoodsOrderDto> getUserOrder(String sid) {
+        List<GoodsOrder> list = goodsOrderRepository.findAllBySid(sid);
+        return transUserGoodsOrderDto(list);
+    }
+
+    /**
+     *
+     * @param sid
+     * @return
+     */
+    public List<UserGoodsOrderDto> getUserOrderWaitDeliver(String sid) {
+        List<GoodsOrder> list = goodsOrderRepository.findAllBySidAndOrderStatus(sid, OrderStatusEnum.waitDeliver);
+        return transUserGoodsOrderDto(list);
+    }
+
+
+    /**
+     * 根据用户id获取订单详情
+     *
+     * @param uid
+     * @return
+     */
+    public List<GoodsOrderDto> findGoodsOrderByUid(int uid) {
+        List<GoodsOrder> list = goodsOrderRepository.findByUid(uid);
+        return transGoodsOrderDto(list);
+    }
+
+    /**
+     * 将查到的商品订单list 转换为详情list
+     * @param list
+     * @return
+     */
+    private List<GoodsOrderDto> transGoodsOrderDto(List<GoodsOrder> list){
+        List<GoodsOrderDto> goodsOrderDtos = new ArrayList<>();
+        for (GoodsOrder goodsOrder : list) {
+            PayOrder po = payOrderRepository.findByPayOrderNo(goodsOrder.getPayOrderNo());
+            Optional<GoodsOrderDetail> opt = goodsOrderDetailRepository
+                    .findById(goodsOrder.getGoodsOrderDetailId());
+            if (!opt.isPresent()) {
+                throw new RuntimeException("未找到商品详情");
+            } else {
+                GoodsOrderDetail god = opt.get();
+                goodsOrderDtos.add(createOrderDto(goodsOrder, po, god));
+            }
+        }
+        return goodsOrderDtos;
+    }
+
+    private List<UserGoodsOrderDto> transUserGoodsOrderDto(List<GoodsOrder> list){
+        List<UserGoodsOrderDto> userGoodsOrderDtos = new ArrayList<>();
+        for (GoodsOrder goodsOrder : list) {
+            UserGoodsOrderDto userGoodsOrderDto = new UserGoodsOrderDto();
+            int uid = goodsOrder.getUid();
+            userGoodsOrderDto.setUid(uid)
+                    .setGoodsOrderDtos(findGoodsOrderByUid(uid));
+            userGoodsOrderDtos.add(userGoodsOrderDto);
+        }
+        return userGoodsOrderDtos;
+    }
+
+
     @Autowired
     private WxPayService wxPayService;
 
     /**
      * 根据支付方式调用统一下单接口
+     *
      * @param <T>
      * @return
      * @throws WxPayException
@@ -211,7 +294,7 @@ public class OrderService {
         req.setBody(body);//商品介绍
         req.setOutTradeNo(payOrderNo);//传给微信的订单号
         req.setTotalFee(price.multiply(BigDecimal.valueOf(100)).intValue());//金额,分
-        log.info("请求参数",req);
+        log.info("请求参数", req);
         return this.wxPayService.createOrder(req);
     }
 }

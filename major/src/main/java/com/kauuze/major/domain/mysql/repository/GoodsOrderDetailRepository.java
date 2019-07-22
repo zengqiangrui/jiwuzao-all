@@ -4,6 +4,8 @@ import com.jiwuzao.common.domain.mysql.entity.GoodsOrderDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * @author kauuze
  * @email 3412879785@qq.com
