@@ -59,6 +59,10 @@ public class GoodsOrder {
      */
     //private String specOrderIds;
     /**
+     * 商品规格id
+     */
+    private String gsid;
+    /**
      * 规格分类
      */
     private String specClass;

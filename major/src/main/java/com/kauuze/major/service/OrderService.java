@@ -23,7 +23,6 @@ import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.jaxb.SpringDataJaxb;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -38,6 +37,7 @@ import java.util.UUID;
 @Transactional(rollbackOn = Exception.class)
 @Slf4j
 public class OrderService {
+    private static final Boolean DEBUG = true;
 
     @Autowired
     private GoodsOrderRepository goodsOrderRepository;
@@ -83,7 +83,8 @@ public class OrderService {
                     .setCover(goods.getCover()).setCreateTime(System.currentTimeMillis())
                     .setPostage(goods.getPostage()).setSpecClass(goodsSpec.getSpecClass())
                     .setFinalPay(finalPay).setUid(uid).setSid(goods.getSid())
-                    .setGid(goods.getGid()).setPayOrderNo(payOrder.getPayOrderNo());
+                    .setGid(goods.getGid()).setPayOrderNo(payOrder.getPayOrderNo())
+                    .setGsid(e.getSpecId());
             goodsOrderRepository.save(goodsOrder);
 
             price = price.add(finalPay);
@@ -95,7 +96,6 @@ public class OrderService {
 
     /**
      * 用户传入收货信息确认订单
-     *
      * @param
      * @return
      */
@@ -105,21 +105,26 @@ public class OrderService {
         String body = new String("极物造-商品支付");
         for (GoodsOrder e : list) {
             GoodsOrderDetail detail = goodsOrderDetailRepository.findById(e.getGoodsOrderDetailId()).get();
-            detail.setCancelTime(System.currentTimeMillis())
-                    .setReceiverCity(city).setReceiverAddress(address).setReceiverPhone(phone)
+            detail.setReceiverCity(city).setReceiverAddress(address).setReceiverPhone(phone)
                     .setReceiverTrueName(name);
-        }
-        ;
+            goodsOrderDetailRepository.save(detail);
+        };
         PayOrder payOrder = payOrderRepository.findByPayOrderNo(payOrderNo);
         if (payOrder.getPrepayId() != null) {
             //为过期订单设置overTime按老的订单建立新的订单,并与goodsorder关联。
             payOrder = renewOrder(payOrder);
         }
         //调统一下单接口
-        Object res = createOrder(ip, body, payOrderNo, payOrder.getFinalPay());
-        if (res instanceof WxPayAppOrderResult) {
-            WxPayAppOrderResult wxres = (WxPayAppOrderResult) res;
-            payOrder.setPrepayId(wxres.getPrepayId());
+        Object res = null;
+        if (!DEBUG) {
+            res = createOrder(ip, body, payOrderNo, payOrder.getFinalPay());
+            if (res instanceof WxPayAppOrderResult) {
+                WxPayAppOrderResult wxres = (WxPayAppOrderResult) res;
+                payOrder.setPrepayId(wxres.getPrepayId());
+                payOrderRepository.save(payOrder);
+            }
+        } else {
+            payOrder.setPrepayId("Prepay123");
             payOrderRepository.save(payOrder);
         }
         return res;

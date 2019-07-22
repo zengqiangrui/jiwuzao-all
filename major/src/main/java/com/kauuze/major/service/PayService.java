@@ -22,22 +22,23 @@ public class PayService {
     private GoodsOrderRepository goodsOrderRepository;
 
     public void handleNotify(WxPayOrderNotifyResult notifyResult) {
-        String pid = notifyResult.getOutTradeNo();
+        String payOrderNo = notifyResult.getOutTradeNo();
         String transactionId = notifyResult.getTransactionId();
-        PayOrder payOrder = payOrderRepository.findByPayOrderNo(pid);
+        PayOrder payOrder = payOrderRepository.findByPayOrderNo(payOrderNo);
         //判断支付费用是否一致
         if (payOrder.getFinalPay().multiply(BigDecimal.valueOf(100)).intValue()
                 != notifyResult.getTotalFee()) {
-            log.warn("订单金额不一致pid：" + pid);
+            log.warn("订单金额不一致payOrderNo：" + payOrderNo);
             return;
         }
         payOrder.setTransactionId(transactionId);
         payOrder.setPayTime(System.currentTimeMillis());
         payOrderRepository.save(payOrder);
 
-        List<GoodsOrder> list = goodsOrderRepository.findByPayOrderNo(pid);
+        List<GoodsOrder> list = goodsOrderRepository.findByPayOrderNo(payOrderNo);
         list.forEach(e->{
             e.setOrderStatus(OrderStatusEnum.waitDeliver);
+            goodsOrderRepository.save(e);
         });
 
     }
