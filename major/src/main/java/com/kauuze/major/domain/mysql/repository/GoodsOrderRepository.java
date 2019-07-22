@@ -41,4 +41,11 @@ public interface GoodsOrderRepository extends JpaRepository<GoodsOrder,Integer> 
      */
     List<GoodsOrder> findAllBySid(String sid);
 
+    /**
+     * 查找某一用户，订单状态下的所有订单
+     * @param uid 用户id
+     * @param orderStatus 订单状态
+     * @return list
+     */
+    List<GoodsOrder> findAllByUidAndOrderStatus(int uid, OrderStatusEnum orderStatus);
 }

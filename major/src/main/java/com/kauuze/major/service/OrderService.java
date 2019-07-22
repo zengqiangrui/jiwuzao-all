@@ -203,24 +203,13 @@ public class OrderService {
     }
 
     /**
-     * 店铺查看所有下单信息
-     *
-     * @param sid 店铺id
-     * @return List<UserGoodsOrderDto>
+     * @param sid 根据店铺查询每个用户的对象
+     * @return list
      */
-    public List<UserGoodsOrderDto> getUserOrder(String sid) {
-        List<GoodsOrder> list = goodsOrderRepository.findAllBySid(sid);
-        return transUserGoodsOrderDto(list);
-    }
-
-    /**
-     *
-     * @param sid
-     * @return
-     */
-    public List<UserGoodsOrderDto> getUserOrderWaitDeliver(String sid) {
-        List<GoodsOrder> list = goodsOrderRepository.findAllBySidAndOrderStatus(sid, OrderStatusEnum.waitDeliver);
-        return transUserGoodsOrderDto(list);
+    public List<UserGoodsOrderDto> getUserOrderByStatus(String sid, OrderStatusEnum orderStatus) {
+        //查出店铺中所有待发货的list
+        List<GoodsOrder> list = goodsOrderRepository.findAllBySidAndOrderStatus(sid, orderStatus);
+        return transUserGoodsOrderDto(list, orderStatus);
     }
 
 
@@ -236,11 +225,23 @@ public class OrderService {
     }
 
     /**
+     * 根据用户id获取订单详情
+     *
+     * @param uid
+     * @return
+     */
+    public List<GoodsOrderDto> findGoodsOrderByUidStatus(int uid, OrderStatusEnum orderStatus) {
+        List<GoodsOrder> list = goodsOrderRepository.findAllByUidAndOrderStatus(uid, orderStatus);
+        return transGoodsOrderDto(list);
+    }
+
+    /**
      * 将查到的商品订单list 转换为详情list
+     *
      * @param list
      * @return
      */
-    private List<GoodsOrderDto> transGoodsOrderDto(List<GoodsOrder> list){
+    private List<GoodsOrderDto> transGoodsOrderDto(List<GoodsOrder> list) {
         List<GoodsOrderDto> goodsOrderDtos = new ArrayList<>();
         for (GoodsOrder goodsOrder : list) {
             PayOrder po = payOrderRepository.findByPayOrderNo(goodsOrder.getPayOrderNo());
@@ -256,14 +257,21 @@ public class OrderService {
         return goodsOrderDtos;
     }
 
-    private List<UserGoodsOrderDto> transUserGoodsOrderDto(List<GoodsOrder> list){
+    /**
+     * 用户商品订单详情dto转换
+     *
+     * @param list
+     * @return
+     */
+    private List<UserGoodsOrderDto> transUserGoodsOrderDto(List<GoodsOrder> list, OrderStatusEnum orderStatus) {
         List<UserGoodsOrderDto> userGoodsOrderDtos = new ArrayList<>();
         for (GoodsOrder goodsOrder : list) {
             UserGoodsOrderDto userGoodsOrderDto = new UserGoodsOrderDto();
             int uid = goodsOrder.getUid();
             userGoodsOrderDto.setUid(uid)
-                    .setGoodsOrderDtos(findGoodsOrderByUid(uid));
-            userGoodsOrderDtos.add(userGoodsOrderDto);
+                    .setGoodsOrderDtos(findGoodsOrderByUidStatus(uid, orderStatus));
+            if (!userGoodsOrderDtos.contains(userGoodsOrderDto))
+                userGoodsOrderDtos.add(userGoodsOrderDto);
         }
         return userGoodsOrderDtos;
     }

@@ -1,10 +1,11 @@
 package com.kauuze.major.api;
 
+import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
 import com.jiwuzao.common.dto.order.UserGoodsOrderDto;
+import com.jiwuzao.common.include.JsonResult;
 import com.jiwuzao.common.pojo.order.ExpressPojo;
 import com.kauuze.major.config.permission.Merchant;
-import com.kauuze.major.include.JsonResult;
 import com.kauuze.major.service.ExpressService;
 import com.kauuze.major.service.MerchantService;
 import com.kauuze.major.service.OrderService;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/express")
@@ -45,14 +47,15 @@ public class ExpressController {
      * @return
      */
     @Merchant
-    @RequestMapping("/getAllDelivery")
+    @RequestMapping("/getAllDelivery")//todo 查找店铺所有的订单
     public JsonResult getAllDelivery(@RequestAttribute int uid) {
         Store store = merchantService.getMerchantStore(uid);
         if (null == store) {
             return JsonResult.failure("该商家没有店铺");
         }
-        List<UserGoodsOrderDto> userOrder = orderService.getUserOrder(store.getId());
-        return JsonResult.success(userOrder);
+//        List<UserGoodsOrderDto> userOrder = orderService.getUserOrder(store.getId());
+//        return JsonResult.success(userOrder);
+        return null;
     }
 
     /**
@@ -68,7 +71,7 @@ public class ExpressController {
         if (null == store) {
             return JsonResult.failure("该商家没有店铺");
         }
-        List<UserGoodsOrderDto> userOrder = orderService.getUserOrderWaitDeliver(store.getId());
+        List<UserGoodsOrderDto> userOrder = orderService.getUserOrderByStatus(store.getId(), OrderStatusEnum.waitDeliver);
         return JsonResult.success(userOrder);
     }
 }

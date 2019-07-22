@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.Objects;
+
 @Data
 @Accessors(chain = true)
 @AllArgsConstructor
@@ -29,4 +31,17 @@ public class UserGoodsOrderDto {
      * 订单信息
      */
     private List<GoodsOrderDto> goodsOrderDtos;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserGoodsOrderDto that = (UserGoodsOrderDto) o;
+        return uid.equals(that.uid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uid);
+    }
 }

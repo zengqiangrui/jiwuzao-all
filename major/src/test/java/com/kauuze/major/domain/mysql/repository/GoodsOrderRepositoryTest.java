@@ -1,5 +1,6 @@
 package com.kauuze.major.domain.mysql.repository;
 
+import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
 import com.kauuze.major.service.OrderService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,5 +25,10 @@ public class GoodsOrderRepositoryTest {
     @Test
     public void createOrder(){
 //        orderService.createOrder()
+    }
+
+    @Test
+    public void showWaitDelivery(){
+        goodsOrderRepository.findAllBySidAndOrderStatus("5d241a0a3e6e8aadf857f2f9", OrderStatusEnum.waitDeliver).forEach(System.out::println);
     }
 }
