@@ -13,6 +13,7 @@ import com.jiwuzao.common.domain.mysql.entity.GoodsOrderDetail;
 import com.jiwuzao.common.domain.mysql.entity.PayOrder;
 import com.jiwuzao.common.dto.order.GoodsOrderDto;
 import com.jiwuzao.common.dto.order.GoodsOrderSimpleDto;
+import com.jiwuzao.common.dto.order.UserGoodsOrderDto;
 import com.jiwuzao.common.pojo.shopcart.AddItemPojo;
 import com.kauuze.major.domain.mongo.repository.GoodsRepository;
 import com.kauuze.major.domain.mongo.repository.GoodsSpecRepository;
@@ -22,6 +23,7 @@ import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.jaxb.SpringDataJaxb;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -49,6 +51,7 @@ public class OrderService {
 
     /**
      * 用户通过购物车或者单个商品结算，传入商品数组生成订单
+     *
      * @param uid
      * @param itemList
      * @return 返回订单id
@@ -62,7 +65,7 @@ public class OrderService {
                 .setCreateTime(System.currentTimeMillis()).setOvertime(false)
                 .setSystemGoods(false).setQrCode(false).setUid(uid);
         //遍历购买列表， 为每件物品生成goodsOrder,将所有费用相加放入payOrder
-        for (AddItemPojo e : itemList){
+        for (AddItemPojo e : itemList) {
             Goods goods = goodsRepository.findByGid(e.getGid());
             GoodsSpec goodsSpec = goodsSpecRepository.findById(e.getSpecId()).get();
 
@@ -91,6 +94,7 @@ public class OrderService {
 
     /**
      * 用户传入收货信息确认订单
+     *
      * @param
      * @return
      */
@@ -98,12 +102,13 @@ public class OrderService {
                                String phone, String name, String ip) throws WxPayException {
         List<GoodsOrder> list = goodsOrderRepository.findByPid(payOrderNo);
         String body = new String("极物造-商品支付");
-        for (GoodsOrder e : list){
+        for (GoodsOrder e : list) {
             GoodsOrderDetail detail = goodsOrderDetailRepository.findById(e.getGoodsOrderDetailId()).get();
             detail.setCancelTime(System.currentTimeMillis())
                     .setReceiverCity(city).setReceiverAddress(address).setReceiverPhone(phone)
                     .setReceiverTrueName(name);
-        };
+        }
+        ;
         PayOrder payOrder = payOrderRepository.findByPayOrderNo(payOrderNo);
         if (payOrder.getPrepayId() != null) {
             //为过期订单设置overTime按老的订单建立新的订单,并与goodsorder关联。
@@ -111,8 +116,8 @@ public class OrderService {
         }
         //调统一下单接口
         Object res = createOrder(ip, body, payOrderNo, payOrder.getFinalPay());
-        if (res instanceof WxPayAppOrderResult){
-            WxPayAppOrderResult wxres = (WxPayAppOrderResult)res;
+        if (res instanceof WxPayAppOrderResult) {
+            WxPayAppOrderResult wxres = (WxPayAppOrderResult) res;
             payOrder.setPrepayId(wxres.getPrepayId());
             payOrderRepository.save(payOrder);
         }
@@ -121,6 +126,7 @@ public class OrderService {
 
     /**
      * 刷新订单，将老的订单作废
+     *
      * @param payOrder
      * @return
      */
@@ -134,7 +140,7 @@ public class OrderService {
         payOrderRepository.save(newOrder);
 
         List<GoodsOrder> list = goodsOrderRepository.findByPid(payOrder.getPrepayId());
-        list.forEach(e->{
+        list.forEach(e -> {
             e.setPid(newOrder.getPrepayId());
             goodsOrderRepository.save(e);
         });
@@ -143,16 +149,17 @@ public class OrderService {
 
     /**
      * 获取订单简略信息
+     *
      * @param uid
      * @return
      */
     public List<GoodsOrderSimpleDto> getOrderSample(int uid) {
         List<GoodsOrder> goodsOrder = goodsOrderRepository.findByUid(uid);
         List<GoodsOrderSimpleDto> list = new ArrayList<>();
-        goodsOrder.forEach(e->{
+        goodsOrder.forEach(e -> {
             GoodsOrderSimpleDto goodsOrderSimpleDto = new GoodsOrderSimpleDto(
-                    e.getSid(),e.getGoodsOrderNo(),e.getGoodsTitle(),e.getCover(),
-                    e.getSpecClass(),e.getBuyCount(),e.getPostage(),e.getFinalPay(),
+                    e.getSid(), e.getGoodsOrderNo(), e.getGoodsTitle(), e.getCover(),
+                    e.getSpecClass(), e.getBuyCount(), e.getPostage(), e.getFinalPay(),
                     e.getOrderStatus()
             );
             list.add(goodsOrderSimpleDto);
@@ -168,7 +175,17 @@ public class OrderService {
         GoodsOrderDetail god = goodsOrderDetailRepository
                 .findById(go.getGoodsOrderDetailId()).get();
         PayOrder po = payOrderRepository.findByPayOrderNo(go.getPid());
+        return createOrderDto(go,po,god);
+    }
 
+    /**
+     * 封装单个商品订单的显示对象
+     * @param go 订单
+     * @param po 支付
+     * @param god 订单详情
+     * @return 订单dto
+     */
+    private GoodsOrderDto createOrderDto(GoodsOrder go,PayOrder po,GoodsOrderDetail god){
         GoodsOrderDto goodsOrderDto = new GoodsOrderDto();
         goodsOrderDto.setSid(go.getSid()).setGid(go.getGid())
                 .setTrackingNo(god.getTrackingNo()).setReceiverCity(god.getReceiverCity())
@@ -182,11 +199,36 @@ public class OrderService {
         return goodsOrderDto;
     }
 
+    /**
+     * 店铺查看下单信息
+     *
+     * @param sid 店铺id
+     * @return List<UserGoodsOrderDto>
+     */
+    public List<UserGoodsOrderDto> getUserOrder(String sid) {
+        List<GoodsOrder> list = goodsOrderRepository.findAllBySid(sid);
+        List<UserGoodsOrderDto> userGoodsOrderDtos = new ArrayList<>();
+        for (GoodsOrder goodsOrder : list) {
+            goodsOrder.getUid()
+        }
+     }
+
+     public List<GoodsOrderDto> findGoodsOrderByUid(int uid){
+         List<GoodsOrder> list = goodsOrderRepository.findByUid(uid);
+         for (GoodsOrder goodsOrder : list) {
+             payOrderRepository.findById(goodsOrder.getPid())
+             createOrderDto(goodsOrder,)
+         }
+         return
+     }
+
+
     @Autowired
     private WxPayService wxPayService;
 
     /**
      * 根据支付方式调用统一下单接口
+     *
      * @param <T>
      * @return
      * @throws WxPayException
@@ -203,7 +245,7 @@ public class OrderService {
         req.setBody(body);//商品介绍
         req.setOutTradeNo(payOrderNo);//传给微信的订单号
         req.setTotalFee(price.multiply(BigDecimal.valueOf(100)).intValue());//金额,分
-        log.info("请求参数",req);
+        log.info("请求参数", req);
         return this.wxPayService.createOrder(req);
     }
 }

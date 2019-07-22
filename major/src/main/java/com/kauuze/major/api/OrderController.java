@@ -32,13 +32,14 @@ public class OrderController {
 
     /**
      * 用户通过购物车或者单个商品结算，传入商品数组生成订单
+     *
      * @param uid
      * @param genOrderPojo
      * @return 返回订单id
      */
     @RequestMapping("/genOrder")
     @Authorization
-    public JsonResult genOrder(@RequestAttribute int uid, @Valid @RequestBody GenOrderPojo genOrderPojo){
+    public JsonResult genOrder(@RequestAttribute int uid, @Valid @RequestBody GenOrderPojo genOrderPojo) {
         String result = orderService.genOrder(uid, genOrderPojo.getItemList());
         if (result == null) {
             return JsonResult.failure();
@@ -49,9 +50,9 @@ public class OrderController {
 
     /**
      * 用户传入收货信息确认订单
+     *
      * @param pojo
      * @return
-     *
      */
     @RequestMapping("/comfirmOrder")
     @Authorization
@@ -65,8 +66,10 @@ public class OrderController {
             return JsonResult.success(result);
         }
     }
+
     /**
      * 获取订单简略信息
+     *
      * @param uid
      * @return
      */
@@ -86,7 +89,7 @@ public class OrderController {
      */
     @RequestMapping("/getOrderDetail")
     @Authorization
-    public JsonResult getOrderDetail(@RequestAttribute int uid, @Valid @RequestBody GetOrderPojo  getOrderPojo) {
+    public JsonResult getOrderDetail(@RequestAttribute int uid, @Valid @RequestBody GetOrderPojo getOrderPojo) {
         GoodsOrderDto result = orderService.getOrderDetail(uid, getOrderPojo.getGoodsOrderNo());
         if (result == null) {
             return JsonResult.failure();
