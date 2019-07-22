@@ -31,6 +31,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -82,7 +83,7 @@ public class OrderService {
                     .setCover(goods.getCover()).setCreateTime(System.currentTimeMillis())
                     .setPostage(goods.getPostage()).setSpecClass(goodsSpec.getSpecClass())
                     .setFinalPay(finalPay).setUid(uid).setSid(goods.getSid())
-                    .setGid(goods.getGid()).setPid(payOrder.getPayOrderNo());
+                    .setGid(goods.getGid()).setPayOrderNo(payOrder.getPayOrderNo());
             goodsOrderRepository.save(goodsOrder);
 
             price = price.add(finalPay);
@@ -100,7 +101,7 @@ public class OrderService {
      */
     public Object comfirmOrder(String payOrderNo, String city, String address,
                                String phone, String name, String ip) throws WxPayException {
-        List<GoodsOrder> list = goodsOrderRepository.findByPid(payOrderNo);
+        List<GoodsOrder> list = goodsOrderRepository.findByPayOrderNo(payOrderNo);
         String body = new String("极物造-商品支付");
         for (GoodsOrder e : list) {
             GoodsOrderDetail detail = goodsOrderDetailRepository.findById(e.getGoodsOrderDetailId()).get();
@@ -139,9 +140,10 @@ public class OrderService {
         payOrderRepository.save(payOrder);
         payOrderRepository.save(newOrder);
 
-        List<GoodsOrder> list = goodsOrderRepository.findByPid(payOrder.getPrepayId());
+        List<GoodsOrder> list = goodsOrderRepository.findByPayOrderNo(payOrder.getPrepayId());
         list.forEach(e -> {
-            e.setPid(newOrder.getPrepayId());
+            e.setPayOrderNo(newOrder.getPayOrderNo());
+
             goodsOrderRepository.save(e);
         });
         return newOrder;
@@ -174,18 +176,19 @@ public class OrderService {
         GoodsOrder go = goodsOrderRepository.findByGoodsOrderNo(goodsOrderNo);
         GoodsOrderDetail god = goodsOrderDetailRepository
                 .findById(go.getGoodsOrderDetailId()).get();
-        PayOrder po = payOrderRepository.findByPayOrderNo(go.getPid());
-        return createOrderDto(go,po,god);
+        PayOrder po = payOrderRepository.findByPayOrderNo(go.getPayOrderNo());
+        return createOrderDto(go, po, god);
     }
 
     /**
      * 封装单个商品订单的显示对象
-     * @param go 订单
-     * @param po 支付
+     *
+     * @param go  订单
+     * @param po  支付
      * @param god 订单详情
      * @return 订单dto
      */
-    private GoodsOrderDto createOrderDto(GoodsOrder go,PayOrder po,GoodsOrderDetail god){
+    private GoodsOrderDto createOrderDto(GoodsOrder go, PayOrder po, GoodsOrderDetail god) {
         GoodsOrderDto goodsOrderDto = new GoodsOrderDto();
         goodsOrderDto.setSid(go.getSid()).setGid(go.getGid())
                 .setTrackingNo(god.getTrackingNo()).setReceiverCity(god.getReceiverCity())
@@ -200,27 +203,70 @@ public class OrderService {
     }
 
     /**
-     * 店铺查看下单信息
+     * 店铺查看所有下单信息
      *
      * @param sid 店铺id
      * @return List<UserGoodsOrderDto>
      */
     public List<UserGoodsOrderDto> getUserOrder(String sid) {
         List<GoodsOrder> list = goodsOrderRepository.findAllBySid(sid);
+        return transUserGoodsOrderDto(list);
+    }
+
+    /**
+     *
+     * @param sid
+     * @return
+     */
+    public List<UserGoodsOrderDto> getUserOrderWaitDeliver(String sid) {
+        List<GoodsOrder> list = goodsOrderRepository.findAllBySidAndOrderStatus(sid, OrderStatusEnum.waitDeliver);
+        return transUserGoodsOrderDto(list);
+    }
+
+
+    /**
+     * 根据用户id获取订单详情
+     *
+     * @param uid
+     * @return
+     */
+    public List<GoodsOrderDto> findGoodsOrderByUid(int uid) {
+        List<GoodsOrder> list = goodsOrderRepository.findByUid(uid);
+        return transGoodsOrderDto(list);
+    }
+
+    /**
+     * 将查到的商品订单list 转换为详情list
+     * @param list
+     * @return
+     */
+    private List<GoodsOrderDto> transGoodsOrderDto(List<GoodsOrder> list){
+        List<GoodsOrderDto> goodsOrderDtos = new ArrayList<>();
+        for (GoodsOrder goodsOrder : list) {
+            PayOrder po = payOrderRepository.findByPayOrderNo(goodsOrder.getPayOrderNo());
+            Optional<GoodsOrderDetail> opt = goodsOrderDetailRepository
+                    .findById(goodsOrder.getGoodsOrderDetailId());
+            if (!opt.isPresent()) {
+                throw new RuntimeException("未找到商品详情");
+            } else {
+                GoodsOrderDetail god = opt.get();
+                goodsOrderDtos.add(createOrderDto(goodsOrder, po, god));
+            }
+        }
+        return goodsOrderDtos;
+    }
+
+    private List<UserGoodsOrderDto> transUserGoodsOrderDto(List<GoodsOrder> list){
         List<UserGoodsOrderDto> userGoodsOrderDtos = new ArrayList<>();
         for (GoodsOrder goodsOrder : list) {
-            goodsOrder.getUid()
+            UserGoodsOrderDto userGoodsOrderDto = new UserGoodsOrderDto();
+            int uid = goodsOrder.getUid();
+            userGoodsOrderDto.setUid(uid)
+                    .setGoodsOrderDtos(findGoodsOrderByUid(uid));
+            userGoodsOrderDtos.add(userGoodsOrderDto);
         }
-     }
-
-     public List<GoodsOrderDto> findGoodsOrderByUid(int uid){
-         List<GoodsOrder> list = goodsOrderRepository.findByUid(uid);
-         for (GoodsOrder goodsOrder : list) {
-             payOrderRepository.findById(goodsOrder.getPid())
-             createOrderDto(goodsOrder,)
-         }
-         return
-     }
+        return userGoodsOrderDtos;
+    }
 
 
     @Autowired

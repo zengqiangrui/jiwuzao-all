@@ -1,5 +1,6 @@
 package com.kauuze.major.domain.mysql.repository;
 
+import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -14,16 +15,24 @@ import java.util.List;
 @Repository
 public interface GoodsOrderRepository extends JpaRepository<GoodsOrder,Integer> {
     List<GoodsOrder> findByUid(int uid);
-    List<GoodsOrder> findByPid(String pid);
+    List<GoodsOrder> findByPayOrderNo(String pid);
     GoodsOrder findByGoodsOrderNo(String goodsOrderNo);
 
     /**
      * 查找店铺中某用户的下单情况
      * @param uid 用户id
      * @param sid 店铺id
-     * @return
+     * @return list
      */
     List<GoodsOrder> findAllByUidAndSid(int uid,String sid);
+
+    /**
+     * 查找店铺中某状态下的订单情况
+     * @param sid 店铺id
+     * @param orderStatus 状态枚举
+     * @return list
+     */
+    List<GoodsOrder> findAllBySidAndOrderStatus(String sid, OrderStatusEnum orderStatus);
 
     /**
      * 查找某店铺所有订单
