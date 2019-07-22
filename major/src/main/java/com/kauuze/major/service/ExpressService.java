@@ -1,6 +1,5 @@
 package com.kauuze.major.service;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jiwuzao.common.dto.order.ExpressResultDto;
 import com.jiwuzao.common.include.JsonUtil;
 import com.jiwuzao.common.include.yun.KdniaoUtil;
