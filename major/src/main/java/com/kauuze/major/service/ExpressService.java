@@ -20,6 +20,7 @@ import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +28,7 @@ import java.util.Optional;
 
 @Service
 @Slf4j
+@Transactional
 public class ExpressService {
 
     @Autowired
