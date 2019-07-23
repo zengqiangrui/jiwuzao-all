@@ -1,13 +1,15 @@
-package com.kauuze.major.test;
+package com.kauuze.major;
 
 
 import com.jiwuzao.common.domain.enumType.ExpressEnum;
 import com.jiwuzao.common.domain.mongo.entity.Express;
+import com.jiwuzao.common.include.JsonResult;
 import com.kauuze.major.domain.mongo.repository.CategoryRepository;
 import com.kauuze.major.domain.mongo.repository.ExpressRepository;
 import com.kauuze.major.domain.mongo.repository.GoodsSpecRepository;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
 import com.kauuze.major.include.StringUtil;
+import com.kauuze.major.include.yun.TencentUtil;
 import com.kauuze.major.service.ExpressService;
 import com.kauuze.major.service.GoodsService;
 import org.apache.commons.lang3.StringUtils;
@@ -36,6 +38,8 @@ public class GoodsServiceTest {
     private PayOrderRepository payOrderRepository;
     @Autowired
     private GoodsSpecRepository goodsSpecRepository;
+    @Autowired
+    private TencentUtil tencentUtil;
 
     @Test
     public void showGoods() {

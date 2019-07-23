@@ -1,4 +1,4 @@
-package com.kauuze.major.config.contain;
+package com.kauuze.major.config.contain.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

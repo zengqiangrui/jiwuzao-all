@@ -1,4 +1,4 @@
-package com.kauuze.major.test;
+package com.kauuze.major;
 
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
