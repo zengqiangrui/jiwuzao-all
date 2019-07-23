@@ -90,7 +90,7 @@ public class Rand {
      * 生成订单号，策略为年月日时分秒拼接五位随机整数
      * @return String
      */
-    public static String createOrderNo() {
+    public synchronized static String createOrderNo() {
         SimpleDateFormat simpleDateFormat;
         simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         Date date = new Date();
