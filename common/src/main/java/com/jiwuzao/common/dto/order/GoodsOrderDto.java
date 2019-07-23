@@ -24,7 +24,7 @@ public class GoodsOrderDto {
     /**
      * 物流单号
      */
-    private String trackingNo;
+    private String expressNo;
     /**
      * 收货省市区
      */

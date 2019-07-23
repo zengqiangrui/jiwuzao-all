@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
@@ -64,5 +65,11 @@ public class OrderServiceTest {
             e.setOrderStatus(OrderStatusEnum.waitDeliver);
             goodsOrderRepository.save(e);
         });
+    }
+
+
+    @Test
+    public void showOrderPage(){
+        orderService.findAllOrderByStore("5d241a0a3e6e8aadf857f2f9", PageRequest.of(0,2)).getContent().forEach(System.out::println);
     }
 }

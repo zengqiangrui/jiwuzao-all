@@ -2,6 +2,8 @@ package com.kauuze.major.domain.mysql.repository;
 
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -41,6 +43,14 @@ public interface GoodsOrderRepository extends JpaRepository<GoodsOrder,Integer> 
      * @return list
      */
     List<GoodsOrder> findAllBySid(String sid);
+
+    /**
+     * 分页查找店铺下所有订单
+     * @param sid
+     * @param pageable
+     * @return
+     */
+    Page<GoodsOrder> findAllBySid(String sid, Pageable pageable);
 
     /**
      * 查找某一用户，订单状态下的所有订单

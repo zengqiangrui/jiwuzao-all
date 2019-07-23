@@ -11,9 +11,11 @@ import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrderDetail;
 import com.jiwuzao.common.domain.mysql.entity.PayOrder;
+import com.jiwuzao.common.dto.goods.GoodsSimpleDto;
 import com.jiwuzao.common.dto.order.GoodsOrderDto;
 import com.jiwuzao.common.dto.order.GoodsOrderSimpleDto;
 import com.jiwuzao.common.dto.order.UserGoodsOrderDto;
+import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.pojo.shopcart.AddItemPojo;
 import com.kauuze.major.domain.mongo.repository.GoodsRepository;
 import com.kauuze.major.domain.mongo.repository.GoodsSpecRepository;
@@ -25,6 +27,8 @@ import com.kauuze.major.include.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -212,7 +216,7 @@ public class OrderService {
     private GoodsOrderDto createOrderDto(GoodsOrder go, PayOrder po, GoodsOrderDetail god) {
         GoodsOrderDto goodsOrderDto = new GoodsOrderDto();
         goodsOrderDto.setSid(go.getSid()).setGid(go.getGid())
-                .setTrackingNo(god.getTrackingNo()).setReceiverCity(god.getReceiverCity())
+                .setExpressNo(god.getExpressNo()).setReceiverCity(god.getReceiverCity())
                 .setReceiverAddress(god.getReceiverAddress()).setReceiverTrueName(god.getReceiverTrueName())
                 .setReceiverPhone(god.getReceiverPhone()).setGoodsTitle(go.getGoodsTitle())
                 .setCover(go.getCover()).setSpecString(go.getSpecClass())
@@ -322,5 +326,27 @@ public class OrderService {
         req.setTotalFee(price.multiply(BigDecimal.valueOf(100)).intValue());//金额,分
         log.info("请求参数", req);
         return this.wxPayService.createOrder(req);
+    }
+
+    public PageDto<GoodsOrderDto> findAllOrderByStore(String sid, Pageable pageable) {
+        Page<GoodsOrder> goodsOrderPage = goodsOrderRepository.findAllBySid(sid, pageable);
+        List<GoodsOrder> goodsOrderList = goodsOrderPage.getContent();
+        List<GoodsOrderDto> goodsOrderDtos = new ArrayList<>();
+        for (GoodsOrder goodsOrder : goodsOrderList) {
+            PayOrder po = payOrderRepository.findByPayOrderNo(goodsOrder.getPayOrderNo());
+            Optional<GoodsOrderDetail> opt = goodsOrderDetailRepository
+                    .findById(goodsOrder.getGoodsOrderDetailId());
+            if (!opt.isPresent()) {
+                throw new RuntimeException("未找到商品详情");
+            }else{
+                //数据拼装
+                GoodsOrderDto goodsOrderDto= createOrderDto(goodsOrder,po,opt.get());
+                goodsOrderDtos.add(goodsOrderDto);
+            }
+        }
+        PageDto<GoodsOrderDto> page = new PageDto<>();
+        page.setTotal(goodsOrderPage.getTotalElements());
+        page.setContent(goodsOrderDtos);
+        return page;
     }
 }
