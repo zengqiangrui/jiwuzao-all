@@ -12,9 +12,9 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class ExpressPojo {
     @StringMax(max = 32)
-    private String expCode;
+    private String expCode;//快递公司编号
     @StringMax(max = 32)
-    private String orderId;
+    private String orderNo;//订单号
     @StringMax(max = 32)
-    private String expNo;
+    private String expNo;//快递物流号
 }

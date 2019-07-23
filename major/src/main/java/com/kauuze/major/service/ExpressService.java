@@ -1,5 +1,6 @@
 package com.kauuze.major.service;
 
+import com.jiwuzao.common.domain.enumType.OrderExStatusEnum;
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
 import com.jiwuzao.common.domain.mongo.entity.Express;
 import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
@@ -74,14 +75,14 @@ public class ExpressService {
     }
 
     /**
-     * 发货一件商品：业务流程是商家在快递公司进行发货，完成后对于发货的商品输入快递公司编码和
+     * 发货一件商品：业务流程是商家在快递公司进行发货，完成后对于发货的商品输入快递公司编码和快递单号
      *
      * @param expCode
      * @param orderNo
      * @param expNo
      * @return
      */
-    public GoodsOrder addExpressOrder(String expCode, String orderNo, String expNo) {
+    public GoodsOrder addExpressOrder(String expCode, String expNo, String orderNo) {
         Optional<Express> code = expressRepository.findByCode(expCode);
         if (!code.isPresent()) {
             throw new OrderException(OrderExceptionEnum.NOT_SUPPORT_EXPRESS_CODE);
@@ -93,6 +94,8 @@ public class ExpressService {
                     throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
                 } else {
                     GoodsOrder goodsOrder = orderOptional.get();
+                    if (goodsOrder.getOrderStatus() != OrderStatusEnum.waitDeliver || goodsOrder.getOrderExStatus() != OrderExStatusEnum.normal)
+                        throw new OrderException(OrderExceptionEnum.EXCEPTION_ORDER);
                     //查找商品库存（规格信息）
                     if (StringUtil.isBlank(goodsOrder.getGsid())) {
                         throw new OrderException(OrderExceptionEnum.SPEC_NOT_FOUND);//规格信息没有找到

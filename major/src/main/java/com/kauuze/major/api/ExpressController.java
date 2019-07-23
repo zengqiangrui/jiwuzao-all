@@ -43,7 +43,7 @@ public class ExpressController {
         if(store.getViolation()){
             throw new StoreException(StoreExceptionEnum.STORE_ILLEGAL);//店铺违规
         }
-        GoodsOrder goodsOrder = expressService.addExpressOrder(express.getExpCode(), express.getExpNo(), express.getExpNo());
+        GoodsOrder goodsOrder = expressService.addExpressOrder(express.getExpCode(), express.getExpNo(), express.getOrderNo());
         if(goodsOrder!=null){
             return JsonResult.success();
         }

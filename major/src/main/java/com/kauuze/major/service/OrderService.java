@@ -20,6 +20,7 @@ import com.kauuze.major.domain.mongo.repository.GoodsSpecRepository;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderDetailRepository;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
+import com.kauuze.major.include.Rand;
 import com.kauuze.major.include.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -85,7 +86,7 @@ public class OrderService {
                     .setPostage(goods.getPostage()).setSpecClass(goodsSpec.getSpecClass())
                     .setFinalPay(finalPay).setUid(uid).setSid(goods.getSid())
                     .setGid(goods.getGid()).setPayOrderNo(payOrder.getPayOrderNo())
-                    .setGsid(e.getSpecId());
+                    .setGsid(e.getSpecId()).setPayOrderNo(Rand.createOrderNo());//增加生成orderNo
             goodsOrderRepository.save(goodsOrder);
 
             price = price.add(finalPay);
