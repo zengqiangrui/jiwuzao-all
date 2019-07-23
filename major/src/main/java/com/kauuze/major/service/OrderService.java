@@ -20,6 +20,7 @@ import com.kauuze.major.domain.mongo.repository.GoodsSpecRepository;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderDetailRepository;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
+import com.kauuze.major.include.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,6 +97,7 @@ public class OrderService {
 
     /**
      * 用户传入收货信息确认订单
+     *
      * @param
      * @return
      */
@@ -108,7 +110,8 @@ public class OrderService {
             detail.setReceiverCity(city).setReceiverAddress(address).setReceiverPhone(phone)
                     .setReceiverTrueName(name);
             goodsOrderDetailRepository.save(detail);
-        };
+        }
+        ;
         PayOrder payOrder = payOrderRepository.findByPayOrderNo(payOrderNo);
         if (payOrder.getPrepayId() != null) {
             //为过期订单设置overTime按老的订单建立新的订单,并与goodsorder关联。
@@ -177,11 +180,23 @@ public class OrderService {
     /**
      * 获取订单详细信息
      */
-    public GoodsOrderDto getOrderDetail(int uid, String goodsOrderNo) {
-        GoodsOrder go = goodsOrderRepository.findByGoodsOrderNo(goodsOrderNo);
-        GoodsOrderDetail god = goodsOrderDetailRepository
-                .findById(go.getGoodsOrderDetailId()).get();
+    public GoodsOrderDto getOrderDetail(String goodsOrderNo) {
+        if (StringUtil.isBlank(goodsOrderNo)) {
+            return null;
+//            throw new RuntimeException("订单编号不能为空");
+        }
+        Optional<GoodsOrder> goodsOrderOptional = goodsOrderRepository.findByGoodsOrderNo(goodsOrderNo);
+        if (!goodsOrderOptional.isPresent())
+            return null;
+        GoodsOrder go = goodsOrderOptional.get();
+        Optional<GoodsOrderDetail> detailOptional = goodsOrderDetailRepository
+                .findById(go.getGoodsOrderDetailId());
+        if (!detailOptional.isPresent())
+            return null;
+        GoodsOrderDetail god = detailOptional.get();
         PayOrder po = payOrderRepository.findByPayOrderNo(go.getPayOrderNo());
+        if (po == null)
+            return null;
         return createOrderDto(go, po, god);
     }
 

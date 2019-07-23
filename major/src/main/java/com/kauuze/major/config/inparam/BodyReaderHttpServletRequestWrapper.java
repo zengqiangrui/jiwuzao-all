@@ -45,7 +45,7 @@ public class BodyReaderHttpServletRequestWrapper extends HttpServletRequestWrapp
                 + "params:" + JsonUtil.toJsonString(request.getParameterMap()) + "  body:" + bodyStr;
         LOG.info(log);
         LogRepository logRepository =  SpringContext.getBean(LogRepository.class);
-        logRepository.save(new Log(null,System.currentTimeMillis(),log, "major",false,DateTimeUtil.covertDateView(System.currentTimeMillis())));
+        logRepository.save(new Log(null,System.currentTimeMillis(),log, "major",false,null,DateTimeUtil.covertDateView(System.currentTimeMillis())));
     }
 
     @Override

@@ -90,7 +90,7 @@ public class OrderController {
     @RequestMapping("/getOrderDetail")
     @Authorization
     public JsonResult getOrderDetail(@RequestAttribute int uid, @Valid @RequestBody GetOrderPojo getOrderPojo) {
-        GoodsOrderDto result = orderService.getOrderDetail(uid, getOrderPojo.getGoodsOrderNo());
+        GoodsOrderDto result = orderService.getOrderDetail(getOrderPojo.getGoodsOrderNo());
         if (result == null) {
             return JsonResult.failure();
         } else {

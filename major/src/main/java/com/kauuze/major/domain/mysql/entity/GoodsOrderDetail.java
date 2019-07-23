@@ -72,7 +72,7 @@ public class GoodsOrderDetail {
     /**
      * 是否申请取消订单:未审批无法发货
      */
-    private boolean applyCancel;
+    private boolean applyCancel = false;
     /**
      * 申请取消订单时间
      */
@@ -94,11 +94,11 @@ public class GoodsOrderDetail {
     /**
      * 是否退款：由商家进行退款，取消订单全额退款。
      */
-    private Boolean refund;
+    private Boolean refund =false;
     /**
      * 退款时间
      */
-    private Boolean refundTime;
+    private Long refundTime;
     /**
      * 退款金额
      */
@@ -107,7 +107,7 @@ public class GoodsOrderDetail {
     /**
      * 是否投诉
      */
-    private Boolean complaint;
+    private Boolean complaint = false;
     /**
      * 投诉时间
      */

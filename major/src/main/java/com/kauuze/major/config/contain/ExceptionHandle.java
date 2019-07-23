@@ -2,15 +2,18 @@ package com.kauuze.major.config.contain;
 
 
 import com.jiwuzao.common.domain.mongo.entity.Log;
+import com.jiwuzao.common.exception.OrderException;
+import com.jiwuzao.common.include.DateTimeUtil;
+import com.jiwuzao.common.include.JsonResult;
+import com.jiwuzao.common.include.StateModel;
 import com.kauuze.major.domain.mongo.repository.LogRepository;
-import com.kauuze.major.include.DateTimeUtil;
-import com.kauuze.major.include.StateModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,7 +47,7 @@ public class ExceptionHandle {
         try {
             StringWriter stringWriter = new StringWriter();
             e.printStackTrace(new PrintWriter(stringWriter));
-            logRepository.save(new Log(null, System.currentTimeMillis(),request.getRequestURL().toString() + "\r\n" + stringWriter.toString(), "major",true, DateTimeUtil.covertDateView(System.currentTimeMillis())));
+            logRepository.save(new Log(null, System.currentTimeMillis(),request.getRequestURL().toString() + "\r\n" + stringWriter.toString(), "major",true,null, DateTimeUtil.covertDateView(System.currentTimeMillis())));
             response.setStatus(500);
             StateModel stateModel = new StateModel();
             stateModel.setState("service wrong");
@@ -53,5 +56,14 @@ public class ExceptionHandle {
             return null;
         }
         return null;
+    }
+
+    @ExceptionHandler(value = OrderException.class)
+    @ResponseBody
+    public JsonResult showOrderException(OrderException e){
+        Log log = new Log();
+        log.setService("orderService").setCreateTime(System.currentTimeMillis()).setLog(e.getMessage()).setError(true).setErrCode(e.getCode());
+        logRepository.save(log);
+        return JsonResult.error(e.getCode(),e.getMessage());
     }
 }

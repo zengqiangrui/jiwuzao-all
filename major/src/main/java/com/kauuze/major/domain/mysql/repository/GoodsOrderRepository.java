@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author kauuze
@@ -16,7 +17,7 @@ import java.util.List;
 public interface GoodsOrderRepository extends JpaRepository<GoodsOrder,Integer> {
     List<GoodsOrder> findByUid(int uid);
     List<GoodsOrder> findByPayOrderNo(String pid);
-    GoodsOrder findByGoodsOrderNo(String goodsOrderNo);
+    Optional<GoodsOrder> findByGoodsOrderNo(String goodsOrderNo);
 
     /**
      * 查找店铺中某用户的下单情况

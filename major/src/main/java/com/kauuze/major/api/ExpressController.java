@@ -2,7 +2,10 @@ package com.kauuze.major.api;
 
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
+import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
 import com.jiwuzao.common.dto.order.UserGoodsOrderDto;
+import com.jiwuzao.common.exception.StoreException;
+import com.jiwuzao.common.exception.excEnum.StoreExceptionEnum;
 import com.jiwuzao.common.include.JsonResult;
 import com.jiwuzao.common.pojo.order.ExpressPojo;
 import com.kauuze.major.config.permission.Merchant;
@@ -33,11 +36,18 @@ public class ExpressController {
     @RequestMapping("/deliveryOne")
     @Merchant
     public JsonResult deliveryGoods(@RequestAttribute int uid, @RequestBody @Valid ExpressPojo express) {
-        if (!expressService.getOneByExpCode(express.getExpCode()).isPresent()) {
-            return JsonResult.failure("不存在该快递公司");
+        Store store = merchantService.getMerchantStore(uid);
+        if (null == store) {
+            throw new StoreException(StoreExceptionEnum.STORE_NOT_FOUND);//未找到店铺
         }
-        //todo 发货一件
-        return null;
+        if(store.getViolation()){
+            throw new StoreException(StoreExceptionEnum.STORE_ILLEGAL);//店铺违规
+        }
+        GoodsOrder goodsOrder = expressService.addExpressOrder(express.getExpCode(), express.getExpNo(), express.getExpNo());
+        if(goodsOrder!=null){
+            return JsonResult.success();
+        }
+        return JsonResult.failure();
     }
 
     /**
@@ -49,10 +59,7 @@ public class ExpressController {
     @Merchant
     @RequestMapping("/getAllDelivery")//todo 查找店铺所有的订单
     public JsonResult getAllDelivery(@RequestAttribute int uid) {
-        Store store = merchantService.getMerchantStore(uid);
-        if (null == store) {
-            return JsonResult.failure("该商家没有店铺");
-        }
+
 //        List<UserGoodsOrderDto> userOrder = orderService.getUserOrder(store.getId());
 //        return JsonResult.success(userOrder);
         return null;

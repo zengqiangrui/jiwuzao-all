@@ -67,5 +67,17 @@ public class JsonResult {
         JsonResult jsonResult = new JsonResult("failure",null,message);
         return jsonResult;
     }
+    /**
+     * 业务异常
+     *
+     * @param code
+     * @param msg
+     * @return
+     */
+    public static JsonResult error(Integer code, String msg) {
+        return new JsonResult("error", code, msg);
+    }
+
+
 
 }

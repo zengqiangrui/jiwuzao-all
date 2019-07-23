@@ -35,9 +35,9 @@ public class GoodsOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer uid;
-    private String sid;
-    private String gid;
+    private Integer uid;//用户id
+    private String sid;//店铺id
+    private String gid;//商品id
     private String payOrderNo;
     private Integer goodsOrderDetailId;
     private Long createTime;
@@ -87,7 +87,7 @@ public class GoodsOrder {
      * 订单异常状态
      */
     @Enumerated(EnumType.STRING)
-    private OrderExStatusEnum orderExStatus;
+    private OrderExStatusEnum orderExStatus = OrderExStatusEnum.normal;
     /**
      * 发货时间
      */

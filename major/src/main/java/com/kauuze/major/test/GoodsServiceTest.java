@@ -5,6 +5,8 @@ import com.jiwuzao.common.domain.enumType.ExpressEnum;
 import com.jiwuzao.common.domain.mongo.entity.Express;
 import com.kauuze.major.domain.mongo.repository.CategoryRepository;
 import com.kauuze.major.domain.mongo.repository.ExpressRepository;
+import com.kauuze.major.domain.mongo.repository.GoodsSpecRepository;
+import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
 import com.kauuze.major.include.StringUtil;
 import com.kauuze.major.service.ExpressService;
 import com.kauuze.major.service.GoodsService;
@@ -30,6 +32,10 @@ public class GoodsServiceTest {
     private ExpressRepository expressRepository;
     @Autowired
     private ExpressService expressService;
+    @Autowired
+    private PayOrderRepository payOrderRepository;
+    @Autowired
+    private GoodsSpecRepository goodsSpecRepository;
 
     @Test
     public void showGoods() {
@@ -41,17 +47,13 @@ public class GoodsServiceTest {
         System.out.println(expressService.getOrderTracesByJson("SF","118650888018",""));
     }
 
-//    @Test
-//    public void add() throws FileNotFoundException {
-//        Scanner sc = new Scanner(new File("C:\\Users\\Administrator\\Desktop\\kdniao.txt"));
-//        while (sc.hasNext()) {
-//            String str = sc.nextLine();
-//            if (StringUtils.isNoneBlank(str)) {
-//                String[] s = str.split("\\s+");
-//                System.out.println(s[0] + "," + s[1]);
-//                Express express = new Express(null, s[0], s[1], ExpressEnum.TRANS);
-//                System.out.println(expressRepository.save(express));
-//            }
-//        }
-//    }
+    @Test
+    public void showPay(){
+        System.out.println(payOrderRepository.findByPayOrderNo("aaaa"));
+    }
+
+    @Test
+    public void showSpec(){
+//        goodsSpecRepository.findByGid()
+    }
 }
