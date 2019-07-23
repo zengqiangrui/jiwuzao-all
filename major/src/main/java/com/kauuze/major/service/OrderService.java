@@ -86,7 +86,7 @@ public class OrderService {
                     .setPostage(goods.getPostage()).setSpecClass(goodsSpec.getSpecClass())
                     .setFinalPay(finalPay).setUid(uid).setSid(goods.getSid())
                     .setGid(goods.getGid()).setPayOrderNo(payOrder.getPayOrderNo())
-                    .setGsid(e.getSpecId()).setPayOrderNo(Rand.createOrderNo());//增加生成orderNo
+                    .setGsid(e.getSpecId()).setGoodsOrderNo(Rand.createOrderNo());//增加生成orderNo
             goodsOrderRepository.save(goodsOrder);
 
             price = price.add(finalPay);
