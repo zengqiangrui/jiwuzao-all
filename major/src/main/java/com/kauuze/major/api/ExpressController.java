@@ -88,10 +88,9 @@ public class ExpressController {
     }
 
     @RequestMapping("/notify")
-    @GreenWay
-    public String getExpressNotify(@RequestParam(value = "RequestData") String requestData, @RequestParam(value = "requestType") String RequestType, @RequestParam(value = "DataSign") String dataSign) {
+    public String getExpressNotify(@RequestParam(value = "RequestData") String requestData, @RequestParam(value = "RequestType") String requestType, @RequestParam(value = "DataSign") String dataSign) {
         log.info("RequestData", requestData);
-        log.info("RequestType", RequestType);
+        log.info("RequestType", requestType);
         log.info("DataSign", dataSign);
 
         return "success";
