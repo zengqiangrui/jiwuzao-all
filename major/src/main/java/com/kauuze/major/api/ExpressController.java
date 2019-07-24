@@ -54,6 +54,7 @@ public class ExpressController {
 
     /**
      * 商家查看店铺所有下单情况
+     *
      * @param uid  用户id
      * @param page 分页参数
      * @return pageDto 分页对象
@@ -68,6 +69,7 @@ public class ExpressController {
 
     /**
      * 商家查看店铺未发货订单情况
+     *
      * @param uid
      * @return
      */
@@ -88,14 +90,12 @@ public class ExpressController {
     }
 
     @RequestMapping("/notify")
-    public String getExpressNotify(String data){
-
-        log.info("快递回调",data);
+    public String getExpressNotify(String RequestData, String RequestType, String DataSign) {
+        log.info("RequestData", RequestData);
+        log.info("RequestType", RequestType);
+        log.info("DataSign", DataSign);
         return "success";
     }
-
-
-
 
 
     /**
