@@ -5,6 +5,8 @@ import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
 import com.jiwuzao.common.domain.mongo.entity.Express;
 import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
+import com.jiwuzao.common.dto.order.ExpressRequestDataDto;
+import com.jiwuzao.common.dto.order.ExpressRequestMainDto;
 import com.jiwuzao.common.dto.order.ExpressResultDto;
 import com.jiwuzao.common.exception.OrderException;
 import com.jiwuzao.common.exception.excEnum.OrderExceptionEnum;
@@ -16,6 +18,7 @@ import com.kauuze.major.domain.mongo.repository.ExpressRepository;
 import com.kauuze.major.domain.mongo.repository.GoodsSpecRepository;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,9 +62,23 @@ public class ExpressService {
         params.put("DataType", "2");
 
         String result = kdniaoUtil.sendPost(properties.getTraceUrl(), params);
-        log.info("kdniaoResult", result);
-        //根据公司业务处理返回的信息......
+        log.info("kdniaoTraceResult", result);
         return JsonUtil.parseJsonString(result, ExpressResultDto.class);
+    }
+
+    public String orderTracesSubByJson(ExpressRequestDataDto requestDataDto,String expressOrder) throws Exception {
+        KdniaoUtil kdniaoUtil = new KdniaoUtil();
+        //todo 传入收货人和发货人信息
+        String requestData = JsonUtil.toJsonString(requestDataDto);
+        Map<String, String> params = new HashMap<>();
+        params.put("RequestData", kdniaoUtil.urlEncoder(requestData, "UTF-8"));
+        params.put("EBusinessID", properties.getEBusinessID());
+        params.put("RequestType", "1008");
+        String dataSign = kdniaoUtil.encrypt(requestData, properties.getAppKey(), "UTF-8");
+        params.put("DataSign", kdniaoUtil.urlEncoder(dataSign, "UTF-8"));
+        params.put("DataType", "2");
+        String result = kdniaoUtil.sendPost(properties.getSubscriptionUrl(), params);
+        return result;
     }
 
     /**

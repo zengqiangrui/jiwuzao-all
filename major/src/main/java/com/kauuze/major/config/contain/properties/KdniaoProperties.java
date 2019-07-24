@@ -11,5 +11,6 @@ public class KdniaoProperties {
     private String eBusinessID;
     private String appKey;
     private String traceUrl;
+    private String subscriptionUrl;
 
 }

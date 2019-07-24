@@ -11,7 +11,10 @@ public enum  ExpressEnum {
     ABROAD(2,"国外快递公司"),
     TRANS(3,"转运快递公司")
     ;
-
+    private Integer code;
+    private String msg;
     ExpressEnum(int code,String msg) {
+        this.code = code;
+        this.msg = msg;
     }
 }

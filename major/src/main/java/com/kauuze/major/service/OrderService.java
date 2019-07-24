@@ -115,8 +115,7 @@ public class OrderService {
             detail.setReceiverCity(city).setReceiverAddress(address).setReceiverPhone(phone)
                     .setReceiverTrueName(name);
             goodsOrderDetailRepository.save(detail);
-        }
-        ;
+        };
         PayOrder payOrder = payOrderRepository.findByPayOrderNo(payOrderNo);
         if (payOrder.getPrepayId() != null) {
             //为过期订单设置overTime按老的订单建立新的订单,并与goodsorder关联。

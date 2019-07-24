@@ -17,6 +17,7 @@ import com.kauuze.major.config.permission.Merchant;
 import com.kauuze.major.service.ExpressService;
 import com.kauuze.major.service.MerchantService;
 import com.kauuze.major.service.OrderService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -31,6 +32,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/express")
+@Slf4j
 public class ExpressController {
 
     @Autowired
@@ -43,7 +45,6 @@ public class ExpressController {
     @RequestMapping("/deliveryOne")
     @Merchant
     public JsonResult deliveryGoods(@RequestAttribute int uid, @RequestBody @Valid ExpressPojo express) {
-
         GoodsOrder goodsOrder = expressService.addExpressOrder(express.getExpCode(), express.getExpNo(), express.getOrderNo());
         if (goodsOrder != null) {
             return JsonResult.success();
@@ -53,7 +54,7 @@ public class ExpressController {
 
     /**
      * 商家查看店铺所有下单情况
-     * @param uid 用户id
+     * @param uid  用户id
      * @param page 分页参数
      * @return pageDto 分页对象
      */
@@ -67,7 +68,6 @@ public class ExpressController {
 
     /**
      * 商家查看店铺未发货订单情况
-     *
      * @param uid
      * @return
      */
@@ -79,8 +79,28 @@ public class ExpressController {
         return JsonResult.success(userOrder);
     }
 
+    @Merchant
+    @RequestMapping("/getAllWaitReceive")
+    public JsonResult getAllWaitReceive(@RequestAttribute int uid) {
+        Store store = checkStoreStatus(uid);
+        List<UserGoodsOrderDto> userOrder = orderService.getUserOrderByStatus(store.getId(), OrderStatusEnum.waitReceive);
+        return JsonResult.success(userOrder);
+    }
+
+    @RequestMapping("/notify")
+    public String getExpressNotify(String data){
+
+        log.info("快递回调",data);
+        return data;
+    }
+
+
+
+
+
     /**
      * 用于验证店铺信息是否正确
+     *
      * @param uid
      * @return
      */
