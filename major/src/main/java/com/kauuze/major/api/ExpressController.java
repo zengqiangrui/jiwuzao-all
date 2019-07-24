@@ -13,6 +13,7 @@ import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.pojo.common.PagePojo;
 import com.jiwuzao.common.pojo.order.ExpressPojo;
 import com.jiwuzao.common.pojo.order.OrderPagePojo;
+import com.kauuze.major.config.permission.GreenWay;
 import com.kauuze.major.config.permission.Merchant;
 import com.kauuze.major.service.ExpressService;
 import com.kauuze.major.service.MerchantService;
@@ -21,10 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -90,10 +88,12 @@ public class ExpressController {
     }
 
     @RequestMapping("/notify")
-    public String getExpressNotify(String RequestData, String RequestType, String DataSign) {
-        log.info("RequestData", RequestData);
+    @GreenWay
+    public String getExpressNotify(@RequestParam(value = "RequestData") String requestData, @RequestParam(value = "requestType") String RequestType, @RequestParam(value = "DataSign") String dataSign) {
+        log.info("RequestData", requestData);
         log.info("RequestType", RequestType);
-        log.info("DataSign", DataSign);
+        log.info("DataSign", dataSign);
+
         return "success";
     }
 
