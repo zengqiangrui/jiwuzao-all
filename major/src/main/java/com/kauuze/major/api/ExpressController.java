@@ -91,7 +91,7 @@ public class ExpressController {
     public String getExpressNotify(String data){
 
         log.info("快递回调",data);
-        return data;
+        return "success";
     }
 
 
