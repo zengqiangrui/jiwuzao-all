@@ -25,7 +25,6 @@ import java.math.BigDecimal;
         @Index(name = "index_goodsOrder_uid",columnList = "uid"),
         @Index(name = "index_goodsOrder_sid",columnList = "sid"),
         @Index(name = "index_goodsOrder_gid",columnList = "gid"),
-        @Index(name = "index_goodsOrder_pid",columnList = "pid"),
         @Index(name = "index_goodsOrder_goodsOrderDetailId",columnList = "goodsOrderDetailId",unique = true),
         @Index(name = "index_goodsOrder_createTime",columnList = "createTime"),
         @Index(name = "index_goodsOrder_goodsOrderNo",columnList = "goodsOrderNo",unique = true),

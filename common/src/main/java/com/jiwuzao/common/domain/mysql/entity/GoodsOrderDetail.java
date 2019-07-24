@@ -19,9 +19,9 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Table(indexes = {
-        @Index(name = "index_goodsOrder_trackingNo",columnList = "trackingNo",unique = true),
+        @Index(name = "index_goodsOrder_expressNo",columnList = "expressNo",unique = true),
         @Index(name = "index_goodsOrder_applyCancel",columnList = "applyCancel"),
-        @Index(name = "index_goodsOrder_applyCancelMerchantAudit",columnList = "trackingNo"),
+        @Index(name = "index_goodsOrder_applyCancelMerchantAudit",columnList = "expressNo"),
         @Index(name = "index_goodsOrder_refundOrderNo",columnList = "refundOrderNo",unique = true),
         @Index(name = "index_goodsOrder_refund",columnList = "refund"),
         @Index(name = "index_goodsOrder_complaint",columnList = "complaint"),
