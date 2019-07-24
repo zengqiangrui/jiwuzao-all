@@ -10,7 +10,6 @@ pipeline {
             }
             steps {
                 sh 'mvn -B -DskipTests clean package'
-                sh 'cd common;mvn install'
                 sh 'cd major;mvn dockerfile:build'
                 sh 'cd manager;mvn dockerfile:build'
             }
