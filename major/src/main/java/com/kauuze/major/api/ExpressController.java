@@ -24,8 +24,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.bouncycastle.asn1.eac.CertificateBody.requestType;
 
 
 @RestController
@@ -88,10 +94,15 @@ public class ExpressController {
     }
 
     @RequestMapping("/notify")
-    public String getExpressNotify(@RequestParam(value = "RequestData") String requestData, @RequestParam(value = "RequestType") String requestType, @RequestParam(value = "DataSign") String dataSign) {
-        log.info("RequestData", requestData);
-        log.info("RequestType", requestType);
-        log.info("DataSign", dataSign);
+    public String getExpressNotify(HttpServletRequest request, HttpServletResponse response) {
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        Set<Map.Entry<String, String[]>> entries = parameterMap.entrySet();
+        for (Map.Entry<String, String[]> entry : entries) {
+            log.info("key:{},value:{}",entry.getKey(),entry.getValue());
+        }
+//        log.info("RequestData", requestData);
+//        log.info("RequestType", requestType);
+//        log.info("DataSign", dataSign);
 
         return "success";
     }
