@@ -164,6 +164,7 @@ public class ExpressController {
         String dataSign = parameterMap.get("DataSign")[0];//MjcwOGRmOTEyNTVjYjM5OWEwY2I1Yzc5MjRhODQxOGU=
         String requestType = parameterMap.get("RequestType")[0];//101
         ExpressNotifySendDto expressNotifySendDto = expressService.handleNotify(requestData, dataSign, requestType);
+        log.info("expressDto",expressNotifySendDto);
         return JsonUtil.toJsonString(expressNotifySendDto);
     }
 
