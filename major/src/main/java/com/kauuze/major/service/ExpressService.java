@@ -226,6 +226,7 @@ public class ExpressService {
                     BeanUtils.copyProperties(dataPojo,expressResult);
                     expressResult.setId(expressResultOptional.get().getId());
                     ExpressResult save = resultRepository.save(expressResult);//更新物流订单信息
+                    log.info("更新物流订单信息:",save);
                 }else {
                    return notifySendDto.setSuccess(false).setReason("该运单物流跟踪未订阅");
                 }
