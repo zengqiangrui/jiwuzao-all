@@ -158,7 +158,8 @@ public class ExpressController {
      * @return
      */
     @RequestMapping("/notify")
-    public String getExpressNotify(HttpServletRequest request) throws RuntimeException {
+    public String getExpressNotify(HttpServletRequest request){
+        log.info("request",request);
         Map<String, String[]> parameterMap = request.getParameterMap();
         String requestData = parameterMap.get("RequestData")[0];//{"PushTime":"2019-07-25 16:32:16","EBusinessID":"test1554228","Data":[{"LogisticCode":"1234561","ShipperCode":"SF","Traces":[{"AcceptStation":"顺丰速运已收取快件","AcceptTime":"2019-07-25 16:32:16","Remark":""},{"AcceptStation":"货物已经到达深圳","AcceptTime":"2019-07-25 16:32:162","Remark":""},{"AcceptStation":"货物到达福田保税区网点","AcceptTime":"2019-07-25 16:32:163","Remark":""},{"AcceptStation":"货物已经被张三签收了","AcceptTime":"2019-07-25 16:32:164","Remark":""}],"State":"3","EBusinessID":"test1554228","Success":true,"Reason":"","CallBack":"","EstimatedDeliveryTime":"2019-07-25 16:32:16"}],"Count":"1"}
         String dataSign = parameterMap.get("DataSign")[0];//MjcwOGRmOTEyNTVjYjM5OWEwY2I1Yzc5MjRhODQxOGU=
