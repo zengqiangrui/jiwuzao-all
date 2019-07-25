@@ -213,10 +213,13 @@ public class ExpressService {
     public ExpressNotifySendDto handleNotify(String requestData, String dataSign, String requestType) {
         ExpressNotifySendDto notifySendDto = new ExpressNotifySendDto().setEBusinessID(properties.getEBusinessID()).setUpdateTime(new Date());
         if (StringUtil.isBlank(dataSign)) {
+            log.info("未获取签名信息");
             return notifySendDto.setSuccess(false).setReason("未获取签名信息");
         }
-        if(!"101".equals(requestType))
+        if(!"101".equals(requestType)) {
+            log.info("不支持的请求类型");
             return notifySendDto.setSuccess(false).setReason("不支持的请求类型");
+        }
         ExpressPushPojo expressPushPojo = JsonUtil.parseJsonString(requestData, ExpressPushPojo.class);
         if (expressPushPojo.getCount() > 0 && !expressPushPojo.getData().isEmpty()){
             for (ExpressPushDataPojo dataPojo : expressPushPojo.getData()) {
@@ -233,6 +236,7 @@ public class ExpressService {
             }
             return notifySendDto.setSuccess(true);
         }else{
+            log.info("未接收到轨迹信息");
             return notifySendDto.setSuccess(false).setReason("未接收到轨迹信息");
         }
     }
