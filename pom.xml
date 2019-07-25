@@ -18,14 +18,6 @@
     <packaging>pom</packaging>
 
     <name>jiwuzao</name>
-    <description>Parent for Spring Boot</description>
-
-    <modules>
-        <module>major</module>
-        <module>manager</module>
-        <module>common</module>
-    </modules>
-
     <dependencies>
         <!--公共依赖-->
         <dependency>
@@ -48,27 +40,13 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-websocket</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
+        <!--引入websocket 包含了 web 同时基于tomcat的-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-tomcat</artifactId>
-                </exclusion>
-            </exclusions>
+            <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-undertow</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -106,5 +84,13 @@
             <version>1.0.6</version>
         </dependency>
     </dependencies>
+
+    <description>Parent for Spring Boot</description>
+
+    <modules>
+        <module>major</module>
+        <module>manager</module>
+        <module>common</module>
+    </modules>
 
 </project>

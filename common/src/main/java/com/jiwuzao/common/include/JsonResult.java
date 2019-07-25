@@ -78,6 +78,15 @@ public class JsonResult {
         return new JsonResult("error", code, msg);
     }
 
+    /**
+     * 业务异常
+     *
+     * @param msg
+     * @return
+     */
+    public static JsonResult error(String msg) {
+        return new JsonResult("error", null, msg);
+    }
 
 
 }

@@ -1,12 +1,10 @@
-package com.jiwuzao.common.dto.order;
+package com.jiwuzao.common.dto.express;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.undertow.io.Sender;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.apache.lucene.search.Weight;
 
 @Data
 @Accessors(chain = true)
@@ -16,7 +14,6 @@ import org.apache.lucene.search.Weight;
  * 轨迹订阅接口请求数据
  */
 public class ExpressRequestDataDto {
-
     @JsonProperty("ShipperCode")
     private String shipperCode;//快递公司编码
     @JsonProperty("LogisticCode")

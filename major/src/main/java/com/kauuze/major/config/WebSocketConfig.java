@@ -9,12 +9,11 @@ import org.springframework.web.socket.server.HandshakeInterceptor;
 import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
 @Configuration
-//@EnableWebSocket
 public class WebSocketConfig {
 
-//    @Bean
-//    public ServerEndpointExporter serverEndpointExporter() {
-//        return new ServerEndpointExporter();
-//    }
+    @Bean
+    public ServerEndpointExporter serverEndpointExporter() {
+        return new ServerEndpointExporter();
+    }
 
 }

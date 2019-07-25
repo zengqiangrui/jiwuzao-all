@@ -7,13 +7,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class ExpressRepositoryTest {
     @Autowired
     private ExpressRepository expressRepository;
+//    @Autowired
+//    private StringRedisTemplate redisTemplate;
+//
+//    @Test
+//    public void testRedis(){
+//        redisTemplate.opsForValue().set("testKey","testValue");
+//        System.out.println(redisTemplate.opsForValue().get("testKey"));
+//    }
+
 
     @Test
     public void show(){

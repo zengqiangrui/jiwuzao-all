@@ -31,6 +31,9 @@ public class GoodsOrderDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    private String goodsOrderNo;
+
     /**
      * 订单完成时间
      */
@@ -52,6 +55,11 @@ public class GoodsOrderDetail {
      * 收货详细地址
      */
     private String receiverAddress;
+
+    /**
+     * 邮编
+     */
+    private String postCode;
     /**
      * 收货人
      */

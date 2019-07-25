@@ -1,4 +1,4 @@
-package com.jiwuzao.common.pojo.order;
+package com.jiwuzao.common.pojo.express;
 
 import com.jiwuzao.common.include.valid.StringMax;
 import lombok.AllArgsConstructor;
@@ -11,12 +11,11 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class ExpressPojo {
+
     @StringMax(max = 32)
-    private String expCode;//快递公司编号
+    private String goodsOrderNo;//本订单号
     @StringMax(max = 32)
-    private String orderNo;//订单号
-    @StringMax(max = 32)
-    private String expNo;//快递物流号
-    @StringMax(max = 32)
-    private String senderAddressId;//寄件人的地址id
+    private String expNo;//快递单号
+    @StringMax(max = 10)
+    private String expCode;//快递公司代码
 }

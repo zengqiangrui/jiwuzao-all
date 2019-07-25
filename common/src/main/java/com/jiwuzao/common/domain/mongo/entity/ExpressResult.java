@@ -1,7 +1,6 @@
 package com.jiwuzao.common.domain.mongo.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.jiwuzao.common.dto.order.ExpressTraceDto;
+import com.jiwuzao.common.dto.express.ExpressTraceDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,12 +19,13 @@ public class ExpressResult {
     @Id
     private String id;
 
-    private String eBusinessID;
-
+    private String pushTime;
     /**
      * 物流运单号
      */
     private String logisticCode;
+
+    private String eBusinessID;
 
     /**
      * 快递公司编码，必须

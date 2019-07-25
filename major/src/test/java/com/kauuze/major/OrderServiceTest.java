@@ -2,11 +2,13 @@ package com.kauuze.major;
 
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
+import com.jiwuzao.common.domain.mongo.entity.ExpressResult;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
 import com.jiwuzao.common.domain.mysql.entity.PayOrder;
 import com.jiwuzao.common.pojo.shopcart.AddItemPojo;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
+import com.kauuze.major.service.ExpressService;
 import com.kauuze.major.service.OrderService;
 import com.kauuze.major.service.PayService;
 import org.junit.Test;
@@ -20,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class OrderServiceTest {
     @Autowired
     OrderService orderService;
@@ -30,6 +32,8 @@ public class OrderServiceTest {
     PayOrderRepository payOrderRepository;
     @Autowired
     GoodsOrderRepository goodsOrderRepository;
+    @Autowired
+    private ExpressService expressService;
 
     @Test
     public void genOrder(){
@@ -71,5 +75,15 @@ public class OrderServiceTest {
     @Test
     public void showOrderPage(){
         orderService.findAllOrderByStore("5d241a0a3e6e8aadf857f2f9", PageRequest.of(0,2)).getContent().forEach(System.out::println);
+    }
+
+    @Test
+    public void showExpress(){
+        try {
+            ExpressResult sf = expressService.getOrderTracesByJson("SF", "1234564", "111");
+            System.out.println(sf);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -1,4 +1,4 @@
-package com.jiwuzao.common.dto.order;
+package com.jiwuzao.common.dto.express;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
