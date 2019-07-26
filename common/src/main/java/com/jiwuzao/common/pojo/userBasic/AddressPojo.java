@@ -1,5 +1,6 @@
 package com.jiwuzao.common.pojo.userBasic;
 
+import com.jiwuzao.common.domain.enumType.AddressEnum;
 import com.jiwuzao.common.include.valid.Phone;
 import com.jiwuzao.common.include.valid.StringMax;
 import com.jiwuzao.common.include.valid.TrueName;
@@ -35,5 +36,7 @@ public class AddressPojo {
      */
     @TrueName
     private String receiverTrueName;
+
+    private AddressEnum defaultStatus;
 
 }

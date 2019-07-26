@@ -21,4 +21,6 @@ public interface AddressRepository extends MongoRepository<ReceiverAddress, Stri
     List<ReceiverAddress> findAllByUidAndAddressStatusIsNot(Integer uid,AddressEnum addressEnum);
 
     List<ReceiverAddress> findAllByUidAndAddressStatus(Integer uid, AddressEnum addressEnum);
+
+
 }
