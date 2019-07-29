@@ -6,6 +6,7 @@ import lombok.Data;
 
 /**
  * 用于api返回restful
+ *
  * @author kauuze
  * @email 3412879785@qq.com
  * @time 2019-02-24 12:30
@@ -29,43 +30,48 @@ public class JsonResult {
 
     /**
      * 业务成功
+     *
      * @return
      */
-    public static JsonResult success(){
-        JsonResult jsonResult = new JsonResult("success",null,null);
+    public static JsonResult success() {
+        JsonResult jsonResult = new JsonResult("success", null, null);
         return jsonResult;
     }
 
     /**
      * 业务成功
+     *
      * @param data
      * @return
      */
-    public static JsonResult success(Object data){
-        JsonResult jsonResult = new JsonResult("success",data,null);
+    public static JsonResult success(Object data) {
+        JsonResult jsonResult = new JsonResult("success", data, null);
         return jsonResult;
     }
 
     /**
      * 业务失败
+     *
      * @return
      */
-    public static JsonResult failure(){
-        JsonResult jsonResult = new JsonResult("failure",null,"操作失败");
+    public static JsonResult failure() {
+        JsonResult jsonResult = new JsonResult("failure", null, "操作失败");
         return jsonResult;
     }
 
     /**
      * 业务失败
+     *
      * @param message
      * @return
      */
-    public static JsonResult failure(String message){
-        if(StringUtil.isBlank(message)){
+    public static JsonResult failure(String message) {
+        if (StringUtil.isBlank(message)) {
             message = "操作失败";
         }
-        JsonResult jsonResult = new JsonResult("failure",null,message);
+        JsonResult jsonResult = new JsonResult("failure", null, message);
         return jsonResult;
     }
+
 
 }

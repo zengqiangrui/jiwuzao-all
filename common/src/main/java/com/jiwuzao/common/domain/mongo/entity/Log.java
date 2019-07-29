@@ -31,6 +31,7 @@ public class Log {
      */
     @Indexed
     private Boolean error;
+    private Integer errCode;
     private String dateView;
 
 }

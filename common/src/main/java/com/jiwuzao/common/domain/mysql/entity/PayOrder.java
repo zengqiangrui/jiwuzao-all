@@ -30,7 +30,6 @@ import java.math.BigDecimal;
         @Index(name = "index_payOrder_payTime",columnList = "payTime"),
         @Index(name = "index_payOrder_payChannel",columnList = "payChannel"),
         @Index(name = "index_payOrder_pay",columnList = "pay")
-
 })
 public class PayOrder {
     @Id
@@ -92,4 +91,8 @@ public class PayOrder {
      * 预支付会话标识
      */
     private String prepayId;
+    /**
+     * 微信支付订单号
+     */
+    private String transactionId;
 }

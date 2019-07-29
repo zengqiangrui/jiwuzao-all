@@ -1,7 +1,7 @@
 package com.kauuze.manager.config.contain;
 
 
-import com.kauuze.manager.domain.mongo.entity.Log;
+import com.jiwuzao.common.domain.mongo.entity.Log;
 import com.kauuze.manager.domain.mongo.repository.LogRepository;
 import com.kauuze.manager.include.DateTimeUtil;
 import com.kauuze.manager.include.StateModel;
@@ -53,7 +53,7 @@ public class ExceptionHandle {
         try {
             StringWriter stringWriter = new StringWriter();
             e.printStackTrace(new PrintWriter(stringWriter));
-            logRepository.save(new Log(null, System.currentTimeMillis(),request.getRequestURL().toString() + "\r\n" + stringWriter.toString(), "major",true, DateTimeUtil.covertDateView(System.currentTimeMillis())));
+            logRepository.save(new Log(null, System.currentTimeMillis(),request.getRequestURL().toString() + "\r\n" + stringWriter.toString(), "major",true,null, DateTimeUtil.covertDateView(System.currentTimeMillis())));
             response.setStatus(500);
             StateModel stateModel = new StateModel();
             stateModel.setState("service wrong");

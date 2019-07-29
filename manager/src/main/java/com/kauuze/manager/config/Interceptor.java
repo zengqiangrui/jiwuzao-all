@@ -1,8 +1,8 @@
 package com.kauuze.manager.config;
 
+import com.jiwuzao.common.domain.mongo.entity.userBastic.UserToken;
 import com.kauuze.manager.config.permission.*;
 import com.kauuze.manager.domain.common.MongoUtil;
-import com.kauuze.manager.domain.mongo.entity.userBastic.UserToken;
 import com.kauuze.manager.include.DateTimeUtil;
 import com.kauuze.manager.include.StateModel;
 import com.kauuze.manager.include.StringUtil;

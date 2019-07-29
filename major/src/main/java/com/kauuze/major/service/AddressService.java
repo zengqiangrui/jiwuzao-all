@@ -107,6 +107,9 @@ public class AddressService {
      */
     public List<ReceiverAddress> getAddressByDelault(int uid) {
         List<ReceiverAddress> list = addressRepository.findAllByUidAndAddressStatus(uid, AddressEnum.DEFAULT);
+        for (ReceiverAddress address : list) {
+            System.out.println(address);
+        }
 
         return list;
     }

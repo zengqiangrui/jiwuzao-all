@@ -1,15 +1,15 @@
 package com.kauuze.manager.service;
 
 import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
+import com.jiwuzao.common.domain.enumType.RoleEnum;
+import com.jiwuzao.common.domain.enumType.UserStateEnum;
+import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
+import com.jiwuzao.common.domain.mongo.entity.userBastic.UserToken;
+import com.jiwuzao.common.domain.mongo.entity.userBastic.VerifyActor;
 import com.kauuze.manager.domain.common.EsUtil;
 import com.kauuze.manager.domain.common.MongoUtil;
-import com.kauuze.manager.domain.enumType.RoleEnum;
-import com.kauuze.manager.domain.enumType.UserStateEnum;
 import com.kauuze.manager.domain.es.entity.GoodsEs;
 import com.kauuze.manager.domain.es.repository.GoodsRepositoryEs;
-import com.kauuze.manager.domain.mongo.entity.userBastic.Store;
-import com.kauuze.manager.domain.mongo.entity.userBastic.UserToken;
-import com.kauuze.manager.domain.mongo.entity.userBastic.VerifyActor;
 import com.kauuze.manager.domain.mongo.repository.StoreRepository;
 import com.kauuze.manager.domain.mongo.repository.UserTokenRepository;
 import com.kauuze.manager.domain.mongo.repository.VerifyActorRepository;

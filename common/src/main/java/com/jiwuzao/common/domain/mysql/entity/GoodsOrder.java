@@ -1,6 +1,7 @@
 package com.jiwuzao.common.domain.mysql.entity;
 
 
+import com.jiwuzao.common.domain.enumType.OrderExStatusEnum;
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,7 +25,6 @@ import java.math.BigDecimal;
         @Index(name = "index_goodsOrder_uid",columnList = "uid"),
         @Index(name = "index_goodsOrder_sid",columnList = "sid"),
         @Index(name = "index_goodsOrder_gid",columnList = "gid"),
-        @Index(name = "index_goodsOrder_pid",columnList = "pid"),
         @Index(name = "index_goodsOrder_goodsOrderDetailId",columnList = "goodsOrderDetailId",unique = true),
         @Index(name = "index_goodsOrder_createTime",columnList = "createTime"),
         @Index(name = "index_goodsOrder_goodsOrderNo",columnList = "goodsOrderNo",unique = true),
@@ -34,10 +34,10 @@ public class GoodsOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer uid;
-    private String sid;
-    private String gid;
-    private String pid;
+    private Integer uid;//用户id
+    private String sid;//店铺id
+    private String gid;//商品id
+    private String payOrderNo;
     private Integer goodsOrderDetailId;
     private Long createTime;
 
@@ -58,6 +58,10 @@ public class GoodsOrder {
      */
     //private String specOrderIds;
     /**
+     * 商品规格id
+     */
+    private String gsid;
+    /**
      * 规格分类
      */
     private String specClass;
@@ -68,7 +72,7 @@ public class GoodsOrder {
     /**
      * 运费
      */
-    private BigDecimal freight;
+    private BigDecimal postage;
     /**
      * 最终实付款
      */
@@ -78,6 +82,11 @@ public class GoodsOrder {
      */
     @Enumerated(EnumType.STRING)
     private OrderStatusEnum orderStatus;
+    /**
+     * 订单异常状态
+     */
+    @Enumerated(EnumType.STRING)
+    private OrderExStatusEnum orderExStatus = OrderExStatusEnum.normal;
     /**
      * 发货时间
      */

@@ -2,12 +2,12 @@ package com.kauuze.manager.service;
 
 import com.jiwuzao.common.domain.common.MongoUtil;
 import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
+import com.jiwuzao.common.domain.enumType.SystemGoodsNameEnum;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.jiwuzao.common.domain.mongo.entity.GoodsDetail;
 import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
+import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
 import com.jiwuzao.common.dto.goods.GoodsOpenDto;
-import com.kauuze.manager.domain.enumType.SystemGoodsNameEnum;
-import com.kauuze.manager.domain.mongo.entity.userBastic.Store;
 import com.kauuze.manager.domain.mongo.repository.*;
 import com.kauuze.manager.domain.mysql.repository.UserRepository;
 import com.kauuze.manager.include.PageDto;
@@ -107,4 +107,6 @@ public class GoodsService {
                 goodsDetail.getGoodsTypeClass(), goodsSpecs, goods.getPutaway(),
                 goods.getAuditType(), goods.getCreateTime(), goods.getUpdateTime());
     }
+
+
 }

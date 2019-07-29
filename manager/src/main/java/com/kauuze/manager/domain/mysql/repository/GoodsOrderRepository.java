@@ -1,8 +1,8 @@
 package com.kauuze.manager.domain.mysql.repository;
 
 
-import com.kauuze.manager.domain.enumType.OrderExStatusEnum;
-import com.kauuze.manager.domain.mysql.entity.GoodsOrder;
+import com.jiwuzao.common.domain.enumType.OrderExStatusEnum;
+import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

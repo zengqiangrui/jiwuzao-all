@@ -9,6 +9,7 @@ import com.kauuze.major.service.AddressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -19,7 +20,7 @@ public class AddressController {
 
     @RequestMapping("/addUserAddress")
     @Authorization
-    public JsonResult addUserAddress(@RequestAttribute int uid, @RequestBody AddressPojo addressPojo) {
+    public JsonResult addUserAddress(@RequestAttribute int uid, @Valid @RequestBody AddressPojo addressPojo) {
         ReceiverAddress address = addressService.addAddress(uid, addressPojo.getReceiveProvinces(), addressPojo.getReceiverAddress(), addressPojo.getReceiverPhone(), addressPojo.getReceiverTrueName(), addressPojo.getDefaultStatus());
         if (null != address) {
             return JsonResult.success(address);
@@ -33,13 +34,10 @@ public class AddressController {
     public JsonResult defaultAddress(@RequestAttribute int uid) {
         System.out.println("defaultAddress" + uid);
         List<ReceiverAddress> listAddress = addressService.getAddressByDelault(uid);
-        for (ReceiverAddress address : listAddress) {
-            if (address != null) {
-                return JsonResult.success(address);
-            }
+        if(listAddress == null){
+            return JsonResult.success();
         }
-        return JsonResult.failure();
-
+        return JsonResult.success(listAddress.get(0));
     }
 
     @RequestMapping("/undeleteAddress")
@@ -56,10 +54,9 @@ public class AddressController {
 
     @RequestMapping("/deleteAddress")
     @Authorization
-    public JsonResult deleteAddress(@RequestAttribute int uid, @RequestBody String addressId) {
-        System.out.println(addressId);
-        ReceiverAddress receiverAddress = addressService.userDelById(addressId);
-        System.out.println("addressId" + addressId);
+    public JsonResult deleteAddress(@RequestAttribute int uid, @RequestBody AddressPojo addressPojo) {
+        addressService.userDelById(addressPojo.getAddressId());
+        System.out.println("addressId" + addressPojo.getAddressId());
         //如果删除的是缓存中的地址，则返回一个默认地址回去，以显示
         List<ReceiverAddress> listAddress = addressService.getAddressByDelault(uid);
         for (ReceiverAddress address : listAddress) {

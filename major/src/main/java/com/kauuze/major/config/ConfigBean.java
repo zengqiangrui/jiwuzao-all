@@ -7,7 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.binarywang.wxpay.config.WxPayConfig;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.github.binarywang.wxpay.service.impl.WxPayServiceImpl;
-import com.kauuze.major.config.contain.WxPayProperties;
+import com.kauuze.major.config.contain.properties.WxPayProperties;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -53,4 +53,7 @@ public class ConfigBean implements WebMvcConfigurer {
         wxPayService.setConfig(payConfig);
         return wxPayService;
     }
+
+
+
 }

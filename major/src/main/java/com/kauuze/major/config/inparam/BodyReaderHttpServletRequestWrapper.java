@@ -2,8 +2,8 @@ package com.kauuze.major.config.inparam;
 
 
 import com.jiwuzao.common.config.contain.SpringContext;
+import com.jiwuzao.common.domain.mongo.entity.Log;
 import com.kauuze.major.config.Interceptor;
-import com.kauuze.major.domain.mongo.entity.Log;
 import com.kauuze.major.domain.mongo.repository.LogRepository;
 import com.kauuze.major.include.DateTimeUtil;
 import com.kauuze.major.include.JsonUtil;
@@ -45,7 +45,7 @@ public class BodyReaderHttpServletRequestWrapper extends HttpServletRequestWrapp
                 + "params:" + JsonUtil.toJsonString(request.getParameterMap()) + "  body:" + bodyStr;
         LOG.info(log);
         LogRepository logRepository =  SpringContext.getBean(LogRepository.class);
-        logRepository.save(new Log(null,System.currentTimeMillis(),log, "major",false,DateTimeUtil.covertDateView(System.currentTimeMillis())));
+        logRepository.save(new Log(null,System.currentTimeMillis(),log, "major",false,null,DateTimeUtil.covertDateView(System.currentTimeMillis())));
     }
 
     @Override

@@ -19,9 +19,9 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Table(indexes = {
-        @Index(name = "index_goodsOrder_trackingNo",columnList = "trackingNo",unique = true),
+        @Index(name = "index_goodsOrder_expressNo",columnList = "expressNo",unique = true),
         @Index(name = "index_goodsOrder_applyCancel",columnList = "applyCancel"),
-        @Index(name = "index_goodsOrder_applyCancelMerchantAudit",columnList = "trackingNo"),
+        @Index(name = "index_goodsOrder_applyCancelMerchantAudit",columnList = "expressNo"),
         @Index(name = "index_goodsOrder_refundOrderNo",columnList = "refundOrderNo",unique = true),
         @Index(name = "index_goodsOrder_refund",columnList = "refund"),
         @Index(name = "index_goodsOrder_complaint",columnList = "complaint"),
@@ -31,6 +31,9 @@ public class GoodsOrderDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    private String goodsOrderNo;
+
     /**
      * 订单完成时间
      */
@@ -43,7 +46,7 @@ public class GoodsOrderDetail {
     /**
      * 物流单号
      */
-    private String trackingNo;
+    private String expressNo;
     /**
      * 收货省市区
      */
@@ -52,6 +55,11 @@ public class GoodsOrderDetail {
      * 收货详细地址
      */
     private String receiverAddress;
+
+    /**
+     * 邮编
+     */
+    private String postCode;
     /**
      * 收货人
      */

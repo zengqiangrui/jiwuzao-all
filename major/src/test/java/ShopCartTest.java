@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = MajorApplication.class)
+@SpringBootTest(classes = MajorApplication.class,webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Slf4j
 public class ShopCartTest{
     @Autowired
@@ -22,11 +22,11 @@ public class ShopCartTest{
 //        shopCartService.addItem(4, "5d2bf4862197fd2c5cfd4af6",
 //                "5d2bf4862197fd2c5cfd4af9", 2);
 //        System.out.println(shopCartService.getItems(4).toString());
-        List<String> cidList= new ArrayList<>();
-        cidList.add("5d2ec4776a4d8045020e2b7c");
-        cidList.add("5d2ec4ed6a4d80458fc159d2");
-        cidList.add("5d2ec5e26a4d804649c28348");
-        cidList.add("5d2ec62a6a4d8046ce4697b2");
-        shopCartService.delItems(cidList);
+//        List<String> cidList= new ArrayList<>();
+//        cidList.add("5d2ec4776a4d8045020e2b7c");
+//        cidList.add("5d2ec4ed6a4d80458fc159d2");
+//        cidList.add("5d2ec5e26a4d804649c28348");
+//        cidList.add("5d2ec62a6a4d8046ce4697b2");
+//        shopCartService.delItems(cidList);
     }
 }

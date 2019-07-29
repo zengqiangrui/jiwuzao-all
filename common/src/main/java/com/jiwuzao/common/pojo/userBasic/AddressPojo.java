@@ -14,6 +14,8 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class AddressPojo {
+    @StringMax
+    private String addressId;
     /**
      * 默认收货省,市,区
      */

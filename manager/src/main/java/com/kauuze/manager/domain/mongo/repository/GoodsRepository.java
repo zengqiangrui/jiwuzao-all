@@ -21,4 +21,5 @@ public interface GoodsRepository extends MongoRepository<Goods, String> {
     Goods findByGid(String gid);
     Page<Goods> findBySid(String sid, Pageable pageable);
     Page<Goods> findByAuditType(AuditTypeEnum auditTypeEnum, Pageable pageable);
+    Page<Goods> findAll( Pageable pageable);
 }

@@ -1,11 +1,11 @@
 package com.kauuze.major.config;
 
-import com.kauuze.major.config.permission.*;
 import com.jiwuzao.common.domain.common.MongoUtil;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.UserToken;
 import com.jiwuzao.common.include.DateTimeUtil;
 import com.jiwuzao.common.include.StateModel;
 import com.jiwuzao.common.include.StringUtil;
+import com.kauuze.major.config.permission.*;
 import com.kauuze.major.include.TokenUtil;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -14,6 +14,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.InetAddress;
 
 /**
  * 拦截器用于权限验证
@@ -101,6 +102,7 @@ public class Interceptor implements HandlerInterceptor {
         userTokenUp.setLastAccessTime(System.currentTimeMillis());
         MongoUtil.updateNotNon("uid",userTokenUp,UserToken.class);
         request.setAttribute("uid",userToken.getUid());
+        request.setAttribute("ip", getIpAddr(request));
         return true;
     }
 
@@ -141,5 +143,39 @@ public class Interceptor implements HandlerInterceptor {
         } catch (IOException e) {
             throw new RuntimeException("Interceptor response403 error");
         }
+    }
+
+
+    /**
+     * @Description: 获取客户端IP地址
+     */
+    private String getIpAddr(HttpServletRequest request) {
+           String ip = request.getHeader("x-forwarded-for");
+           if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+               ip = request.getHeader("Proxy-Client-IP");
+           }
+           if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+               ip = request.getHeader("WL-Proxy-Client-IP");
+           }
+           if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+               ip = request.getRemoteAddr();
+               if(ip.equals("127.0.0.1")){
+                   //根据网卡取本机配置的IP
+                   InetAddress inet=null;
+                   try {
+                       inet = InetAddress.getLocalHost();
+                   } catch (Exception e) {
+                       e.printStackTrace();
+                   }
+                   ip= inet.getHostAddress();
+               }
+           }
+           // 多个代理的情况，第一个IP为客户端真实IP,多个IP按照','分割
+           if(ip != null && ip.length() > 15){
+               if(ip.indexOf(",")>0){
+                   ip = ip.substring(0,ip.indexOf(","));
+               }
+           }
+           return ip;
     }
 }

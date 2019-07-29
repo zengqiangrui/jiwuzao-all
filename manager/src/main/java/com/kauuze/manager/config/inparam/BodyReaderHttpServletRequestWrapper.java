@@ -2,8 +2,8 @@ package com.kauuze.manager.config.inparam;
 
 
 import com.jiwuzao.common.config.contain.SpringContext;
+import com.jiwuzao.common.domain.mongo.entity.Log;
 import com.kauuze.manager.config.Interceptor;
-import com.kauuze.manager.domain.mongo.entity.Log;
 import com.kauuze.manager.domain.mongo.repository.LogRepository;
 import com.kauuze.manager.include.DateTimeUtil;
 import com.kauuze.manager.include.JsonUtil;
@@ -46,7 +46,7 @@ public class BodyReaderHttpServletRequestWrapper extends HttpServletRequestWrapp
 
         LOG.info(log);
         LogRepository logRepository =  SpringContext.getBean(LogRepository.class);
-        logRepository.save(new Log(null,System.currentTimeMillis(),log, "manager",false, DateTimeUtil.covertDateView(System.currentTimeMillis())));
+        logRepository.save(new Log(null,System.currentTimeMillis(),log, "manager",false, null,DateTimeUtil.covertDateView(System.currentTimeMillis())));
     }
 
     @Override

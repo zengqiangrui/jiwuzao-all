@@ -15,21 +15,5 @@ import java.util.List;
 public class GenOrderPojo {
     private List<AddItemPojo> itemList;
 
-    /**
-     * 收货省市区
-     */
-    private String city;
-    /**
-     *收货详细地址
-     */
-    private String address;
-    /**
-     * 收货手机
-     */
-    private String phone;
 
-    /**
-     * 收货姓名
-     */
-    private String trueName;
 }

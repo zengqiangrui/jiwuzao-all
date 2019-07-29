@@ -9,7 +9,12 @@ public enum  AddressEnum {
     DELETE(3,"用户已删除")
     ;
 
-    AddressEnum(int value, String msg) {
+    private Integer value;
 
+    private String msg;
+
+    AddressEnum(int value, String msg) {
+        this.value = value;
+        this.msg = msg;
     }
 }

@@ -37,5 +37,8 @@ public class GoodsPagePojo {
      */
     private String sortBy = "createTime";
 
-
+    /**
+     * 商品类型
+     */
+    private Integer currentTab;
 }
