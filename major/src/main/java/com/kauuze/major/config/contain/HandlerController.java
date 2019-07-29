@@ -14,44 +14,49 @@ import java.io.IOException;
 
 /**
  * 全局错误拦截
+ *
  * @author kauuze
  * @email 3412879785@qq.com
  * @time 2019-02-24 12:30
  */
 @RestController
 public class HandlerController implements ErrorController {
-  @Autowired
-  private LogRepository logRepository;
-  @RequestMapping("/error")
-  @GreenWay
-  public void error(HttpServletResponse response) {
-    try {
-      int status = response.getStatus();
-      StateModel stateModel = new StateModel();
-      if(status == 404){
-        stateModel.setState("not find");
-        response.getWriter().write(stateModel.toJsonString());
-        return;
-      }else if(status == 400){
-        stateModel.setState("param mismatch");
-        response.getWriter().write(stateModel.toJsonString());
-        return;
-      } else if(status == 415){
-        stateModel.setState("Content-Type mismatch");
-        response.getWriter().write(stateModel.toJsonString());
-        return;
-      } else {
-        response.setStatus(500);
-        stateModel.setState("service wrong");
-        response.getWriter().write(stateModel.toJsonString());
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
+    @Autowired
+    private LogRepository logRepository;
 
-  @Override
-  public String getErrorPath() {
-    return "/error";
-  }
+    @RequestMapping("/error")
+    @GreenWay
+    public void error(HttpServletResponse response) {
+        try {
+            int status = response.getStatus();
+            StateModel stateModel = new StateModel();
+            if (status == 404) {
+                stateModel.setState("not find");
+                response.getWriter().write(stateModel.toJsonString());
+                return;
+            } else if (status == 400) {
+                stateModel.setState("param mismatch");
+                response.getWriter().write(stateModel.toJsonString());
+                return;
+            } else if (status == 415) {
+                stateModel.setState("Content-Type mismatch");
+                response.getWriter().write(stateModel.toJsonString());
+                return;
+            } else if (status == 600) {
+                stateModel.setState("order exception");
+                response.getWriter().write(stateModel.toJsonString());
+            } else {
+                response.setStatus(500);
+                stateModel.setState("service wrong");
+                response.getWriter().write(stateModel.toJsonString());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public String getErrorPath() {
+        return "/error";
+    }
 }

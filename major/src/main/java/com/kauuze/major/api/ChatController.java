@@ -1,24 +1,30 @@
 package com.kauuze.major.api;
 
-import com.jiwuzao.common.domain.mongo.entity.ChatGroup;
+import com.jiwuzao.common.domain.enumType.OnlineStatusEnum;
 import com.jiwuzao.common.dto.chat.ChatGroupDto;
 import com.jiwuzao.common.pojo.common.UidPojo;
 import com.kauuze.major.config.permission.Authorization;
 import com.kauuze.major.include.JsonResult;
 import com.kauuze.major.service.ChatService;
-import com.kauuze.major.service.socket.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.Future;
 
 @RestController
 @ServerEndpoint("/chat/{uid}/{groupId}")
@@ -38,11 +44,15 @@ public class ChatController {
     private String uid = "";
 
     private String groupId = "";
+    //用于延时处理信息入库的list
+    private List<Future> futures = new ArrayList<>();
 
     @RequestMapping("/init")
     @Authorization
-    public JsonResult initChat(@RequestAttribute int uid, @RequestBody UidPojo uidB) {
+    public JsonResult initChat(@RequestAttribute int uid, @Valid @RequestBody UidPojo uidB) {
+        System.out.println(uid + "," + uidB);
         ChatGroupDto chatGroupDto = chatService.initChatGroup(uid, uidB.getUid());
+        System.out.println(uid + "," + uidB);
         if (null != chatGroupDto) {
             return JsonResult.success(chatGroupDto);
         } else {
@@ -63,6 +73,7 @@ public class ChatController {
         log.info("有用户加入:" + uid + ",当前在线人数为" + getOnlineCount());
         try {
             sendMessage("连接成功");
+            chatService.switchUserGroupStatus(Integer.parseInt(uid), groupId, OnlineStatusEnum.ON_LINE);
         } catch (IOException e) {
             log.error("websocket IO异常");
         }
@@ -99,6 +110,7 @@ public class ChatController {
         webSocketSet.remove(this);  //从set中删除
         subOnlineCount();           //在线数减1
         log.info("有一连接关闭！当前在线人数为" + getOnlineCount());
+        chatService.switchUserGroupStatus(Integer.parseInt(uid), groupId, OnlineStatusEnum.OFF_LINE);
     }
 
     /**
@@ -118,23 +130,23 @@ public class ChatController {
         this.session.getBasicRemote().sendText(message);
     }
 
-    /**
-     * 指定消息发送
-     */
-    public static void sendInfo(String message, @PathParam("uid") String uid) throws IOException {
-        log.info("推送消息到窗口" + uid + "，推送内容:" + message);
-        for (ChatController item : webSocketSet)
-            try {
-                //这里可以设定只推送给这个uid的，为null则全部推送
-                if (uid == null) {
-                    item.sendMessage(message);
-                } else if (item.uid.equals(uid)) {
-                    item.sendMessage(message);
-                }
-            } catch (IOException e) {
-                continue;
-            }
-    }
+//    /**
+//     * 指定消息发送
+//     */
+//    public static void sendInfo(String message, @PathParam("uid") String uid) throws IOException {
+//        log.info("推送消息到窗口" + uid + "，推送内容:" + message);
+//        for (ChatController item : webSocketSet)
+//            try {
+//                //这里可以设定只推送给这个uid的，为null则全部推送
+//                if (uid == null) {
+//                    item.sendMessage(message);
+//                } else if (item.uid.equals(uid)) {
+//                    item.sendMessage(message);
+//                }
+//            } catch (IOException e) {
+//                continue;
+//            }
+//    }
 
     private static synchronized int getOnlineCount() {
         return onlineCount;

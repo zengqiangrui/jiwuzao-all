@@ -1,20 +1,10 @@
-package com.jiwuzao.common.domain.mongo.entity;
+package com.jiwuzao.common.dto.chat;
 
 import com.jiwuzao.common.domain.enumType.MessageTypeEnum;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Id;
 
-@Document
-@Data
-@Accessors(chain = true)
-@AllArgsConstructor
-@NoArgsConstructor
-public class ChatMessage {
+public class ChatMessageDto {
     @Id
     private String id;
     //用户id
@@ -32,6 +22,4 @@ public class ChatMessage {
 
     //创建时间
     private long createTime;
-
-
 }
