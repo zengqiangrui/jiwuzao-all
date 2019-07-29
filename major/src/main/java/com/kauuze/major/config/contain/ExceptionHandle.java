@@ -44,6 +44,24 @@ public class ExceptionHandle {
                 return null;
             }
         }
+
+        //处理订单异常
+        if(e instanceof OrderException){
+            try {
+                Log log = new Log();
+                log.setService("orderService").setCreateTime(System.currentTimeMillis()).setLog(e.getMessage()).setError(true).setErrCode(((OrderException) e).getCode());
+                logRepository.save(log);
+                response.setStatus(600);
+                StateModel stateModel = new StateModel();
+                stateModel.setState("order exception");
+                stateModel.setData(e.getMessage());
+                response.getWriter().write(stateModel.toJsonString());
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+
         try {
             StringWriter stringWriter = new StringWriter();
             e.printStackTrace(new PrintWriter(stringWriter));
@@ -51,6 +69,7 @@ public class ExceptionHandle {
             response.setStatus(500);
             StateModel stateModel = new StateModel();
             stateModel.setState("service wrong");
+            stateModel.setData(e.getMessage());
             response.getWriter().write(stateModel.toJsonString());
         } catch (Exception e1) {
             return null;
@@ -58,12 +77,12 @@ public class ExceptionHandle {
         return null;
     }
 
-    @ExceptionHandler(value = OrderException.class)
-    @ResponseBody
-    public JsonResult showOrderException(OrderException e){
-        Log log = new Log();
-        log.setService("orderService").setCreateTime(System.currentTimeMillis()).setLog(e.getMessage()).setError(true).setErrCode(e.getCode());
-        logRepository.save(log);
-        return JsonResult.error(e.getCode(),e.getMessage());
-    }
+//    @ExceptionHandler(value = OrderException.class)
+//    @ResponseBody
+//    public JsonResult showOrderException(OrderException e){
+//        Log log = new Log();
+//        log.setService("orderService").setCreateTime(System.currentTimeMillis()).setLog(e.getMessage()).setError(true).setErrCode(e.getCode());
+//        logRepository.save(log);
+//        return JsonResult.error(e.getCode(),e.getMessage());
+//    }
 }

@@ -15,7 +15,7 @@ public class TencentUtil {
     @Autowired
     private TencentSmsPropertis tencentSmsPropertis;
 
-    public boolean sendSms(String phoneNumber, String[] params) {
+    public boolean sendSms(String phoneNumber, String[] params) {//params里面连个参数，第一个是验证码，第二个是时间
         try {
             SmsSingleSender ssender = new SmsSingleSender(tencentSmsPropertis.getAppId(), tencentSmsPropertis.getAppKey());
             SmsSingleSenderResult result = ssender.sendWithParam("86", phoneNumber, tencentSmsPropertis.getTemplateId(), params,"","","");  // 签名参数未提供或者为空时，会使用默认签名发送短信

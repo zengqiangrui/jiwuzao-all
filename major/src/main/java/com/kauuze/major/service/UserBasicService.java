@@ -19,6 +19,7 @@ import com.kauuze.major.domain.mysql.repository.UserRepository;
 import com.kauuze.major.domain.mysql.repository.WithdrawOrderRepository;
 import com.kauuze.major.include.*;
 import com.kauuze.major.include.yun.SmsUtil;
+import com.kauuze.major.include.yun.TencentUtil;
 import com.kauuze.major.service.dto.userBasic.*;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,8 @@ public class UserBasicService {
     private StoreRepository storeRepository;
     @Autowired
     private WithdrawOrderRepository withdrawOrderRepository;
+    @Autowired
+    private TencentUtil tencentUtil;
 
     /**
      * 发送短信验证码:有效期5分钟。null为发送失败
@@ -59,7 +62,11 @@ public class UserBasicService {
      */
     public Integer sendSms(String phone){
         int msCode = Rand.getNumber(6);
-        if(!SmsUtil.sendTp1(phone, msCode)){//发送失败
+        String[] params = {String.valueOf(msCode),"3"};
+//        if(!SmsUtil.sendTp1(phone, msCode)){//发送失败
+//            return null;
+//        }
+        if(!tencentUtil.sendSms(phone,params)){
             return null;
         }
         Sms sms = smsRepository.findByPhone(phone);
