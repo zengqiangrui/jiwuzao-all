@@ -1,7 +1,9 @@
 package com.kauuze.major.api;
 
+import com.jiwuzao.common.domain.enumType.MessageTypeEnum;
 import com.jiwuzao.common.domain.enumType.OnlineStatusEnum;
 import com.jiwuzao.common.dto.chat.ChatGroupDto;
+import com.jiwuzao.common.dto.chat.ChatMessageDto;
 import com.jiwuzao.common.pojo.common.UidPojo;
 import com.kauuze.major.config.permission.Authorization;
 import com.kauuze.major.include.JsonResult;
@@ -91,6 +93,7 @@ public class ChatController {
         String groupId = requestParameterMap.get("groupId").get(0);
         log.info("uid{},groupId{}", uid, groupId);
         log.info("收到来自窗口" + this.uid + "的信息:" + message);
+        ChatMessageDto chatMessage = chatService.createChatMessage(groupId, Integer.parseInt(uid), message, MessageTypeEnum.TEXT);
         //群发消息
         for (ChatController item : webSocketSet) {
             try {

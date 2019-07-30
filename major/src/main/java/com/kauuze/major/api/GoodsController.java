@@ -1,23 +1,22 @@
 package com.kauuze.major.api;
 
 import com.jiwuzao.common.domain.mongo.entity.Category;
+import com.jiwuzao.common.domain.mongo.entity.Goods;
+import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
 import com.jiwuzao.common.include.JsonResult;
 import com.jiwuzao.common.include.JsonUtil;
 import com.jiwuzao.common.include.PageDto;
-import com.jiwuzao.common.domain.mongo.entity.Goods;
-import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
-import com.jiwuzao.common.dto.goods.GoodsSimpleDto;
+import com.jiwuzao.common.include.StringUtil;
 import com.jiwuzao.common.pojo.common.GidPojo;
-import com.jiwuzao.common.pojo.common.GoodsSpecPojo;
 import com.jiwuzao.common.pojo.common.QuerySpecPojo;
-import com.jiwuzao.common.pojo.goods.AddGoodsPojo;
-import com.jiwuzao.common.pojo.goods.CategoryPojo;
-import com.jiwuzao.common.pojo.goods.GoodsPagePojo;
+import com.jiwuzao.common.pojo.goods.*;
 import com.jiwuzao.common.vo.goods.GoodsDetailVO;
+import com.jiwuzao.common.vo.goods.MerchantGoodsVO;
 import com.kauuze.major.config.contain.ParamMismatchException;
 import com.kauuze.major.config.permission.Authorization;
 import com.kauuze.major.config.permission.Merchant;
 import com.kauuze.major.service.GoodsService;
+import com.qiniu.util.Json;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -43,7 +42,6 @@ import java.util.Map;
 public class GoodsController {
     @Autowired
     private GoodsService goodsService;
-
 
     /**
      * 添加商品
@@ -134,6 +132,16 @@ public class GoodsController {
         return JsonResult.failure("没找到商品信息");
     }
 
+    @RequestMapping("/merchantGetGoodsDetail")
+    public JsonResult getGoodsDetail(@Valid @RequestBody GidPojo gidPojo) {
+        MerchantGoodsVO goodsVO = goodsService.merchantGetGoodsDetail(gidPojo.getGid());
+        if (null != goodsVO) {
+            return JsonResult.success(goodsVO);
+        } else {
+            return JsonResult.failure("没找到商品信息");
+        }
+    }
+
     /**
      * app端获取商品详情
      *
@@ -142,7 +150,7 @@ public class GoodsController {
      */
     @RequestMapping("/getGoodsDetail")
     @Authorization
-    public JsonResult getGoodsDetail(@RequestAttribute int uid, @Valid @RequestBody GidPojo gidPojo){
+    public JsonResult getGoodsDetail(@RequestAttribute int uid, @Valid @RequestBody GidPojo gidPojo) {
         log.debug(gidPojo.getGid());
         GoodsDetailVO vo = goodsService.getGoodsDetail(gidPojo.getGid());
         if (vo == null) {
@@ -151,15 +159,17 @@ public class GoodsController {
             return JsonResult.success(vo);
         }
     }
+
     @RequestMapping("/getSpec")
-    public JsonResult getSpec(@Valid @RequestBody QuerySpecPojo goodsSpecPojo){
-        GoodsSpec goodsSpec =  goodsService.getSpecByGoodsSpecClass(goodsSpecPojo.getGid(),goodsSpecPojo.getSpecClass());
-        if(null!=goodsSpec){
+    public JsonResult getSpec(@Valid @RequestBody QuerySpecPojo goodsSpecPojo) {
+        GoodsSpec goodsSpec = goodsService.getSpecByGoodsSpecClass(goodsSpecPojo.getGid(), goodsSpecPojo.getSpecClass());
+        if (null != goodsSpec) {
             return JsonResult.success(goodsSpec);
-        }else{
+        } else {
             return JsonResult.failure("没找到该规格");
         }
     }
+
     /**
      * 获取极物页面商品列表分页
      *
@@ -167,14 +177,47 @@ public class GoodsController {
      * @return
      */
     @RequestMapping("/getGoodsByClassfy")
-
-    public JsonResult getGoodsByClassfy(@RequestBody GoodsPagePojo goodsPagePojo){
+    @Authorization
+    public JsonResult getGoodsByClassfy(@RequestBody GoodsPagePojo goodsPagePojo) {
         System.out.println(goodsPagePojo);
         List<Goods> goodsList = goodsService.getGoodsList(goodsPagePojo);
-        if(!goodsList.isEmpty()){
+        if (!goodsList.isEmpty()) {
             return JsonResult.success(goodsList);
-        }else {
+        } else {
             return JsonResult.failure();
+        }
+    }
+
+    @RequestMapping("/modifyPrice")
+    @Merchant
+    public JsonResult modifyPrice(@RequestAttribute int uid, @Valid @RequestBody GoodsSpecPricePojo pojo) {
+        String s = goodsService.modifyPrice(uid, pojo.getGid(), pojo.getGoodsSpecId(), pojo.getGoodsPrice());
+        if (StringUtil.isBlank(s)) {
+            return JsonResult.success();
+        } else {
+            return JsonResult.failure(s);
+        }
+    }
+
+    @RequestMapping("/modifyInventory")
+    @Merchant
+    public JsonResult modifyInventory(@RequestAttribute int uid, @Valid @RequestBody GoodsSpecInventoryPojo pojo) {
+        String s = goodsService.modifyInventory(uid, pojo.getGid(), pojo.getGoodsSpecId(), pojo.getInventory());
+        if (StringUtil.isBlank(s)) {
+            return JsonResult.success();
+        } else {
+            return JsonResult.failure(s);
+        }
+    }
+
+    @RequestMapping("/modifyPostage")
+    @Merchant
+    public JsonResult modifyPostage(@RequestAttribute int uid, @Valid @RequestBody GoodsPostagePojo pojo) {
+        String s = goodsService.modifyPostage(uid, pojo.getGid(), pojo.getPostage());
+        if (StringUtil.isBlank(s)) {
+            return JsonResult.success();
+        } else {
+            return JsonResult.failure(s);
         }
     }
 }

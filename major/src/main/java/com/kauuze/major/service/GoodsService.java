@@ -17,6 +17,7 @@ import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.pojo.common.GoodsSpecPojo;
 import com.jiwuzao.common.pojo.goods.GoodsPagePojo;
 import com.jiwuzao.common.vo.goods.GoodsDetailVO;
+import com.jiwuzao.common.vo.goods.MerchantGoodsVO;
 import com.kauuze.major.domain.common.EsUtil;
 import com.kauuze.major.domain.common.MongoUtil;
 import com.kauuze.major.domain.mongo.repository.*;
@@ -181,7 +182,7 @@ public class GoodsService {
         if (!optional.isPresent()) {
             return "规格不存在";
         }
-        if (optional.get().getGid() != gid) {
+        if (!optional.get().getGid().equals(gid)) {
             return "你无权限";
         }
         MongoUtil.updateNotNon("id", new GoodsSpec().setId(goodsSpecId).setSpecPrice(specPrice), GoodsSpec.class);
@@ -208,7 +209,7 @@ public class GoodsService {
         if (!optional.isPresent()) {
             return "规格不存在";
         }
-        if (optional.get().getGid() != gid) {
+        if (!optional.get().getGid().equals(gid)) {
             return "你无权限";
         }
         MongoUtil.updateNotNon("id", new GoodsSpec().setId(goodsSpecId).setSpecInventory(inventory), GoodsSpec.class);
@@ -342,6 +343,12 @@ public class GoodsService {
         return dto;
     }
 
+    /**
+     * 根据规格字符串获取商品规格
+     * @param gid
+     * @param specClass
+     * @return
+     */
     public GoodsSpec getSpecByGoodsSpecClass(String gid, String specClass) {
         return goodsSpecRepository.findByGidAndAndSpecClass(gid, specClass).orElse(null);
     }
@@ -411,5 +418,32 @@ public class GoodsService {
                 break;
         }
         return goodsPage;
+    }
+
+    /**
+     * 商家获取一个商品信息
+     * @param gid 商品id
+     * @return MerchantGoodsVO 单个商品显示对象
+     */
+    public MerchantGoodsVO merchantGetGoodsDetail(String gid) {
+        Goods goods = goodsRepository.findByGid(gid);
+        if(null == goods){
+            return null;
+        }else{
+            Optional<GoodsDetail> detailOptional = goodsDetailRepository.findByGid(gid);
+            if(!detailOptional.isPresent()){
+                return null;
+            }else{
+                GoodsDetail goodsDetail = detailOptional.get();
+                List<GoodsSpec> specList = goodsSpecRepository.findByGid(gid);
+                return new MerchantGoodsVO()
+                        .setTitle(goods.getTitle()).setSlideShow(goodsDetail.getSlideshow())
+                        .setPutAway(goods.getPutaway()).setPostage(goods.getPostage())
+                        .setGid(goods.getGid()).setDetailPhotos(goodsDetail.getDetailPhotos())
+                        .setDetailLabel(goodsDetail.getDetailLabel())
+                        .setDefaultPrice(goods.getDefaultPrice()).setCover(goods.getCover())
+                        .setClassify(goods.getClassify()).setGoodsSpecs(specList);
+            }
+        }
     }
 }
