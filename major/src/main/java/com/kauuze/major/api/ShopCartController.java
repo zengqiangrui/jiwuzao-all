@@ -1,6 +1,6 @@
 package com.kauuze.major.api;
 
-import com.jiwuzao.common.dto.shopCart.ShopCartDto;
+import com.jiwuzao.common.vo.shopcart.ShopCartVO;
 import com.jiwuzao.common.include.JsonResult;
 import com.jiwuzao.common.pojo.shopcart.AddItemPojo;
 import com.jiwuzao.common.pojo.shopcart.DelItemPojo;
@@ -48,7 +48,7 @@ public class ShopCartController {
     @RequestMapping("/getItems")
     @Authorization
     public JsonResult getItems(@RequestAttribute int uid){
-        List<ShopCartDto> result = shopCartService.getItems(uid);
+        List<ShopCartVO> result = shopCartService.getItems(uid);
         if (result == null) {
             return JsonResult.failure("购物车空");
         } else {

@@ -1,5 +1,6 @@
-package com.jiwuzao.common.dto.shopCart;
+package com.jiwuzao.common.vo.shopcart;
 
+import com.jiwuzao.common.dto.shopCart.ShopCartItem;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import java.util.List;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ShopCartDto {
+public class ShopCartVO {
     //这个bean用于给前端返回数据，参数的命名与前端保持一致，和后台参数不一致，需要后续统一命名
     /**
      * 店铺id

@@ -21,7 +21,7 @@ public class AddressController {
     @RequestMapping("/addUserAddress")
     @Authorization
     public JsonResult addUserAddress(@RequestAttribute int uid, @Valid @RequestBody AddressPojo addressPojo) {
-        ReceiverAddress address = addressService.addAddress(uid, addressPojo.getReceiveProvinces(), addressPojo.getReceiverAddress(), addressPojo.getReceiverPhone(), addressPojo.getReceiverTrueName(), addressPojo.getDefaultStatus());
+        ReceiverAddress address = addressService.addAddress(uid, addressPojo.getReceiveProvinces(), addressPojo.getReceiverAddress(), addressPojo.getReceiverPhone(), addressPojo.getReceiverTrueName(), addressPojo.getAddressStatus());
         if (null != address) {
             return JsonResult.success(address);
         } else {
@@ -34,7 +34,7 @@ public class AddressController {
     public JsonResult defaultAddress(@RequestAttribute int uid) {
         System.out.println("defaultAddress" + uid);
         List<ReceiverAddress> listAddress = addressService.getAddressByDelault(uid);
-        if(listAddress == null){
+        if(listAddress.size() == 0){
             return JsonResult.success();
         }
         return JsonResult.success(listAddress.get(0));

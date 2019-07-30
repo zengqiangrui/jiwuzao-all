@@ -5,7 +5,7 @@ import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.jiwuzao.common.domain.mongo.entity.GoodsDetail;
 import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
 import com.jiwuzao.common.domain.mongo.entity.ShopCart;
-import com.jiwuzao.common.dto.shopCart.ShopCartDto;
+import com.jiwuzao.common.vo.shopcart.ShopCartVO;
 import com.jiwuzao.common.dto.shopCart.ShopCartItem;
 import com.kauuze.major.domain.mongo.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ public class ShopCartService {
     }
 
     //返回购物车列表
-    public List<ShopCartDto> getItems(int uid) {
+    public List<ShopCartVO> getItems(int uid) {
         List<ShopCart> items = shopCartRepository.findByUid(uid);
         //用map将同一个店铺的商品放在一个数组中
         Map<String, List<ShopCartItem>> map = new HashMap<>();
@@ -64,10 +64,10 @@ public class ShopCartService {
         });
 
         //每个店铺组成一个ShopCartDto
-        List<ShopCartDto> result = new ArrayList<>();
+        List<ShopCartVO> result = new ArrayList<>();
         map.forEach((k,v)->{
             String sname = storeRepository.findById(k).get().getStoreName();
-            result.add(new ShopCartDto(k, sname, v));
+            result.add(new ShopCartVO(k, sname, v));
         });
         return result;
     }

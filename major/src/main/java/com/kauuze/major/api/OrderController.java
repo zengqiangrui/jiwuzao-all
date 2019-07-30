@@ -5,7 +5,6 @@ import com.jiwuzao.common.dto.order.GoodsOrderDto;
 import com.jiwuzao.common.dto.order.GoodsOrderSimpleDto;
 import com.jiwuzao.common.include.JsonResult;
 import com.jiwuzao.common.pojo.order.ComfirmOrderPojo;
-import com.jiwuzao.common.pojo.order.GenOrderPojo;
 import com.jiwuzao.common.pojo.order.GetOrderPojo;
 import com.kauuze.major.config.permission.Authorization;
 import com.kauuze.major.service.AddressService;
@@ -30,26 +29,26 @@ public class OrderController {
     @Autowired
     private AddressService addressService;
 
-    /**
-     * 用户通过购物车或者单个商品结算，传入商品数组生成订单
-     *
-     * @param uid
-     * @param genOrderPojo
-     * @return 返回订单id
-     */
-    @RequestMapping("/genOrder")
-    @Authorization
-    public JsonResult genOrder(@RequestAttribute int uid, @Valid @RequestBody GenOrderPojo genOrderPojo) {
-        String result = orderService.genOrder(uid, genOrderPojo.getItemList());
-        if (result == null) {
-            return JsonResult.failure();
-        } else {
-            return JsonResult.success(result);
-        }
-    }
+//    /**
+//     * 用户通过购物车或者单个商品结算，传入商品数组生成订单
+//     *
+//     * @param uid
+//     * @param genOrderPojo
+//     * @return 返回订单id
+//     */
+//    @RequestMapping("/genOrder")
+//    @Authorization
+//    public JsonResult genOrder(@RequestAttribute int uid, @Valid @RequestBody GenOrderPojo genOrderPojo) {
+//        String result = orderService.genOrder(uid, genOrderPojo.getItemList());
+//        if (result == null) {
+//            return JsonResult.failure();
+//        } else {
+//            return JsonResult.success(result);
+//        }
+//    }
 
     /**
-     * 用户传入收货信息确认订单
+     * 用户传入收货信息、商品数组确认订单
      *
      * @param pojo
      * @return
