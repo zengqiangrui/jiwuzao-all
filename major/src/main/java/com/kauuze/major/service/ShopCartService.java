@@ -37,13 +37,15 @@ public class ShopCartService {
         String sid = goodsRepository.findByGid(gid).getSid();
         if (sid == null)
             return null;
-        if (shopCartRepository.findByUidAndSpecId(uid, specId) != null)
-            return null;
-        ShopCart shopCart = new ShopCart(null, uid, sid, gid, specId, ShopCartEnum.settled, System.currentTimeMillis());
+        if (shopCartRepository.findByUidAndSpecId(uid, specId) != null){
+            return "商品已在购物车中";  
+        }
+        ShopCart shopCart = new ShopCart(null, uid, sid, gid, specId, ShopCartEnum.settled, System.currentTimeMillis(), num);
         shopCartRepository.save(shopCart);
         return "添加成功";
     }
 
+    //返回购物车列表
     public List<ShopCartDto> getItems(int uid) {
         List<ShopCart> items = shopCartRepository.findByUid(uid);
         //用map将同一个店铺的商品放在一个数组中
@@ -51,6 +53,7 @@ public class ShopCartService {
         items.forEach(e ->{
             String gid = e.getGid();
             String sid = e.getSid();
+            Integer num = e.getNum();
             ShopCartItem item = makeItems(e.getId(), gid, e.getSpecId());
             List<ShopCartItem> list = map.get(sid);
             if (list == null) {
@@ -76,7 +79,7 @@ public class ShopCartService {
         //todo 组装商品显示规格字符串
 
         return  new ShopCartItem(cid, gid, goods.getSid(), goods.getTitle(), goods.getCover(), goodsSpec.getSpecClass(),
-                goodsSpec.getSpecPrice().toString(), 1);
+                goodsSpec.getSpecPrice().toString(), 1, goodsSpec.getSpecInventory());
     }
 
     public String delItems(List<String> cidList) {

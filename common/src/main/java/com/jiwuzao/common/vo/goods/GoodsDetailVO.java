@@ -50,4 +50,14 @@ public class GoodsDetailVO {
      * 匠人头像url地址
      */
     private String portrait;
+
+    /**
+     * 商品规格分类
+     */
+    private String goodsType;
+
+    /**
+     * 商品类型分类
+     */
+    private String goodsTypeClass;
 }

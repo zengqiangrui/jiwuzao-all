@@ -362,7 +362,8 @@ public class GoodsService {
         vo.setTitle(goods.getTitle()).setDefaultPrice(goods.getDefaultPrice())
                 .setDetailLabel(detail.getDetailLabel()).setDetailPhotos(detail.getDetailPhotos())
                 .setPostage(goods.getPostage()).setSlideshow(detail.getSlideshow())
-                .setNickName(user.getNickName()).setPortrait(info.getPortrait());
+                .setNickName(user.getNickName()).setPortrait(info.getPortrait())
+                .setGoodsType(detail.getGoodsType()).setGoodsTypeClass(detail.getGoodsTypeClass());
         return vo;
     }
 

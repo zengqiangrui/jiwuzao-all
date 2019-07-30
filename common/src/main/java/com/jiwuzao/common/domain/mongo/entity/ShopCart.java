@@ -33,4 +33,5 @@ public class ShopCart {
     private ShopCartEnum shopCartStatus;
     @Indexed
     private long createTime;
+    private Integer num;
 }

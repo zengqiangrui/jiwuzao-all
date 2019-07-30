@@ -27,7 +27,7 @@ public class GoodsSpec {
     @Indexed
     private String gid;
     /**
-     * 规格分类("红色；300ml")
+     * 规格分类("红色,300ml")
      */
     @Indexed
     private String specClass;

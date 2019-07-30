@@ -10,14 +10,13 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ShopCartItem {
-
     private String cid;//shopcart id
-    private String gid;//goods id
+    private String goodsId;//goods id
     private String sid;//store id
     /**
      * 商品显示标题
      */
-    private String goodsTitle;
+    private String goodsName;
 
     /**
      * 商品显示图片
@@ -38,4 +37,9 @@ public class ShopCartItem {
      * 商品数量
      */
     private Integer goodsNumber;
+
+    /**
+     * 商品库存
+     */
+    private Integer goodsStock;
 }

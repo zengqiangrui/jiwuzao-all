@@ -23,7 +23,7 @@ public class ShopCartController {
     @Autowired
     ShopCartService shopCartService;
     /**
-     * 商品上架
+     * 加入购物车
      *
      * @param uid
      * @param addItemPojo
@@ -40,17 +40,28 @@ public class ShopCartController {
         }
     }
 
+    /**
+     * 获取用户购物车列表
+     * @param uid
+     * @return
+     */
     @RequestMapping("/getItems")
     @Authorization
     public JsonResult getItems(@RequestAttribute int uid){
         List<ShopCartDto> result = shopCartService.getItems(uid);
         if (result == null) {
-            return JsonResult.failure();
+            return JsonResult.failure("购物车空");
         } else {
             return JsonResult.success(result);
         }
     }
 
+    /**
+     * 从购物车删除
+     * @param uid
+     * @param delItemPojo
+     * @return
+     */
     @RequestMapping("/delItems")
     @Authorization
     public JsonResult delItems(@RequestAttribute int uid, @Valid @RequestBody DelItemPojo delItemPojo) {
