@@ -3,7 +3,9 @@ package com.kauuze.major;
 
 import com.jiwuzao.common.domain.enumType.ExpressEnum;
 import com.jiwuzao.common.domain.mongo.entity.Express;
+import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.jiwuzao.common.include.JsonResult;
+import com.jiwuzao.common.pojo.goods.GoodsPagePojo;
 import com.kauuze.major.domain.mongo.repository.CategoryRepository;
 import com.kauuze.major.domain.mongo.repository.ExpressRepository;
 import com.kauuze.major.domain.mongo.repository.GoodsSpecRepository;
@@ -17,14 +19,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.Scanner;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class GoodsServiceTest {
     @Autowired
     private GoodsService goodsService;
@@ -59,5 +63,24 @@ public class GoodsServiceTest {
     @Test
     public void showSpec(){
 //        goodsSpecRepository.findByGid()
+    }
+
+    @Test
+    public void getAll(){
+        GoodsPagePojo goodsPagePojo=new GoodsPagePojo();
+        goodsPagePojo.setCurrentTab(0);
+        goodsPagePojo.setCurrentPage(1);
+        goodsPagePojo.setPageSize(10);
+        System.out.println("+++++++++++++++++++++"+goodsPagePojo);
+        List<Goods> goodsList = goodsService.getGoodsList(goodsPagePojo);
+        System.out.println("==========="+goodsList);
+//        System.out.println("************"+goodsList.isEmpty());
+            if(goodsList!=null) {
+                for (Goods goods : goodsList) {
+                    System.out.println(goods);
+                }
+            }else{
+                System.out.println("null");
+            }
     }
 }

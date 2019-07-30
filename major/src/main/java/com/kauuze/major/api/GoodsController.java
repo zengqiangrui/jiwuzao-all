@@ -4,7 +4,12 @@ import com.jiwuzao.common.domain.mongo.entity.Category;
 import com.jiwuzao.common.include.JsonResult;
 import com.jiwuzao.common.include.JsonUtil;
 import com.jiwuzao.common.include.PageDto;
+import com.jiwuzao.common.domain.mongo.entity.Goods;
+import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
+import com.jiwuzao.common.dto.goods.GoodsSimpleDto;
 import com.jiwuzao.common.pojo.common.GidPojo;
+import com.jiwuzao.common.pojo.common.GoodsSpecPojo;
+import com.jiwuzao.common.pojo.common.QuerySpecPojo;
 import com.jiwuzao.common.pojo.goods.AddGoodsPojo;
 import com.jiwuzao.common.pojo.goods.CategoryPojo;
 import com.jiwuzao.common.pojo.goods.GoodsPagePojo;
@@ -146,5 +151,30 @@ public class GoodsController {
             return JsonResult.success(vo);
         }
     }
+    @RequestMapping("/getSpec")
+    public JsonResult getSpec(@Valid @RequestBody QuerySpecPojo goodsSpecPojo){
+        GoodsSpec goodsSpec =  goodsService.getSpecByGoodsSpecClass(goodsSpecPojo.getGid(),goodsSpecPojo.getSpecClass());
+        if(null!=goodsSpec){
+            return JsonResult.success(goodsSpec);
+        }else{
+            return JsonResult.failure("没找到该规格");
+        }
+    }
+    /**
+     * 获取极物页面商品列表分页
+     *
+     * @param goodsPagePojo
+     * @return
+     */
+    @RequestMapping("/getGoodsByClassfy")
 
+    public JsonResult getGoodsByClassfy(@RequestBody GoodsPagePojo goodsPagePojo){
+        System.out.println(goodsPagePojo);
+        List<Goods> goodsList = goodsService.getGoodsList(goodsPagePojo);
+        if(!goodsList.isEmpty()){
+            return JsonResult.success(goodsList);
+        }else {
+            return JsonResult.failure();
+        }
+    }
 }
