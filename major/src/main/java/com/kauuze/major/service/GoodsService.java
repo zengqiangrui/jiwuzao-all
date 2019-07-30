@@ -332,4 +332,8 @@ public class GoodsService {
         dto.setTotal(goods.getTotalElements());
         return dto;
     }
+
+    public GoodsSpec getSpecByGoodsSpecClass(String gid, String specClass) {
+        return goodsSpecRepository.findByGidAndAndSpecClass(gid,specClass).orElse(null);
+    }
 }
