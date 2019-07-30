@@ -332,7 +332,7 @@ public class GoodsService {
     private PageDto<GoodsSimpleDto> getGoodsSimplePage(Page<Goods> goods) {
         List<GoodsSimpleDto> goodsSimpleDtos = new ArrayList<>();
         PageDto<GoodsSimpleDto> dto = new PageDto<>();
-        goods.forEach(e->{
+        goods.forEach(e -> {
             goodsSimpleDtos.add(getGoodsSimpleDto(e.getGid()));
         });
         dto.setContent(goodsSimpleDtos);
@@ -341,9 +341,9 @@ public class GoodsService {
     }
 
     public GoodsSpec getSpecByGoodsSpecClass(String gid, String specClass) {
-        return goodsSpecRepository.findByGidAndAndSpecClass(gid,specClass).orElse(null);
+        return goodsSpecRepository.findByGidAndAndSpecClass(gid, specClass).orElse(null);
     }
-}
+
 
     /**
      * 获取商品列表
@@ -353,12 +353,12 @@ public class GoodsService {
     public List<Goods> getGoodsList(GoodsPagePojo goodsPagePojo) {
 //        Pageable pageable = PageUtil.getNewsInsert(page,size);
         PageRequest pageRequest = PageRequest.of(goodsPagePojo.getCurrentPage(), goodsPagePojo.getPageSize(),
-                Sort.Direction.DESC,goodsPagePojo.getSortBy());
+                Sort.Direction.DESC, goodsPagePojo.getSortBy());
         List<Goods> goodsPage = null;
         switch (goodsPagePojo.getCurrentTab()) {
             case 0:
                 //推荐，暂写food
-                goodsPage=goodsRepository.findByClassify(pageRequest, GoodsClassifyEnum.food);
+                goodsPage = goodsRepository.findByClassify(pageRequest, GoodsClassifyEnum.food);
                 break;
             case 1:
                 goodsPage = goodsRepository.findByClassify(pageRequest, GoodsClassifyEnum.special);
