@@ -1,5 +1,6 @@
 package com.kauuze.major.api;
 
+import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
 import com.jiwuzao.common.dto.goods.GoodsSimpleDto;
 import com.jiwuzao.common.pojo.common.GidPojo;
@@ -141,5 +142,21 @@ public class GoodsController {
             return JsonResult.failure("没找到该规格");
         }
     }
+    /**
+     * 获取极物页面商品列表分页
+     *
+     * @param goodsPagePojo
+     * @return
+     */
+    @RequestMapping("/getGoodsByClassfy")
 
+    public JsonResult getGoodsByClassfy(@RequestBody GoodsPagePojo goodsPagePojo){
+        System.out.println(goodsPagePojo);
+        List<Goods> goodsList = goodsService.getGoodsList(goodsPagePojo);
+        if(!goodsList.isEmpty()){
+            return JsonResult.success(goodsList);
+        }else {
+            return JsonResult.failure();
+        }
+    }
 }

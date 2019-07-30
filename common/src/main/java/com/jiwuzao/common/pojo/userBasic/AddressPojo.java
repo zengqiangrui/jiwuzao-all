@@ -1,5 +1,6 @@
 package com.jiwuzao.common.pojo.userBasic;
 
+import com.jiwuzao.common.domain.enumType.AddressEnum;
 import com.jiwuzao.common.include.valid.Phone;
 import com.jiwuzao.common.include.valid.StringMax;
 import com.jiwuzao.common.include.valid.TrueName;
@@ -13,6 +14,8 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class AddressPojo {
+    @StringMax
+    private String addressId;
     /**
      * 默认收货省,市,区
      */
@@ -35,5 +38,7 @@ public class AddressPojo {
      */
     @TrueName
     private String receiverTrueName;
+
+    private AddressEnum defaultStatus;
 
 }

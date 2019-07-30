@@ -13,7 +13,9 @@ import com.jiwuzao.common.dto.goods.GoodsOpenDto;
 import com.jiwuzao.common.dto.goods.GoodsSimpleDto;
 import com.jiwuzao.common.include.DateTimeUtil;
 import com.jiwuzao.common.include.PageDto;
+import com.jiwuzao.common.include.PageUtil;
 import com.jiwuzao.common.pojo.common.GoodsSpecPojo;
+import com.jiwuzao.common.pojo.goods.GoodsPagePojo;
 import com.kauuze.major.domain.common.EsUtil;
 import com.kauuze.major.domain.common.MongoUtil;
 import com.kauuze.major.domain.mongo.repository.*;
@@ -21,7 +23,9 @@ import com.kauuze.major.domain.mongo.repository.*;
 import com.kauuze.major.domain.mysql.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -247,6 +251,7 @@ public class GoodsService {
 
     /**
      * 获取商品简略信息
+     *
      * @param gid
      * @return
      */
@@ -280,12 +285,13 @@ public class GoodsService {
 
     /**
      * 获取简单用户信息，效率高
+     *
      * @param uid
      * @param pageable
      * @return
      */
-    public PageDto<GoodsSimpleDto> getGoodsSimple(int uid,Pageable pageable){
-        Page<Goods> goods = goodsRepository.findByUid(uid,pageable);
+    public PageDto<GoodsSimpleDto> getGoodsSimple(int uid, Pageable pageable) {
+        Page<Goods> goods = goodsRepository.findByUid(uid, pageable);
         return getGoodsSimplePage(goods);
     }
 
@@ -319,6 +325,7 @@ public class GoodsService {
 
     /**
      * 获取用户商品简单分页
+     *
      * @param goods
      * @return
      */
@@ -335,5 +342,52 @@ public class GoodsService {
 
     public GoodsSpec getSpecByGoodsSpecClass(String gid, String specClass) {
         return goodsSpecRepository.findByGidAndAndSpecClass(gid,specClass).orElse(null);
+    }
+}
+
+    /**
+     * 获取商品列表
+     *
+     * @return
+     */
+    public List<Goods> getGoodsList(GoodsPagePojo goodsPagePojo) {
+//        Pageable pageable = PageUtil.getNewsInsert(page,size);
+        PageRequest pageRequest = PageRequest.of(goodsPagePojo.getCurrentPage(), goodsPagePojo.getPageSize(),
+                Sort.Direction.DESC,goodsPagePojo.getSortBy());
+        List<Goods> goodsPage = null;
+        switch (goodsPagePojo.getCurrentTab()) {
+            case 0:
+                //推荐，暂写food
+                goodsPage=goodsRepository.findByClassify(pageRequest, GoodsClassifyEnum.food);
+                break;
+            case 1:
+                goodsPage = goodsRepository.findByClassify(pageRequest, GoodsClassifyEnum.special);
+                break;
+            case 2:
+                goodsPage = goodsRepository.findByClassify(pageRequest, GoodsClassifyEnum.food);
+                break;
+            case 3:
+                goodsPage = goodsRepository.findByClassify(pageRequest, GoodsClassifyEnum.clothing);
+                break;
+            case 4:
+                goodsPage = goodsRepository.findByClassify(pageRequest, GoodsClassifyEnum.jewelry);
+                break;
+            case 5:
+                goodsPage = goodsRepository.findByClassify(pageRequest, GoodsClassifyEnum.bags);
+                break;
+            case 6:
+                goodsPage = goodsRepository.findByClassify(pageRequest, GoodsClassifyEnum.appliance);
+                break;
+            case 7:
+                goodsPage = goodsRepository.findByClassify(pageRequest, GoodsClassifyEnum.gift);
+                break;
+            case 8:
+                goodsPage = goodsRepository.findByClassify(pageRequest, GoodsClassifyEnum.beauty);
+                break;
+            case 9:
+                goodsPage = goodsRepository.findByClassify(pageRequest, GoodsClassifyEnum.other);
+                break;
+        }
+        return goodsPage;
     }
 }

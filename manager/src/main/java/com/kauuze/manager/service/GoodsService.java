@@ -107,4 +107,6 @@ public class GoodsService {
                 goodsDetail.getGoodsTypeClass(), goodsSpecs, goods.getPutaway(),
                 goods.getAuditType(), goods.getCreateTime(), goods.getUpdateTime());
     }
+
+
 }

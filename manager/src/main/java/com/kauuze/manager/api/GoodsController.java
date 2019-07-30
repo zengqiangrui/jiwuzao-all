@@ -31,6 +31,7 @@ public class GoodsController {
     @Cms
     public JsonResult findGoodsByAuditType(@Valid @RequestBody AuditTypePojo auditTypePojo){
         PagePojo pagePojo = auditTypePojo.getPage();
+
         PageDto<GoodsOpenDto> pageDto = goodsService.findGoodsByAuditType(auditTypePojo.getAuditType(),
                 pagePojo.getNum(), 20);
         if (pageDto.getTotal() != 0)
@@ -53,4 +54,7 @@ public class GoodsController {
             return JsonResult.failure(result);
         }
     }
+
+
+
 }

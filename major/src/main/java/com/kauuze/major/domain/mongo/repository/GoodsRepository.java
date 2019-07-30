@@ -1,5 +1,6 @@
 package com.kauuze.major.domain.mongo.repository;
 
+import com.jiwuzao.common.domain.enumType.GoodsClassifyEnum;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,4 +20,5 @@ public interface GoodsRepository extends MongoRepository<Goods,String> {
     Page<Goods> findByUid(int uid,Pageable pageable);
 
 
+    List<Goods> findByClassify(Pageable pageable , GoodsClassifyEnum classify);
 }
