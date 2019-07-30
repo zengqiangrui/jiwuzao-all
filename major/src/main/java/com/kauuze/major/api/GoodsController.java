@@ -1,18 +1,18 @@
 package com.kauuze.major.api;
 
-import com.jiwuzao.common.dto.goods.GoodsSimpleDto;
-import com.jiwuzao.common.pojo.common.GidPojo;
-import com.jiwuzao.common.pojo.goods.AddGoodsPojo;
-import com.jiwuzao.common.pojo.goods.CategoryPojo;
-import com.jiwuzao.common.pojo.goods.GoodsPagePojo;
-import com.kauuze.major.config.contain.ParamMismatchException;
-import com.kauuze.major.config.permission.Merchant;
 import com.jiwuzao.common.domain.mongo.entity.Category;
 import com.jiwuzao.common.include.JsonResult;
 import com.jiwuzao.common.include.JsonUtil;
 import com.jiwuzao.common.include.PageDto;
+import com.jiwuzao.common.pojo.common.GidPojo;
+import com.jiwuzao.common.pojo.goods.AddGoodsPojo;
+import com.jiwuzao.common.pojo.goods.CategoryPojo;
+import com.jiwuzao.common.pojo.goods.GoodsPagePojo;
+import com.jiwuzao.common.vo.goods.GoodsDetailVO;
+import com.kauuze.major.config.contain.ParamMismatchException;
+import com.kauuze.major.config.permission.Authorization;
+import com.kauuze.major.config.permission.Merchant;
 import com.kauuze.major.service.GoodsService;
-import com.jiwuzao.common.dto.goods.GoodsOpenDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -129,5 +129,22 @@ public class GoodsController {
         return JsonResult.failure("没找到商品信息");
     }
 
+    /**
+     * app端获取商品详情
+     *
+     * @param gidPojo
+     * @return
+     */
+    @RequestMapping("/getGoodsDetail")
+    @Authorization
+    public JsonResult getGoodsDetail(@RequestAttribute int uid, @Valid @RequestBody GidPojo gidPojo){
+        log.debug(gidPojo.getGid());
+        GoodsDetailVO vo = goodsService.getGoodsDetail(gidPojo.getGid());
+        if (vo == null) {
+            return JsonResult.failure("没有这件商品");
+        } else {
+            return JsonResult.success(vo);
+        }
+    }
 
 }

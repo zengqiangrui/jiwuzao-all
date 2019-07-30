@@ -8,16 +8,17 @@ import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.jiwuzao.common.domain.mongo.entity.GoodsDetail;
 import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
+import com.jiwuzao.common.domain.mongo.entity.userBastic.UserInfo;
 import com.jiwuzao.common.domain.mysql.entity.User;
 import com.jiwuzao.common.dto.goods.GoodsOpenDto;
 import com.jiwuzao.common.dto.goods.GoodsSimpleDto;
 import com.jiwuzao.common.include.DateTimeUtil;
 import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.pojo.common.GoodsSpecPojo;
+import com.jiwuzao.common.vo.goods.GoodsDetailVO;
 import com.kauuze.major.domain.common.EsUtil;
 import com.kauuze.major.domain.common.MongoUtil;
 import com.kauuze.major.domain.mongo.repository.*;
-
 import com.kauuze.major.domain.mysql.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -44,6 +45,8 @@ public class GoodsService {
     private GoodsRepository goodsRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserInfoRepository userInfoRepository;
     @Autowired
     private StoreRepository storeRepository;
     @Autowired
@@ -331,5 +334,25 @@ public class GoodsService {
         dto.setContent(goodsSimpleDtos);
         dto.setTotal(goods.getTotalElements());
         return dto;
+    }
+
+    /**
+     * app端获取商品详情
+     * @param gid
+     * @return
+     */
+    public GoodsDetailVO getGoodsDetail(String gid){
+        GoodsDetail detail = goodsDetailRepository.findByGid(gid).get();
+        Goods goods = goodsRepository.findByGid(gid);
+        User user = userRepository.findById(goods.getUid()).get();
+        UserInfo info = userInfoRepository.findByUid(goods.getUid());
+        if (detail == null || goods == null || user == null || info ==null)
+            return null;
+        GoodsDetailVO vo = new GoodsDetailVO();
+        vo.setTitle(goods.getTitle()).setDefaultPrice(goods.getDefaultPrice())
+                .setDetailLabel(detail.getDetailLabel()).setDetailPhotos(detail.getDetailPhotos())
+                .setPostage(goods.getPostage()).setSlideshow(detail.getSlideshow())
+                .setNickName(user.getNickName()).setPortrait(info.getPortrait());
+        return vo;
     }
 }
