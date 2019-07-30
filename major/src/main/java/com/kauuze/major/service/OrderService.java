@@ -11,7 +11,6 @@ import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrderDetail;
 import com.jiwuzao.common.domain.mysql.entity.PayOrder;
-import com.jiwuzao.common.dto.goods.GoodsSimpleDto;
 import com.jiwuzao.common.dto.order.GoodsOrderDto;
 import com.jiwuzao.common.dto.order.GoodsOrderSimpleDto;
 import com.jiwuzao.common.dto.order.UserGoodsOrderDto;
@@ -63,6 +62,7 @@ public class OrderService {
      * @param itemList
      * @return 返回订单id
      */
+    @Deprecated
     public String genOrder(int uid, List<AddItemPojo> itemList) {
         BigDecimal price = new BigDecimal(BigInteger.ZERO);
         //生成支付订单
@@ -106,7 +106,56 @@ public class OrderService {
      * @param
      * @return
      */
-    public Object comfirmOrder(String payOrderNo, String city, String address,
+    public Object comfirmOrder(int uid, List<AddItemPojo> itemList, String city, String address,
+                               String phone, String name, String ip) throws WxPayException {
+        BigDecimal price = new BigDecimal(BigInteger.ZERO);
+        //生成支付订单
+        PayOrder payOrder = new PayOrder().setPay(false)
+                .setPayOrderNo(UUID.randomUUID().toString().replace("-", ""))
+                .setFinalPay(BigDecimal.ZERO).setPayChannel(PayChannelEnum.wxPay)
+                .setCreateTime(System.currentTimeMillis()).setOvertime(false)
+                .setSystemGoods(false).setQrCode(false).setUid(uid);
+        //遍历购买列表， 为每件物品生成goodsOrder,将所有费用相加放入payOrder
+        for (AddItemPojo e : itemList) {
+            Goods goods = goodsRepository.findByGid(e.getGid());
+            GoodsSpec goodsSpec = goodsSpecRepository.findById(e.getSpecId()).get();
+
+            //生成GoodsOrderDetail
+            GoodsOrderDetail detail = new GoodsOrderDetail().setComplaint(false);
+
+            detail = goodsOrderDetailRepository.save(detail);
+
+            BigDecimal finalPay = goods.getPostage()
+                    .add(goodsSpec.getSpecPrice().multiply(BigDecimal.valueOf(e.getNum())));
+            //生成GoodsOrder放入detail的id
+            GoodsOrder goodsOrder = new GoodsOrder().setGoodsOrderDetailId(detail.getId()).setGoodsTitle(goods.getTitle())
+                    .setOrderStatus(OrderStatusEnum.waitPay).setBuyCount(e.getNum())
+                    .setCover(goods.getCover()).setCreateTime(System.currentTimeMillis())
+                    .setPostage(goods.getPostage()).setSpecClass(goodsSpec.getSpecClass())
+                    .setFinalPay(finalPay).setUid(uid).setSid(goods.getSid())
+                    .setGid(goods.getGid()).setPayOrderNo(payOrder.getPayOrderNo())
+                    .setGsid(e.getSpecId()).setGoodsOrderNo(Rand.createOrderNo());//增加生成orderNo
+            goodsOrderRepository.save(goodsOrder);
+
+            price = price.add(finalPay);
+        }
+        payOrder.setFinalPay(price);
+        payOrderRepository.save(payOrder);
+        return genPayOrder(payOrder.getPayOrderNo(), city, address, phone, name, ip);
+    }
+
+    /**
+     * 生成支付订单
+     * @param payOrderNo
+     * @param city
+     * @param address
+     * @param phone
+     * @param name
+     * @param ip
+     * @return
+     * @throws WxPayException
+     */
+    private Object genPayOrder(String payOrderNo, String city, String address,
                                String phone, String name, String ip) throws WxPayException {
         List<GoodsOrder> list = goodsOrderRepository.findByPayOrderNo(payOrderNo);
         String body = new String("极物造-商品支付");

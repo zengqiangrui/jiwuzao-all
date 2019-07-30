@@ -51,7 +51,13 @@ public class OrderServiceTest {
      */
     @Test
     public void comfirmOrder() throws WxPayException {
-        orderService.comfirmOrder("c52a4a75ced94cc994608425bf5f9b0c", "重庆市渝中区", "金童路叠彩中心","18671450715","刘元庭","127.0.0.1");
+        List<AddItemPojo> list = new ArrayList<>();
+        AddItemPojo item = new AddItemPojo("5d2c0a292197fd13b83d7311","5d2c0a292197fd13b83d7314",2);
+        list.add(item);
+        item = new AddItemPojo("5d2c0b332197fd13b83d7349","5d2c0b332197fd13b83d734b",2);
+        list.add(item);
+
+        orderService.comfirmOrder(4, list, "重庆市渝中区", "金童路叠彩中心","18671450715","刘元庭","127.0.0.1");
     }
 
     @Test

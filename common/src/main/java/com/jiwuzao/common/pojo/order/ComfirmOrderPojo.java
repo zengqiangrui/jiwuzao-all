@@ -14,10 +14,6 @@ import java.util.List;
 @Accessors(chain = true)
 public class ComfirmOrderPojo {
     /**
-     * 订单id
-     */
-    private String goodsOrderNo;
-    /**
      * 收货省市区
      */
     private String city;

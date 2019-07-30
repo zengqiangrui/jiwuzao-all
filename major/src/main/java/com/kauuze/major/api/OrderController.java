@@ -55,9 +55,9 @@ public class OrderController {
      */
     @RequestMapping("/comfirmOrder")
     @Authorization
-    public JsonResult comfirmOrder(@RequestAttribute("ip") String ip,
+    public JsonResult comfirmOrder(@RequestAttribute("uid") int uid, @RequestAttribute("ip") String ip,
                                    @Valid @RequestBody ComfirmOrderPojo pojo) throws WxPayException {
-        Object result = orderService.comfirmOrder(pojo.getGoodsOrderNo(), pojo.getCity(),
+        Object result = orderService.comfirmOrder(uid, pojo.getItemList(), pojo.getCity(),
                 pojo.getAddress(), pojo.getPhone(), pojo.getTrueName(), ip);
         if (result == null) {
             return JsonResult.failure();
