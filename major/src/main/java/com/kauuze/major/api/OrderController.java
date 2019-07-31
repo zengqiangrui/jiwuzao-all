@@ -1,6 +1,7 @@
 package com.kauuze.major.api;
 
 import com.github.binarywang.wxpay.exception.WxPayException;
+import com.github.binarywang.wxpay.service.WxPayService;
 import com.jiwuzao.common.dto.order.GoodsOrderDto;
 import com.jiwuzao.common.dto.order.GoodsOrderSimpleDto;
 import com.jiwuzao.common.include.JsonResult;
@@ -28,6 +29,21 @@ public class OrderController {
     OrderService orderService;
     @Autowired
     private AddressService addressService;
+    @Autowired
+    private WxPayService wxPayService;
+
+    /**
+     * 获取沙箱支付key
+     * @return
+     * @throws WxPayException
+     */
+    @RequestMapping("/getKey")
+    public String getSandboxSignKey() throws WxPayException {
+        String sandboxSignKey = wxPayService.getSandboxSignKey();
+        System.out.println(sandboxSignKey);
+        return sandboxSignKey;
+    }
+
 
 //    /**
 //     * 用户通过购物车或者单个商品结算，传入商品数组生成订单

@@ -66,7 +66,7 @@ public class Goods {
     /**
      * 是否上架
      */
-    private Boolean putaway;
+    private Boolean putaway = false;
     /**
      * 上架时间
      */

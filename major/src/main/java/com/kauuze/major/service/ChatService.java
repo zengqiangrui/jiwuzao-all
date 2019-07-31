@@ -26,7 +26,6 @@ import java.util.concurrent.Future;
 
 @Service
 @Slf4j
-@Async
 public class ChatService {
     @Autowired
     private ChatGroupRepository chatGroupRepository;
@@ -37,7 +36,7 @@ public class ChatService {
     @Autowired
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
-    private List<Future> futures = new ArrayList<>();
+    private static List<Future> futures = new ArrayList<>();
 
     /**
      * 建立聊天联系
@@ -94,7 +93,8 @@ public class ChatService {
      * @param type
      * @return
      */
-    public ChatMessageDto createChatMessage(String groupId, int uid, String content, MessageTypeEnum type) {
+    @Async
+    public Future<?> createChatMessage(String groupId, int uid, String content, MessageTypeEnum type) {
         // 消息持久化,使用线程池并发执行
         Future<?> future = threadPoolTaskExecutor.submit(() -> {
             ChatMessage chatMessage = new ChatMessage()
@@ -110,7 +110,7 @@ public class ChatService {
             }
         });
         futures.add(future);
-        return null;
+        return future;
     }
 
     /**

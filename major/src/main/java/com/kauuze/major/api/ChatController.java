@@ -1,21 +1,20 @@
 package com.kauuze.major.api;
 
+import com.jiwuzao.common.config.contain.SpringContext;
 import com.jiwuzao.common.domain.enumType.MessageTypeEnum;
 import com.jiwuzao.common.domain.enumType.OnlineStatusEnum;
 import com.jiwuzao.common.dto.chat.ChatGroupDto;
-import com.jiwuzao.common.dto.chat.ChatMessageDto;
 import com.jiwuzao.common.pojo.common.UidPojo;
 import com.kauuze.major.config.permission.Authorization;
 import com.kauuze.major.include.JsonResult;
 import com.kauuze.major.service.ChatService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
 
 import javax.validation.Valid;
 import javax.websocket.*;
@@ -33,8 +32,6 @@ import java.util.concurrent.Future;
 @RequestMapping("/chat")
 @Slf4j
 public class ChatController {
-    @Autowired
-    private ChatService chatService;
 
     //静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。
     private static int onlineCount = 0;
@@ -53,6 +50,7 @@ public class ChatController {
     @Authorization
     public JsonResult initChat(@RequestAttribute int uid, @Valid @RequestBody UidPojo uidB) {
         System.out.println(uid + "," + uidB);
+        final ChatService chatService = SpringContext.getBean(ChatService.class);
         ChatGroupDto chatGroupDto = chatService.initChatGroup(uid, uidB.getUid());
         System.out.println(uid + "," + uidB);
         if (null != chatGroupDto) {
@@ -75,6 +73,7 @@ public class ChatController {
         log.info("有用户加入:" + uid + ",当前在线人数为" + getOnlineCount());
         try {
             sendMessage("连接成功");
+            final ChatService chatService = SpringContext.getBean(ChatService.class);
             chatService.switchUserGroupStatus(Integer.parseInt(uid), groupId, OnlineStatusEnum.ON_LINE);
         } catch (IOException e) {
             log.error("websocket IO异常");
@@ -93,7 +92,8 @@ public class ChatController {
         String groupId = requestParameterMap.get("groupId").get(0);
         log.info("uid{},groupId{}", uid, groupId);
         log.info("收到来自窗口" + this.uid + "的信息:" + message);
-        ChatMessageDto chatMessage = chatService.createChatMessage(groupId, Integer.parseInt(uid), message, MessageTypeEnum.TEXT);
+        final ChatService chatService = SpringContext.getBean(ChatService.class);
+        chatService.createChatMessage(groupId, Integer.parseInt(uid), message, MessageTypeEnum.TEXT);
         //群发消息
         for (ChatController item : webSocketSet) {
             try {
@@ -113,6 +113,7 @@ public class ChatController {
         webSocketSet.remove(this);  //从set中删除
         subOnlineCount();           //在线数减1
         log.info("有一连接关闭！当前在线人数为" + getOnlineCount());
+        final ChatService chatService = SpringContext.getBean(ChatService.class);
         chatService.switchUserGroupStatus(Integer.parseInt(uid), groupId, OnlineStatusEnum.OFF_LINE);
     }
 
