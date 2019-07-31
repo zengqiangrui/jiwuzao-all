@@ -32,6 +32,11 @@ public class GoodsDetailVO {
     private String title;
 
     /**
+     * 商品封面
+     */
+    private String cover;
+
+    /**
      * 默认价格：可排序
      */
     private BigDecimal defaultPrice;

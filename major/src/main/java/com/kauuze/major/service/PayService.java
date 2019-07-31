@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -21,7 +22,9 @@ public class PayService {
     @Autowired
     private GoodsOrderRepository goodsOrderRepository;
 
+    @Transactional(rollbackOn = Exception.class)
     public void handleNotify(WxPayOrderNotifyResult notifyResult) {
+        log.info(notifyResult.toString());
         String payOrderNo = notifyResult.getOutTradeNo();
         String transactionId = notifyResult.getTransactionId();
         PayOrder payOrder = payOrderRepository.findByPayOrderNo(payOrderNo);

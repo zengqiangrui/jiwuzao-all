@@ -16,7 +16,6 @@ import com.kauuze.major.config.contain.ParamMismatchException;
 import com.kauuze.major.config.permission.Authorization;
 import com.kauuze.major.config.permission.Merchant;
 import com.kauuze.major.service.GoodsService;
-import com.qiniu.util.Json;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -177,7 +176,6 @@ public class GoodsController {
      * @return
      */
     @RequestMapping("/getGoodsByClassfy")
-    @Authorization
     public JsonResult getGoodsByClassfy(@RequestBody GoodsPagePojo goodsPagePojo) {
         System.out.println(goodsPagePojo);
         List<Goods> goodsList = goodsService.getGoodsList(goodsPagePojo);

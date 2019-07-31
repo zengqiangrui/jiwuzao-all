@@ -370,7 +370,8 @@ public class GoodsService {
                 .setDetailLabel(detail.getDetailLabel()).setDetailPhotos(detail.getDetailPhotos())
                 .setPostage(goods.getPostage()).setSlideshow(detail.getSlideshow())
                 .setNickName(user.getNickName()).setPortrait(info.getPortrait())
-                .setGoodsType(detail.getGoodsType()).setGoodsTypeClass(detail.getGoodsTypeClass());
+                .setGoodsType(detail.getGoodsType()).setGoodsTypeClass(detail.getGoodsTypeClass())
+                .setCover(goods.getCover());
         return vo;
     }
 
