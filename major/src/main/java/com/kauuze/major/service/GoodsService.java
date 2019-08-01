@@ -88,11 +88,14 @@ public class GoodsService {
      * @return
      */
     public String putAway(int uid, String gid) {
-        User user = userRepository.findById(uid);
-        BigDecimal decimal = systemGoodsRepository.findByName(SystemGoodsNameEnum.deposit).getPrice();
-        if (user.getDeposit().compareTo(decimal) < 0) {
-            return "未交满保证金" + decimal.toString();
-        }
+        /**
+         * 获取保证金，暂时不交保证金
+         */
+//        User user = userRepository.findById(uid);
+//        BigDecimal decimal = systemGoodsRepository.findByName(SystemGoodsNameEnum.deposit).getPrice();
+//        if (user.getDeposit().compareTo(decimal) < 0) {
+//            return "未交满保证金" + decimal.toString();
+//        }
         Goods goods = goodsRepository.findByGid(gid);
         if (goods == null) {
             return "该商品不存在";
@@ -106,11 +109,12 @@ public class GoodsService {
         if (goods.getPutaway()) {
             return "该商品已上架";
         }
-        Map<String, String> map = new HashMap<>();
-        map.put("gid", goods.getGid());
-        map.put("putaway", "true");
-        EsUtil.modify(map);
-        return null;
+        goods.setPutaway(true).setPutawayTime(System.currentTimeMillis());
+        Goods save = goodsRepository.save(goods);
+        if (null != save)
+            return "上架成功";
+        else
+            return "上架失败";
     }
 
     /**
@@ -345,6 +349,7 @@ public class GoodsService {
 
     /**
      * 根据规格字符串获取商品规格
+     *
      * @param gid
      * @param specClass
      * @return
@@ -355,15 +360,16 @@ public class GoodsService {
 
     /**
      * app端获取商品详情
+     *
      * @param gid
      * @return
      */
-    public GoodsDetailVO getGoodsDetail(String gid){
+    public GoodsDetailVO getGoodsDetail(String gid) {
         GoodsDetail detail = goodsDetailRepository.findByGid(gid).get();
         Goods goods = goodsRepository.findByGid(gid);
         User user = userRepository.findById(goods.getUid()).get();
         UserInfo info = userInfoRepository.findByUid(goods.getUid());
-        if (detail == null || goods == null || user == null || info ==null)
+        if (detail == null || goods == null || user == null || info == null)
             return null;
         GoodsDetailVO vo = new GoodsDetailVO();
         vo.setTitle(goods.getTitle()).setDefaultPrice(goods.getDefaultPrice())
@@ -424,18 +430,19 @@ public class GoodsService {
 
     /**
      * 商家获取一个商品信息
+     *
      * @param gid 商品id
      * @return MerchantGoodsVO 单个商品显示对象
      */
     public MerchantGoodsVO merchantGetGoodsDetail(String gid) {
         Goods goods = goodsRepository.findByGid(gid);
-        if(null == goods){
+        if (null == goods) {
             return null;
-        }else{
+        } else {
             Optional<GoodsDetail> detailOptional = goodsDetailRepository.findByGid(gid);
-            if(!detailOptional.isPresent()){
+            if (!detailOptional.isPresent()) {
                 return null;
-            }else{
+            } else {
                 GoodsDetail goodsDetail = detailOptional.get();
                 List<GoodsSpec> specList = goodsSpecRepository.findByGid(gid);
                 return new MerchantGoodsVO()

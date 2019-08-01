@@ -8,6 +8,7 @@ import com.github.binarywang.wxpay.config.WxPayConfig;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.github.binarywang.wxpay.service.impl.WxPayServiceImpl;
 import com.kauuze.major.config.contain.properties.WxPayProperties;
+import com.mongodb.MongoClientOptions;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -54,6 +55,11 @@ public class ConfigBean implements WebMvcConfigurer {
         return wxPayService;
     }
 
-
-
+    @Bean
+    public MongoClientOptions mongoOptions() {
+        return MongoClientOptions
+                .builder()
+                .maxConnectionIdleTime(60000)
+                .build();
+    }
 }

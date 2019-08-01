@@ -78,7 +78,7 @@ public class ShopCartService {
         GoodsSpec goodsSpec = goodsSpecRepository.findById(specId).get();
         //todo 组装商品显示规格字符串
 
-        return  new ShopCartItem(cid, gid, goods.getSid(), goods.getTitle(), goods.getCover(), goodsSpec.getSpecClass(),
+        return  new ShopCartItem(cid, gid, goods.getSid(),goodsSpec.getId(), goods.getTitle(), goods.getCover(), goodsSpec.getSpecClass(),
                 goodsSpec.getSpecPrice().toString(), 1, goodsSpec.getSpecInventory());
     }
 
