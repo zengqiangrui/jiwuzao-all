@@ -13,7 +13,6 @@ import com.jiwuzao.common.pojo.goods.*;
 import com.jiwuzao.common.vo.goods.GoodsDetailVO;
 import com.jiwuzao.common.vo.goods.MerchantGoodsVO;
 import com.kauuze.major.config.contain.ParamMismatchException;
-import com.kauuze.major.config.permission.Authorization;
 import com.kauuze.major.config.permission.Merchant;
 import com.kauuze.major.service.GoodsService;
 import lombok.extern.slf4j.Slf4j;
@@ -148,8 +147,7 @@ public class GoodsController {
      * @return
      */
     @RequestMapping("/getGoodsDetail")
-    @Authorization
-    public JsonResult getGoodsDetail(@RequestAttribute int uid, @Valid @RequestBody GidPojo gidPojo) {
+    public JsonResult getGoodsDetailApp(@Valid @RequestBody GidPojo gidPojo) {
         log.debug(gidPojo.getGid());
         GoodsDetailVO vo = goodsService.getGoodsDetail(gidPojo.getGid());
         if (vo == null) {
