@@ -71,6 +71,7 @@ public class QiniuUtil {
         Auth auth = Auth.create(accesskey, secretkey);
         StringMap policy = new StringMap();
         policy.put("fsizeLimit", 1024 * 1024 * 50);
+//        policy.put("returnBody","{\"code\":\"0\",\"msg\":\"success\",\"data\":{\"src\": \"http://cdn.jiwuzao.com/$(key)\",\"title\": \"$(x:name)\"}}'");
         String upToken = auth.uploadToken(bucket, key, 3600L, policy);
         Map<String, String> map = new HashMap<>();
         map.put("key", key);

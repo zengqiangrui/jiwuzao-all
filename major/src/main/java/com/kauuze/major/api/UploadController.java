@@ -6,6 +6,7 @@ import com.jiwuzao.common.pojo.common.SuffixPojo;
 import com.jiwuzao.common.pojo.common.UrlPojo;
 import com.jiwuzao.common.pojo.common.UrlsPojo;
 import com.jiwuzao.common.include.JsonResult;
+import com.qiniu.util.Json;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +24,11 @@ public class UploadController {
     @RequestMapping("/upToken")
     public JsonResult upToken(@Valid @RequestBody SuffixPojo suffixPojo) {
         return JsonResult.success(QiniuUtil.upToken(suffixPojo.getSuffix()));
+    }
+
+    @RequestMapping("/richUpToken")
+    public JsonResult richUpToken(){
+        return JsonResult.success(QiniuUtil.upToken(""));
     }
 
     @RequestMapping("/delFilesBatch")

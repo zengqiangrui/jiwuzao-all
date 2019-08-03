@@ -15,6 +15,7 @@ import com.jiwuzao.common.include.JsonUtil;
 import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.include.StringUtil;
 import com.jiwuzao.common.pojo.common.PagePojo;
+import com.jiwuzao.common.pojo.express.ExpressNoPojo;
 import com.jiwuzao.common.pojo.order.ExpressPojo;
 import com.jiwuzao.common.pojo.order.GetOrderPojo;
 import com.jiwuzao.common.pojo.order.OrderPagePojo;
@@ -130,6 +131,18 @@ public class ExpressController {
     @Authorization
     public JsonResult getTraceByOrder(@Valid @RequestBody GetOrderPojo getOrderPojo) {
         ExpressShowDto showDto = expressService.getExpressOneByOrder(getOrderPojo.getGoodsOrderNo());
+        return JsonResult.success(showDto);
+    }
+
+    /**
+     * 根据物流id，获取单一商品订单物流轨迹
+     * @param expressNo
+     * @return
+     */
+    @RequestMapping("/getTraceByExpNo")
+    @Authorization
+    public JsonResult getTraceByExpNo(@Valid @RequestBody ExpressNoPojo expressNo){
+        ExpressShowDto showDto = expressService.getExpressOneByOrder(expressNo.getExpressNo());
         return JsonResult.success(showDto);
     }
 

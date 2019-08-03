@@ -46,11 +46,13 @@ public class ChatController {
     //用于延时处理信息入库的list
     private List<Future> futures = new ArrayList<>();
 
+    @Autowired
+    private ChatService chatService;
+
     @RequestMapping("/init")
     @Authorization
     public JsonResult initChat(@RequestAttribute int uid, @Valid @RequestBody UidPojo uidB) {
         System.out.println(uid + "," + uidB);
-        final ChatService chatService = SpringContext.getBean(ChatService.class);
         ChatGroupDto chatGroupDto = chatService.initChatGroup(uid, uidB.getUid());
         System.out.println(uid + "," + uidB);
         if (null != chatGroupDto) {
@@ -58,6 +60,13 @@ public class ChatController {
         } else {
             return JsonResult.failure("建立聊天失败");
         }
+    }
+
+    @RequestMapping("/getAllGroup")
+    @Authorization
+    public JsonResult getAllGroup(@RequestAttribute int uid){
+        List<ChatGroupDto> userAllGroup = chatService.getUserAllGroup(uid);
+        return JsonResult.success(userAllGroup);
     }
 
     /**
@@ -93,7 +102,8 @@ public class ChatController {
         log.info("uid{},groupId{}", uid, groupId);
         log.info("收到来自窗口" + this.uid + "的信息:" + message);
         final ChatService chatService = SpringContext.getBean(ChatService.class);
-        chatService.createChatMessage(groupId, Integer.parseInt(uid), message, MessageTypeEnum.TEXT);
+        Future<?> chatMessage = chatService.createChatMessage(groupId, Integer.parseInt(uid), message, MessageTypeEnum.TEXT);
+        futures.add(chatMessage);
         //群发消息
         for (ChatController item : webSocketSet) {
             try {

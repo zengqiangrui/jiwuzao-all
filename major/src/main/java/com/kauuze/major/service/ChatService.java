@@ -11,6 +11,8 @@ import com.kauuze.major.domain.mongo.ChatMessageRepository;
 import com.kauuze.major.domain.mongo.repository.ChatGroupRepository;
 import com.kauuze.major.domain.mongo.repository.UserInfoRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -35,8 +37,6 @@ public class ChatService {
     private UserInfoRepository userInfoRepository;
     @Autowired
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
-
-    private static List<Future> futures = new ArrayList<>();
 
     /**
      * 建立聊天联系
@@ -68,6 +68,31 @@ public class ChatService {
         }
     }
 
+    /**
+     * 获取用户所有好友(可聊天对象)
+     *
+     * @param uid
+     * @return
+     */
+    public List<ChatGroupDto> getUserAllGroup(int uid) {
+        List<ChatGroup> chatGroups = chatGroupRepository.findByUidAOrUidB(uid);
+        List<ChatGroupDto> chatGroupDtos = new ArrayList<>();
+        for (ChatGroup chatGroup : chatGroups) {
+            UserInfo userA = userInfoRepository.findByUid(chatGroup.getUidA());
+            UserInfo userB = userInfoRepository.findByUid(chatGroup.getUidB());
+            ChatGroupDto chatGroupDto = new ChatGroupDto()
+                    .setUidA(chatGroup.getUidA())
+                    .setUidB(chatGroup.getUidB())
+                    .setGroupId(chatGroup.getId())
+                    .setUserNameA(userA.getNickName())
+                    .setUserNameB(userB.getNickName())
+                    .setAvatarA(userA.getPortrait())
+                    .setAvatarB(userB.getPortrait());
+            chatGroupDtos.add(chatGroupDto);
+        }
+        return chatGroupDtos;
+    }
+
     public ChatGroupDto switchUserGroupStatus(int uid, String groupId, OnlineStatusEnum status) {
         Optional<ChatGroup> opt = chatGroupRepository.findById(groupId);
         if (!opt.isPresent()) {
@@ -96,7 +121,7 @@ public class ChatService {
     @Async
     public Future<?> createChatMessage(String groupId, int uid, String content, MessageTypeEnum type) {
         // 消息持久化,使用线程池并发执行
-        Future<?> future = threadPoolTaskExecutor.submit(() -> {
+        return threadPoolTaskExecutor.submit(() -> {
             ChatMessage chatMessage = new ChatMessage()
                     .setMessageType(type).setGroupId(groupId).setUid(uid)
                     .setContent(content).setCreateTime(System.currentTimeMillis());
@@ -109,8 +134,6 @@ public class ChatService {
                 throw new RuntimeException("消息入库异常");
             }
         });
-        futures.add(future);
-        return future;
     }
 
     /**
@@ -131,14 +154,13 @@ public class ChatService {
     }
 
 
-    public void checkMessageTask() throws ExecutionException, InterruptedException {
+    public void checkMessageTask(List<Future> futures) throws ExecutionException, InterruptedException {
         //查询任务执行的结果
         for (Future<?> future : futures) {
             if (!future.isCancelled() && future.isDone())
                 System.out.println(future.get());
         }
     }
-
 
     private ChatGroupDto transToDto(ChatGroup chatGroup) {
         System.out.println(chatGroup);
@@ -148,5 +170,7 @@ public class ChatService {
                 .setUidA(userA.getUid()).setUidB(userB.getUid()).setUserNameA(userA.getNickName()).setUserNameB(userB.getNickName())
                 .setGroupId(chatGroup.getId());
     }
+
+
 
 }

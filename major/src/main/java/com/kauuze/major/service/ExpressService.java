@@ -203,6 +203,20 @@ public class ExpressService {
     }
 
     /**
+     * 查询内部的数据库物流订单数据信息
+     * @return
+     */
+    public ExpressShowDto getExpressOneByLogistic(String logisticNo){
+        Optional<ExpressResult> byLogisticCode = resultRepository.findByLogisticCode(logisticNo);
+        if (byLogisticCode.isPresent()) {
+            ExpressResult expressResult = byLogisticCode.get();
+            return new ExpressShowDto().setExpNo(expressResult.getLogisticCode()).setOrderNo(expressResult.getOrderCode()).setTraces(expressResult.getTraces());
+        } else {
+            throw new RuntimeException("物流信息未找到");
+        }
+    }
+
+    /**
      * 处理物流回调
      *
      * @param requestData
