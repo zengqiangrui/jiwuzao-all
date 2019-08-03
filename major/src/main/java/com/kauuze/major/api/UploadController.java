@@ -60,11 +60,10 @@ public class UploadController {
         if (file.isEmpty()) {
             throw new RuntimeException("文件为空");
         }
-        if(file.getSize()>1024*1024*5)
+        if (file.getSize() > 1024 * 1024 * 5)
             throw new RuntimeException("文件大小应小于5m");
-        String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());//根据日期上传图片进行保存
-//        String filePath = "E:/images/uploads/" + date;
-        String filePath = "/usr/images/uploads/" + date;
+//        String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());//根据日期上传图片进行保存
+        String filePath = "/root/jiwuzao/images/";
         File f = new File(filePath);
         if (!f.exists()) f.mkdirs();
         String fName = Rand.getUUID() + file.getOriginalFilename();
@@ -73,7 +72,7 @@ public class UploadController {
         try {
             file.transferTo(dest);
             layUploadDto.setCode(0).setMsg("上传成功").setData(new LayImgDto()
-                    .setSrc("http://api.jiwuzao.com/images/" + fName).setTitle(file.getOriginalFilename()));
+                    .setSrc("http://api.jiwuzao.com/jiwuzao/" + fName).setTitle(file.getOriginalFilename()));
             log.info("上传成功");
             return JsonUtil.toJsonString(layUploadDto);
         } catch (IOException e) {

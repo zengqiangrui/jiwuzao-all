@@ -42,6 +42,6 @@ public class WebConfig implements WebMvcConfigurer {
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/images/**").addResourceLocations("file:/usr/images/");
+        registry.addResourceHandler("/jiwuzao/**").addResourceLocations("file:/root/jiwuzao/images/");
     }
 }
