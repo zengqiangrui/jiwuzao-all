@@ -55,8 +55,7 @@ public class UploadController {
     }
 
     @RequestMapping("/myUpload")
-    @Authorization
-    public String doUpload(@RequestAttribute int uid, @RequestParam("file") MultipartFile file) {
+    public String doUpload(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             throw new RuntimeException("文件为空");
         }
