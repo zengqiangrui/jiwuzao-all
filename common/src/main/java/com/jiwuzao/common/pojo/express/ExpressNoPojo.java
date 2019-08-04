@@ -1,4 +1,4 @@
-package com.jiwuzao.common.pojo.order;
+package com.jiwuzao.common.pojo.express;
 
 import com.jiwuzao.common.include.valid.StringMax;
 import lombok.AllArgsConstructor;
@@ -10,9 +10,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class GetOrderPojo {
-
+public class ExpressNoPojo {
     @StringMax
-    private String goodsOrderNo;
-
+    private String expressNo;
 }
