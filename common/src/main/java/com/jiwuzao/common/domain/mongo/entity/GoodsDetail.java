@@ -52,4 +52,8 @@ public class GoodsDetail {
      * 详情图:可以6张
      */
     private String detailPhotos;
+    /**
+     * 持久化后的点赞数
+     */
+    private Long appriseCnt;
 }

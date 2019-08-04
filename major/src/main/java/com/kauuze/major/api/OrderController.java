@@ -2,9 +2,11 @@ package com.kauuze.major.api;
 
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
+import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
 import com.jiwuzao.common.dto.order.GoodsOrderDto;
 import com.jiwuzao.common.dto.order.GoodsOrderSimpleDto;
 import com.jiwuzao.common.include.JsonResult;
+import com.jiwuzao.common.pojo.common.OrderStatusPojo;
 import com.jiwuzao.common.pojo.order.ComfirmOrderPojo;
 import com.jiwuzao.common.pojo.order.GetOrderPojo;
 import com.kauuze.major.config.permission.Authorization;
@@ -90,8 +92,13 @@ public class OrderController {
      */
     @RequestMapping("/getOrderSample")
     @Authorization
-    public JsonResult getOrderSample(@RequestAttribute("uid") int uid) {
-        List<GoodsOrderSimpleDto> result = orderService.getOrderSample(uid);
+    public JsonResult getOrderSample(@RequestAttribute("uid") int uid, @RequestBody OrderStatusPojo pojo) {
+        OrderStatusEnum status = null;
+        if (pojo != null){
+            status = pojo.getStatus();
+        }
+
+        List<GoodsOrderSimpleDto> result = orderService.getOrderSample(uid, status);
         if (result == null) {
             return JsonResult.failure();
         } else {

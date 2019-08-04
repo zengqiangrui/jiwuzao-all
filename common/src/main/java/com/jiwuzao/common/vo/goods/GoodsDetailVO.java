@@ -65,4 +65,9 @@ public class GoodsDetailVO {
      * 商品类型分类
      */
     private String goodsTypeClass;
+
+    /**
+     * 商品点赞数
+     */
+    private Long appriseCnt;
 }

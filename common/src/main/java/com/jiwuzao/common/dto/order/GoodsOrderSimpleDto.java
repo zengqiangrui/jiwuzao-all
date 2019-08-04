@@ -19,6 +19,10 @@ public class GoodsOrderSimpleDto {
      */
     private String sid;
     /**
+     * 店铺名称
+     */
+    private String storeTitle;
+    /**
      * 商品订单号
      */
     private String goodsOrderNo;
