@@ -1,5 +1,6 @@
 package com.jiwuzao.common.pojo.merchant;
 
+import com.jiwuzao.common.domain.enumType.StoreStyleEnum;
 import com.jiwuzao.common.include.valid.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,9 +27,9 @@ public class OpenStorePojo {
     private String servicePhone;
     @MsCode
     private Integer msCode;
-    @StringMax
+    @StringMax(max = 8192)
     private String storeIntro;
-    @StringMax(max = 21,require = false)
-    private String storeStyle;
+    @StringMax
+    private StoreStyleEnum storeStyle;
 
 }

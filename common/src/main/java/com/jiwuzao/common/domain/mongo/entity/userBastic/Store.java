@@ -1,5 +1,6 @@
 package com.jiwuzao.common.domain.mongo.entity.userBastic;
 
+import com.jiwuzao.common.domain.enumType.StoreStyleEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -63,9 +64,9 @@ public class Store {
     private String storeIntro;
 
     /**
-     * 店铺风格，逗号拼接字符串如"简约，中国风"
+     * 店铺风格，枚举进行选择
      */
-    private String storeStyle;
+    private StoreStyleEnum storeStyle;
 
     /**
      * 营业执照

@@ -3,6 +3,7 @@ package com.kauuze.major.api;
 import com.jiwuzao.common.domain.mongo.entity.Category;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
+import com.jiwuzao.common.dto.goods.GoodsSimpleDto;
 import com.jiwuzao.common.include.JsonResult;
 import com.jiwuzao.common.include.JsonUtil;
 import com.jiwuzao.common.include.PageDto;
@@ -10,7 +11,11 @@ import com.jiwuzao.common.include.StringUtil;
 import com.jiwuzao.common.pojo.common.GidPojo;
 import com.jiwuzao.common.pojo.common.QuerySpecPojo;
 import com.jiwuzao.common.pojo.goods.*;
+import com.jiwuzao.common.pojo.store.StoreIdPojo;
+import com.jiwuzao.common.pojo.store.StorePagePojo;
+import com.jiwuzao.common.pojo.store.StorePojo;
 import com.jiwuzao.common.vo.goods.GoodsDetailVO;
+import com.jiwuzao.common.vo.goods.GoodsSimpleVO;
 import com.jiwuzao.common.vo.goods.MerchantGoodsVO;
 import com.kauuze.major.config.contain.ParamMismatchException;
 import com.kauuze.major.config.permission.Merchant;
@@ -215,5 +220,16 @@ public class GoodsController {
         } else {
             return JsonResult.failure(s);
         }
+    }
+
+    /**
+     * 获取店铺商品信息，分页展示
+     * @param pojo
+     * @return
+     */
+    @RequestMapping("/getGoodsByStore")
+    public JsonResult getGoodsByStore(@Valid @RequestBody StorePojo pojo) {
+        PageDto<GoodsSimpleVO> page = goodsService.getGoodsByStore(pojo.getStoreId(), PageRequest.of(pojo.getPageNum(), pojo.getPageSize(), Sort.by(pojo.getOrderBy())));
+        return JsonResult.success(page);
     }
 }

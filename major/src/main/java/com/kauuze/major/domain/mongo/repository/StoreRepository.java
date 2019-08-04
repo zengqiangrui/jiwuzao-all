@@ -1,5 +1,6 @@
 package com.kauuze.major.domain.mongo.repository;
 
+import com.jiwuzao.common.domain.enumType.StoreStyleEnum;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,4 +28,6 @@ public interface StoreRepository extends MongoRepository<Store,String> {
     Optional<Store> findByUid(int uid);
 
     Page<Store> findByStoreNameLikeAndCreateTimeLessThanEqual(String storeName, Long createTime, Pageable pageable);
+
+    Page<Store> findAllByStoreStyle(StoreStyleEnum style,Pageable pageable);
 }

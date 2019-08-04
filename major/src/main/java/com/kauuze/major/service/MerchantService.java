@@ -9,12 +9,12 @@ import com.jiwuzao.common.domain.mongo.entity.userBastic.VerifyActor;
 import com.jiwuzao.common.domain.mysql.entity.PayOrder;
 import com.jiwuzao.common.domain.mysql.entity.User;
 import com.jiwuzao.common.domain.mysql.entity.WithdrawOrder;
+import com.jiwuzao.common.include.PageDto;
+import com.jiwuzao.common.vo.store.StoreSimpleVO;
+import com.jiwuzao.common.vo.store.StoreVO;
 import com.kauuze.major.ConfigUtil;
 import com.kauuze.major.domain.common.EsUtil;
-import com.kauuze.major.domain.mongo.repository.GoodsRepository;
-import com.kauuze.major.domain.mongo.repository.StoreRepository;
-import com.kauuze.major.domain.mongo.repository.SystemGoodsRepository;
-import com.kauuze.major.domain.mongo.repository.VerifyActorRepository;
+import com.kauuze.major.domain.mongo.repository.*;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
 import com.kauuze.major.domain.mysql.repository.UserRepository;
 import com.kauuze.major.domain.mysql.repository.WithdrawOrderRepository;
@@ -24,14 +24,13 @@ import com.kauuze.major.service.dto.merchant.MerchantUdpDto;
 import com.qiniu.util.Json;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author kauuze
@@ -58,6 +57,8 @@ public class MerchantService {
     private PayOrderRepository payOrderRepository;
     @Autowired
     private UserBasicService userBasicService;
+    @Autowired
+    private UserInfoRepository userInfoRepository;
 
     /**
      * 申请商家认证
@@ -112,7 +113,7 @@ public class MerchantService {
     /**
      * 修改或开店铺
      */
-    public String modifyOrOpenStore(int uid, String storeName, String storeIcon,String storeBgImg,String servicePhone, Integer mscode, String storeIntro,String storeStyle) {
+    public String modifyOrOpenStore(int uid, String storeName, String storeIcon, String storeBgImg, String servicePhone, Integer mscode, String storeIntro, StoreStyleEnum storeStyle) {
         if (!userBasicService.validSms(servicePhone, mscode)) {
             return "验证码错误";
         }
@@ -215,10 +216,47 @@ public class MerchantService {
 
     /**
      * 商户获取店铺信息
+     *
      * @param uid
      * @return
      */
     public Store getMerchantStore(int uid) {
         return storeRepository.findByUid(uid).orElse(null);
+    }
+
+    /**
+     * 根据店铺风格获取店铺分页信息
+     * @param style
+     * @param pageable
+     * @return
+     */
+    public PageDto<StoreSimpleVO> getStoreByStyle(StoreStyleEnum style, Pageable pageable) {
+        Page<Store> storesPage = storeRepository.findAllByStoreStyle(style, pageable);
+        PageDto<StoreSimpleVO> pageDto = new PageDto<>();
+        pageDto.setTotal(storesPage.getTotalElements());
+        List<StoreSimpleVO> list = new ArrayList<>();
+        for (Store store : storesPage.getContent()) {
+            StoreSimpleVO storeSimpleVO = new StoreSimpleVO()
+                    .setStoreIcon(store.getStoreIcon()).setStoreId(store.getId())
+                    .setStoreName(store.getStoreName()).setStyle(store.getStoreStyle())
+                    .setDescription(userBasicService.getUserOpenDto(store.getUid()).getPersonalSign());
+                    list.add(storeSimpleVO);
+        }
+        pageDto.setContent(list);
+        return pageDto;
+    }
+
+    public StoreVO getStoreVO(String storeId){
+        StoreVO storeVO = new StoreVO();
+        Optional<Store> byId = storeRepository.findById(storeId);
+        if(byId.isPresent()){
+            Store store = byId.get();
+            storeVO.setPersonSign(userInfoRepository.findByUid(store.getUid()).getPersonalSign())
+                    .setStoreBgImg(store.getStoreBgImg()).setStoreIntro(store.getStoreIntro()).setStoreName(store.getStoreName())
+                    .setStoreId(storeId).setStoreIcon(store.getStoreIcon());
+        }else {
+            throw new RuntimeException("店铺没找到");
+        }
+        return storeVO;
     }
 }

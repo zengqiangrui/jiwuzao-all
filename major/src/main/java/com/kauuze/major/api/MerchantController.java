@@ -1,16 +1,25 @@
 package com.kauuze.major.api;
 
 import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
+import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.pojo.common.IpAddressPojo;
+import com.jiwuzao.common.pojo.common.PagePojo;
 import com.jiwuzao.common.pojo.merchant.OpenStorePojo;
 import com.jiwuzao.common.pojo.merchant.VerifyActorPojo;
+import com.jiwuzao.common.pojo.store.StoreIdPojo;
+import com.jiwuzao.common.pojo.store.StorePagePojo;
 import com.jiwuzao.common.pojo.systemOrder.WithdrawPojo;
+import com.jiwuzao.common.vo.store.StoreSimpleVO;
+import com.jiwuzao.common.vo.store.StoreVO;
 import com.kauuze.major.config.permission.Authorization;
 import com.kauuze.major.config.permission.Merchant;
 import com.kauuze.major.include.JsonResult;
 import com.kauuze.major.include.StringUtil;
 import com.kauuze.major.service.MerchantService;
+import com.qiniu.util.Json;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -115,4 +124,18 @@ public class MerchantController {
             return JsonResult.failure();
         }
     }
+
+    @RequestMapping("/getStorePage")
+    public JsonResult getStorePage(@Valid@RequestBody StorePagePojo pagePojo) {
+        PageDto<StoreSimpleVO> pageDto = merchantService.getStoreByStyle(pagePojo.getStoreStyle(), PageRequest.of(pagePojo.getPageNum(), pagePojo.getPageSize(), Sort.by(pagePojo.getOrderBy())));
+        return JsonResult.success(pageDto);
+    }
+
+    @RequestMapping("/getStoreById")
+    public JsonResult getStoreById(@Valid @RequestBody StoreIdPojo pojo){
+        StoreVO storeVO = merchantService.getStoreVO(pojo.getStoreId());
+        return JsonResult.success(storeVO);
+    }
+
+
 }

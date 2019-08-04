@@ -14,6 +14,10 @@ public class WxPayProperties {
     private String appId;
 
     /**
+     * 此key不仅限于微信支付，调用其他接口也是凭此key
+     */
+    private String appKey;
+  /**
      * 微信支付商户号
      */
     private String mchId;

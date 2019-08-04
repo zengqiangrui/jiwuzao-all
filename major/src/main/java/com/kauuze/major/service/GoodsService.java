@@ -2,7 +2,6 @@ package com.kauuze.major.service;
 
 import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
 import com.jiwuzao.common.domain.enumType.GoodsClassifyEnum;
-import com.jiwuzao.common.domain.enumType.SystemGoodsNameEnum;
 import com.jiwuzao.common.domain.mongo.entity.Category;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.jiwuzao.common.domain.mongo.entity.GoodsDetail;
@@ -17,6 +16,7 @@ import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.pojo.common.GoodsSpecPojo;
 import com.jiwuzao.common.pojo.goods.GoodsPagePojo;
 import com.jiwuzao.common.vo.goods.GoodsDetailVO;
+import com.jiwuzao.common.vo.goods.GoodsSimpleVO;
 import com.jiwuzao.common.vo.goods.MerchantGoodsVO;
 import com.kauuze.major.domain.common.EsUtil;
 import com.kauuze.major.domain.common.MongoUtil;
@@ -454,5 +454,27 @@ public class GoodsService {
                         .setClassify(goods.getClassify()).setGoodsSpecs(specList);
             }
         }
+    }
+
+    /**
+     * 根据店铺查询上架商品
+     * @param storeId
+     * @param pageable
+     * @return
+     */
+    public PageDto<GoodsSimpleVO> getGoodsByStore(String storeId, Pageable pageable) {
+        Page<Goods> page = goodsRepository.findAllBySidAndPutaway(storeId,true, pageable);
+        PageDto<GoodsSimpleVO> pageDto = new PageDto<>();
+        pageDto.setTotal(page.getTotalElements());
+        List<GoodsSimpleVO> list = new ArrayList<>();
+        for (Goods goods : page.getContent()) {
+                GoodsSimpleVO goodsSimpleVO = new GoodsSimpleVO()
+                        .setGoodsId(goods.getGid()).setGoodsImg(goods.getCover())
+                        .setGoodsName(goods.getTitle()).setGoodsPrice(goods.getDefaultPrice());
+                list.add(goodsSimpleVO);
+
+        }
+        pageDto.setContent(list);
+        return pageDto;
     }
 }
