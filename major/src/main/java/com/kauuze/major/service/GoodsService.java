@@ -2,6 +2,7 @@ package com.kauuze.major.service;
 
 import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
 import com.jiwuzao.common.domain.enumType.GoodsClassifyEnum;
+import com.jiwuzao.common.domain.mongo.entity.*;
 import com.jiwuzao.common.domain.mongo.entity.Category;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.jiwuzao.common.domain.mongo.entity.GoodsDetail;
@@ -15,9 +16,11 @@ import com.jiwuzao.common.include.DateTimeUtil;
 import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.pojo.common.GoodsSpecPojo;
 import com.jiwuzao.common.pojo.goods.GoodsPagePojo;
+import com.jiwuzao.common.vo.goods.GoodsCommentVO;
 import com.jiwuzao.common.vo.goods.GoodsDetailVO;
 import com.jiwuzao.common.vo.goods.GoodsSimpleVO;
 import com.jiwuzao.common.vo.goods.MerchantGoodsVO;
+import com.jiwuzao.common.vo.goods.ViewHistoryVO;
 import com.kauuze.major.domain.common.EsUtil;
 import com.kauuze.major.domain.common.MongoUtil;
 import com.kauuze.major.domain.mongo.repository.*;
@@ -57,6 +60,12 @@ public class GoodsService {
     private SystemGoodsRepository systemGoodsRepository;
     @Autowired
     private CategoryRepository categoryRepository;
+    @Autowired
+    private GoodsCommentRepository goodsCommentRepository;
+    @Autowired
+    private AppriseRepository appriseRepository;
+    @Autowired
+    private ViewHistoryRepository viewHistoryRepository;
 
     /**
      * 添加商品
@@ -73,7 +82,7 @@ public class GoodsService {
         }
         Goods goods = new Goods(null, uid, opt.get().getId(), title, cover, classify, 0, 0, defaultPrice, postage, false, null, null, AuditTypeEnum.wait, null, System.currentTimeMillis(), null);
         goodsRepository.save(goods);
-        GoodsDetail goodsDetail = new GoodsDetail(null, goods.getGid(), slideshow, detailLabel, classify, goodsType, goodsTypeClass, detailPhotos);
+        GoodsDetail goodsDetail = new GoodsDetail(null, goods.getGid(), slideshow, detailLabel, classify, goodsType, goodsTypeClass, detailPhotos, 0L);
         goodsDetailRepository.save(goodsDetail);
         for (GoodsSpecPojo specPojo : goodsSpecPojo) {
             goodsSpecRepository.save(new GoodsSpec(null, goods.getGid(), specPojo.getSpecClass(), specPojo.getSpecPrice(), specPojo.getSpecInventory()));
@@ -314,7 +323,7 @@ public class GoodsService {
     }
 
     /**
-     * 获取用户所有信息
+     * 获取商品所有信息
      *
      * @param goods
      * @return
@@ -377,7 +386,7 @@ public class GoodsService {
                 .setPostage(goods.getPostage()).setSlideshow(detail.getSlideshow())
                 .setNickName(user.getNickName()).setPortrait(info.getPortrait())
                 .setGoodsType(detail.getGoodsType()).setGoodsTypeClass(detail.getGoodsTypeClass())
-                .setCover(goods.getCover());
+                .setCover(goods.getCover()).setAppriseCnt(detail.getAppriseCnt());
         return vo;
     }
 
@@ -476,5 +485,152 @@ public class GoodsService {
         }
         pageDto.setContent(list);
         return pageDto;
+    }
+
+    /**
+     * 添加评论,购买后商品的才能够评论
+     * @param uid
+     * @param comment
+     * @return
+     */
+    public String addComment(int uid, String gid, String comment) {
+        Comment comment1 = new Comment(null, gid, uid, comment, System.currentTimeMillis(), false);
+        goodsCommentRepository.save(comment1);
+        return "添加成功";
+    }
+
+    /**
+     * 获取商品评论列表
+     * @param gid
+     * @return
+     */
+    public List<GoodsCommentVO> getGoodsComment(String gid) {
+        List<Comment> list = goodsCommentRepository.findByGid(gid);
+        List<GoodsCommentVO> res = new ArrayList<>();
+        list.forEach((e)->{
+            Integer uid = e.getUid();
+            UserInfo info = userInfoRepository.findByUid(uid);
+            GoodsCommentVO vo = new GoodsCommentVO(e.getUid(), info.getNickName(), e.getTime(),
+                    info.getPortrait(), e.getContent());
+            res.add(vo);
+        });
+        if (res.size() > 0)
+            return res;
+        else {
+            return null;
+        }
+    }
+
+    /**
+     * 用户对指定商品进行点赞
+     * @param uid
+     * @param gid
+     * @return
+     */
+    public Long addApprise(int uid, String gid) {
+        //判断对象是否存在
+        GoodsDetail detail = goodsDetailRepository.findByGid(gid).get();
+        if (detail == null)
+            return null;
+        //判断是否已经点过赞
+        Apprise apprise = appriseRepository.findByGidAndUid(gid, uid);
+        if (apprise != null) {
+            return detail.getAppriseCnt();
+        }
+        //点赞操作
+        apprise = new Apprise(null, uid, gid, System.currentTimeMillis());
+        appriseRepository.save(apprise);
+
+        GoodsDetail detail1Up = new GoodsDetail();
+        Long cnt = detail.getAppriseCnt()+1;
+        detail1Up.setAppriseCnt(cnt);
+        MongoUtil.updateNotNon("gid", detail1Up,GoodsDetail.class);
+        return cnt;
+    }
+
+    /**
+     * 取消点赞
+     * @param uid
+     * @param gid
+     * @return
+     */
+    public Long delApprise(int uid, String gid) {
+        //判断对象是否存在
+        GoodsDetail detail = goodsDetailRepository.findByGid(gid).get();
+        if (detail == null)
+            return null;
+        //判断是否已经点过赞
+        Apprise apprise = appriseRepository.findByGidAndUid(gid, uid);
+        if (apprise != null) {
+            //取消操作
+            appriseRepository.deleteById(apprise.getId());
+
+            GoodsDetail detail1Up = new GoodsDetail();
+            Long cnt = detail.getAppriseCnt()-1;
+            detail1Up.setAppriseCnt(cnt);
+            MongoUtil.updateNotNon("gid", detail1Up,GoodsDetail.class);
+            return cnt;
+        } else {
+            return detail.getAppriseCnt();
+        }
+    }
+
+    /**
+     * 获取浏览记录
+     * @param uid
+     * @return
+     */
+    public List<ViewHistoryVO> getViewHistory(int uid) {
+        List<ViewHistory> list = viewHistoryRepository.findByUidAndDeleteFalse(uid);
+        List<ViewHistoryVO> volist = new ArrayList<>();
+        for (ViewHistory e : list){
+            Goods goods = goodsRepository.findByGid(e.getGid());
+            if (goods == null){
+                continue;
+            }
+            ViewHistoryVO vo = new ViewHistoryVO(e.getGid(), e.getTime(), goods.getTitle(), goods.getCover());
+        }
+        return volist;
+    }
+
+
+    /**
+     * 添加浏览记录
+     * @param uid
+     * @param gid
+     * @return
+     */
+    public String addViewHistory(int uid, String gid) {
+        //去重判断
+        ViewHistory viewHistory = viewHistoryRepository.findByUidAndGid(uid, gid);
+        if (viewHistory != null)
+        {
+            //更新浏览时间
+            viewHistory.setTime(System.currentTimeMillis());
+            viewHistory.setDelete(false);
+            viewHistoryRepository.save(viewHistory);
+            return "添加成功";
+        } else {
+            viewHistory = new ViewHistory(null, uid, gid, System.currentTimeMillis(), false);
+            viewHistoryRepository.save(viewHistory);
+            return "添加成功";
+        }
+    }
+
+
+    /**
+     * 删除历史记录
+     * @param uid
+     * @param id
+     * @return
+     */
+    public String delViewHistory(int uid, String id) {
+        ViewHistory viewHistory = viewHistoryRepository.findById(id).get();
+        if (viewHistory == null) {
+            return null;
+        } else {
+            viewHistoryRepository.deleteById(id);
+            return "删除成功";
+        }
     }
 }

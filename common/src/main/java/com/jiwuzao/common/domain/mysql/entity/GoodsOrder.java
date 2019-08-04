@@ -65,6 +65,12 @@ public class GoodsOrder {
      * 规格分类
      */
     private String specClass;
+
+    /**
+     * 单价
+     */
+    private BigDecimal specPrice;
+
     /**
      * 购买数量
      */

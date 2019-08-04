@@ -8,6 +8,7 @@ import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
 import com.jiwuzao.common.domain.enumType.PayChannelEnum;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
+import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrderDetail;
 import com.jiwuzao.common.domain.mysql.entity.PayOrder;
@@ -18,6 +19,7 @@ import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.pojo.shopcart.AddItemPojo;
 import com.kauuze.major.domain.mongo.repository.GoodsRepository;
 import com.kauuze.major.domain.mongo.repository.GoodsSpecRepository;
+import com.kauuze.major.domain.mongo.repository.StoreRepository;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderDetailRepository;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
@@ -54,6 +56,8 @@ public class OrderService {
     private GoodsSpecRepository goodsSpecRepository;
     @Autowired
     private PayOrderRepository payOrderRepository;
+    @Autowired
+    private StoreRepository storeRepository;
 
     /**
      * 用户通过购物车或者单个商品结算，传入商品数组生成订单
@@ -88,7 +92,7 @@ public class OrderService {
                     .setOrderStatus(OrderStatusEnum.waitPay).setBuyCount(e.getNum())
                     .setCover(goods.getCover()).setCreateTime(System.currentTimeMillis())
                     .setPostage(goods.getPostage()).setSpecClass(goodsSpec.getSpecClass())
-                    .setFinalPay(finalPay).setUid(uid).setSid(goods.getSid())
+                    .setFinalPay(finalPay).setUid(uid).setSid(goods.getSid()).setSpecPrice(goodsSpec.getSpecPrice())
                     .setGid(goods.getGid()).setPayOrderNo(payOrder.getPayOrderNo())
                     .setGsid(e.getSpecId()).setGoodsOrderNo(Rand.createOrderNo());//增加生成orderNo
             goodsOrderRepository.save(goodsOrder);
@@ -216,12 +220,18 @@ public class OrderService {
      * @param uid
      * @return
      */
-    public List<GoodsOrderSimpleDto> getOrderSample(int uid) {
-        List<GoodsOrder> goodsOrder = goodsOrderRepository.findByUid(uid);
+    public List<GoodsOrderSimpleDto> getOrderSample(int uid, OrderStatusEnum status) {
+        List<GoodsOrder> goodsOrder;
+        if (status == null){
+            goodsOrder = goodsOrderRepository.findByUid(uid);
+        } else {
+            goodsOrder = goodsOrderRepository.findAllByUidAndOrderStatus(uid, status);
+        }
         List<GoodsOrderSimpleDto> list = new ArrayList<>();
         goodsOrder.forEach(e -> {
+            Store store = storeRepository.findById(e.getSid()).get();
             GoodsOrderSimpleDto goodsOrderSimpleDto = new GoodsOrderSimpleDto(
-                    e.getSid(), e.getGoodsOrderNo(), e.getGoodsTitle(), e.getCover(),
+                    e.getSid(), store.getStoreName(), e.getGoodsOrderNo(), e.getGoodsTitle(), e.getCover(),
                     e.getSpecClass(), e.getBuyCount(), e.getPostage(), e.getFinalPay(),
                     e.getOrderStatus()
             );
@@ -268,7 +278,7 @@ public class OrderService {
                 .setReceiverAddress(god.getReceiverAddress()).setReceiverTrueName(god.getReceiverTrueName())
                 .setReceiverPhone(god.getReceiverPhone()).setGoodsTitle(go.getGoodsTitle())
                 .setCover(go.getCover()).setSpecString(go.getSpecClass())
-                .setBuyCount(go.getBuyCount()).setPostage(go.getPostage())
+                .setBuyCount(go.getBuyCount()).setPostage(go.getPostage()).setSpecPrice(go.getSpecPrice())
                 .setFinalPay(go.getFinalPay()).setOrderStatus(go.getOrderStatus())
                 .setCreateTime(go.getCreateTime()).setPayTime(po.getPayTime())
                 .setDeliverTime(go.getDeliverTime()).setTakeTime(go.getTakeTime());

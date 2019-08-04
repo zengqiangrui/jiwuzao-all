@@ -54,6 +54,11 @@ public class GoodsOrderDto {
      * 规格分类("红色;500ml;精装")
      */
     private String specString;
+
+    /**
+     * 单价
+     */
+    private BigDecimal specPrice;
     /**
      * 购买数量
      */

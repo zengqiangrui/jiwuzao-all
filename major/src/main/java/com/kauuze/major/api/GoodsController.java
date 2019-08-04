@@ -8,16 +8,20 @@ import com.jiwuzao.common.include.JsonResult;
 import com.jiwuzao.common.include.JsonUtil;
 import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.include.StringUtil;
+import com.jiwuzao.common.pojo.common.CommentPojo;
 import com.jiwuzao.common.pojo.common.GidPojo;
 import com.jiwuzao.common.pojo.common.QuerySpecPojo;
 import com.jiwuzao.common.pojo.goods.*;
+import com.jiwuzao.common.vo.goods.GoodsCommentVO;
 import com.jiwuzao.common.pojo.store.StoreIdPojo;
 import com.jiwuzao.common.pojo.store.StorePagePojo;
 import com.jiwuzao.common.pojo.store.StorePojo;
 import com.jiwuzao.common.vo.goods.GoodsDetailVO;
 import com.jiwuzao.common.vo.goods.GoodsSimpleVO;
 import com.jiwuzao.common.vo.goods.MerchantGoodsVO;
+import com.jiwuzao.common.vo.goods.ViewHistoryVO;
 import com.kauuze.major.config.contain.ParamMismatchException;
+import com.kauuze.major.config.permission.Authorization;
 import com.kauuze.major.config.permission.Merchant;
 import com.kauuze.major.service.GoodsService;
 import lombok.extern.slf4j.Slf4j;
@@ -162,6 +166,26 @@ public class GoodsController {
         }
     }
 
+    /**
+     * 获取商品评论
+     * @param gidPojo
+     * @return
+     */
+    @RequestMapping("/getGoodsComment")
+    public JsonResult getGoodsComment(@Valid @RequestBody GidPojo gidPojo) {
+        List<GoodsCommentVO> volist = goodsService.getGoodsComment(gidPojo.getGid());
+        if (volist == null) {
+            return JsonResult.failure("没有相关评论");
+        } else {
+            return JsonResult.success(volist);
+        }
+    }
+
+    /**
+     * 获取商品规格信息
+     * @param goodsSpecPojo
+     * @return
+     */
     @RequestMapping("/getSpec")
     public JsonResult getSpec(@Valid @RequestBody QuerySpecPojo goodsSpecPojo) {
         GoodsSpec goodsSpec = goodsService.getSpecByGoodsSpecClass(goodsSpecPojo.getGid(), goodsSpecPojo.getSpecClass());
@@ -231,5 +255,93 @@ public class GoodsController {
     public JsonResult getGoodsByStore(@Valid @RequestBody StorePojo pojo) {
         PageDto<GoodsSimpleVO> page = goodsService.getGoodsByStore(pojo.getStoreId(), PageRequest.of(pojo.getPageNum(), pojo.getPageSize(), Sort.by(pojo.getOrderBy())));
         return JsonResult.success(page);
+    }
+
+    /**
+     * 添加商品评论
+     */
+    @RequestMapping("/addComment")
+    @Authorization
+    public JsonResult addComment(@RequestAttribute int uid, @Valid @RequestBody CommentPojo pojo) {
+        String s = goodsService.addComment(uid, pojo.getGid(), pojo.getComment());
+        if (StringUtil.isBlank(s)) {
+            return JsonResult.success();
+        } else {
+            return JsonResult.failure(s);
+        }
+    }
+
+    /**
+     * 为商品点赞，用户不能重复点赞
+     */
+    @RequestMapping("/addApprise")
+    @Authorization
+    public JsonResult addApprise(@RequestAttribute int uid, @Valid @RequestBody GidPojo pojo) {
+        Long appriseCnt = goodsService.addApprise(uid, pojo.getGid());
+        if (appriseCnt != null) {
+            return JsonResult.success(appriseCnt);
+        } else {
+            return JsonResult.failure("点赞失败");
+        }
+    }
+
+    /**
+     * 取消点赞
+     * @param uid
+     * @param pojo
+     * @return
+     */
+    @RequestMapping("/delApprise")
+    @Authorization
+    public JsonResult delApprise(@RequestAttribute int uid, @Valid @RequestBody GidPojo pojo) {
+        Long appriseCnt = goodsService.delApprise(uid, pojo.getGid());
+        if (appriseCnt != null) {
+            return JsonResult.success(appriseCnt);
+        } else {
+            return JsonResult.failure("取消失败");
+        }
+    }
+
+    /**
+     * 获取浏览记录
+     */
+    @RequestMapping("getViewHistory")
+    @Authorization
+    public JsonResult getViewHistory(@RequestAttribute int uid) {
+        List<ViewHistoryVO> list = goodsService.getViewHistory(uid);
+        if (list.size() == 0) {
+            return JsonResult.success(list);
+        } else {
+            return JsonResult.failure("获取失败");
+        }
+    }
+
+    /**
+     * 添加浏览记录
+     */
+    @RequestMapping("addViewHistory")
+    @Authorization
+    public JsonResult addViewHistory(@RequestAttribute int uid, @Valid @RequestBody GidPojo pojo) {
+        String msg = goodsService.addViewHistory(uid, pojo.getGid());
+        if (msg != null) {
+            return JsonResult.success(msg);
+        } else {
+            return JsonResult.failure("记录失败");
+        }
+    }
+
+    /**
+     * 删除浏览记录
+     */
+    @RequestMapping("delViewHistory")
+    @Authorization
+    public JsonResult delViewHistory(@RequestAttribute int uid, @Valid @RequestBody GidPojo pojo) {
+        //这个pojo传历史记录id
+        String msg = goodsService.delViewHistory(uid, pojo.getGid());
+        if (msg != null) {
+            return JsonResult.success(msg);
+        } else {
+            return JsonResult.failure("删除失败");
+        }
     }
 }
