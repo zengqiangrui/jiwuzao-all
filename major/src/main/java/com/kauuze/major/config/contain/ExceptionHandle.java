@@ -33,6 +33,7 @@ public class ExceptionHandle {
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
     public String handle(Exception e, HttpServletResponse response, HttpServletRequest request) {
+        response.setCharacterEncoding("utf-8");
         if(e instanceof MethodArgumentNotValidException || e instanceof HttpMessageNotReadableException || e instanceof ParamMismatchException){
             StateModel stateModel = new StateModel();
             stateModel.setState("param mismatch");

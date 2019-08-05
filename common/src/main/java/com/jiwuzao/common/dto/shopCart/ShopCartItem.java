@@ -15,6 +15,11 @@ public class ShopCartItem {
     private String sid;//store id
     private String gsid;//规格id
     /**
+     * 商品选中状态
+     */
+    private Boolean checkStatus = false;
+
+    /**
      * 商品显示标题
      */
     private String goodsName;

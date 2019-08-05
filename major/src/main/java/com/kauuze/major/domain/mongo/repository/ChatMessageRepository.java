@@ -1,4 +1,4 @@
-package com.kauuze.major.domain.mongo;
+package com.kauuze.major.domain.mongo.repository;
 
 import com.jiwuzao.common.domain.mongo.entity.ChatMessage;
 import org.springframework.data.domain.Page;

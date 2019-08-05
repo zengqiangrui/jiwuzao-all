@@ -35,7 +35,7 @@ public class AddGoodsPojo {
     @Urls
     private String slideshow;
     @Decimal(zero = true)
-    private BigDecimal postage;
+    private BigDecimal postage = BigDecimal.ZERO;
     @StringMax
     private String detailLabel;
     @StringMax

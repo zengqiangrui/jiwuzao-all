@@ -13,6 +13,7 @@ import com.jiwuzao.common.pojo.order.GetOrderPojo;
 import com.kauuze.major.config.permission.Authorization;
 import com.kauuze.major.service.AddressService;
 import com.kauuze.major.service.OrderService;
+import com.qiniu.util.Json;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -76,18 +77,15 @@ public class OrderController {
      */
     @RequestMapping("/comfirmOrder")
     @Authorization
-    public void comfirmOrder(@RequestAttribute("uid") int uid, @RequestAttribute("ip") String ip,
-                                   @Valid @RequestBody ComfirmOrderPojo pojo, HttpServletResponse response) throws WxPayException, IOException {
+    public JsonResult comfirmOrder(@RequestAttribute("uid") int uid, @RequestAttribute("ip") String ip,
+                             @Valid @RequestBody ComfirmOrderPojo pojo, HttpServletResponse response) throws WxPayException, IOException {
         Object result = orderService.comfirmOrder(uid, pojo.getItemList(), pojo.getCity(),
                 pojo.getAddress(), pojo.getPhone(), pojo.getTrueName(), ip);
-//        if (result == null) {
-//            return JsonResult.failure();
-//        } else {
-//            return JsonResult.success(result);
-//        }
-        WxPayMwebOrderResult result1 = (WxPayMwebOrderResult) result;
-        System.out.println(result1);
-        response.sendRedirect("https://www.baidu.com");
+        if (result == null) {
+            return JsonResult.failure();
+        } else {
+            return JsonResult.success(result);
+        }
     }
 
     /**
