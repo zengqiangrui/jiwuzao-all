@@ -8,7 +8,7 @@ docker stop manager
 docker rmi $(docker images | grep "^<none>"| awk '{print $3}')
 
 # 运行镜像
-docker run --rm --name major -p 10010:10010 -d jiwuzao/major -v /root/jiwuzao/images:/root/jiwuzao/images
+docker run --rm --name major -p 10010:10010 -v /root/jiwuzao/images:/root/jiwuzao/images -d jiwuzao/major
 docker run --rm --name manager -p 10020:10020 -d jiwuzao/manager
 
 # 输出运行情况
