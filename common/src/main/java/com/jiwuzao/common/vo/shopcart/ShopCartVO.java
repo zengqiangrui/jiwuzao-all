@@ -19,6 +19,10 @@ public class ShopCartVO {
      */
     private String artisanId;
     /**
+     * 店铺选中状态
+     */
+    private Boolean checkStatus = false;
+    /**
      * 店铺名称
      */
     private String shopName;

@@ -53,8 +53,8 @@ public class ShopCartService {
         items.forEach(e ->{
             String gid = e.getGid();
             String sid = e.getSid();
-            Integer num = e.getNum();
-            ShopCartItem item = makeItems(e.getId(), gid, e.getSpecId());
+            Integer goodsNum = e.getNum();
+            ShopCartItem item = makeItems(e.getId(), gid, e.getSpecId(), goodsNum);
             List<ShopCartItem> list = map.get(sid);
             if (list == null) {
                 list = new ArrayList<ShopCartItem>();
@@ -67,19 +67,18 @@ public class ShopCartService {
         List<ShopCartVO> result = new ArrayList<>();
         map.forEach((k,v)->{
             String sname = storeRepository.findById(k).get().getStoreName();
-            result.add(new ShopCartVO(k, sname, v));
+            result.add(new ShopCartVO(k, false,sname, v));
         });
         return result;
     }
 
-    public ShopCartItem makeItems(String cid, String gid, String specId){
+    public ShopCartItem makeItems(String cid, String gid, String specId, int goodsNum){
         Goods goods = goodsRepository.findByGid(gid);
-        GoodsDetail detail = goodsDetailRepository.findByGid(gid).get();
+//        GoodsDetail detail = goodsDetailRepository.findByGid(gid).get();
         GoodsSpec goodsSpec = goodsSpecRepository.findById(specId).get();
-        //todo 组装商品显示规格字符串
 
-        return  new ShopCartItem(cid, gid, goods.getSid(),goodsSpec.getId(), goods.getTitle(), goods.getCover(), goodsSpec.getSpecClass(),
-                goodsSpec.getSpecPrice().toString(), 1, goodsSpec.getSpecInventory());
+        return  new ShopCartItem(cid, gid, goods.getSid(),goodsSpec.getId(), false,goods.getTitle(), goods.getCover(), goodsSpec.getSpecClass(),
+                goodsSpec.getSpecPrice().toString(), goodsNum, goodsSpec.getSpecInventory());
     }
 
     public String delItems(List<String> cidList) {
