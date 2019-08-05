@@ -20,7 +20,12 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private String comid;
     /**
-     * 商品gid
+     * 商品订单id
+     */
+    private String goodsOrderNo;
+
+    /**
+     * 商品id
      */
     private String gid;
 

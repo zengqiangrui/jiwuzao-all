@@ -146,6 +146,20 @@ public class UserBasicController {
         return JsonResult.success();
     }
 
+    @RequestMapping("/alterGender")
+    @Authorization
+    public JsonResult alterGender(@RequestAttribute int uid, @Valid @RequestBody AlterGenderPojo alterGenderPojo){
+        userBasicService.alterGender(uid, alterGenderPojo.getGender());
+        return JsonResult.success();
+    }
+
+    @RequestMapping("/alterBirthday")
+    @Authorization
+    public JsonResult alterBirthday(@RequestAttribute int uid, @Valid @RequestBody AlterBirthdayPojo alterBirthdayPojo){
+        userBasicService.alterBirthday(uid, alterBirthdayPojo.getBirthday());
+        return JsonResult.success();
+    }
+
     @RequestMapping("/getUserSimpleOpenDto")
     public JsonResult getUserSimpleOpenDto(@Valid @RequestBody UidPojo uidPojo){
         return JsonResult.success(userBasicService.getUserSimpleOpenDto(uidPojo.getUid()));

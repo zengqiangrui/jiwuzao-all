@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class CommentPojo {
     @Idv
-    private String gid;
+    private String goodsOrderNo;
     @StringMax
     private String comment;
 }

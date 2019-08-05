@@ -9,6 +9,7 @@ import com.jiwuzao.common.domain.mongo.entity.GoodsDetail;
 import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.UserInfo;
+import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
 import com.jiwuzao.common.domain.mysql.entity.User;
 import com.jiwuzao.common.dto.goods.GoodsOpenDto;
 import com.jiwuzao.common.dto.goods.GoodsSimpleDto;
@@ -24,6 +25,7 @@ import com.jiwuzao.common.vo.goods.ViewHistoryVO;
 import com.kauuze.major.domain.common.EsUtil;
 import com.kauuze.major.domain.common.MongoUtil;
 import com.kauuze.major.domain.mongo.repository.*;
+import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import com.kauuze.major.domain.mysql.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -66,6 +68,8 @@ public class GoodsService {
     private AppriseRepository appriseRepository;
     @Autowired
     private ViewHistoryRepository viewHistoryRepository;
+    @Autowired
+    private GoodsOrderRepository goodsOrderRepository;
 
     /**
      * 添加商品
@@ -493,8 +497,9 @@ public class GoodsService {
      * @param comment
      * @return
      */
-    public String addComment(int uid, String gid, String comment) {
-        Comment comment1 = new Comment(null, gid, uid, comment, System.currentTimeMillis(), false);
+    public String addComment(int uid, String goid, String comment) {
+        GoodsOrder order = goodsOrderRepository.findByGoodsOrderNo(goid).get();
+        Comment comment1 = new Comment(null, goid, order.getGid(), uid, comment, System.currentTimeMillis(), false);
         goodsCommentRepository.save(comment1);
         return "添加成功";
     }

@@ -1,34 +1,34 @@
 package com.kauuze.major.service;
 
-import com.github.qcloudsms.SmsSingleSender;
-import com.github.qcloudsms.SmsSingleSenderResult;
-import com.github.qcloudsms.httpclient.HTTPException;
-import com.jiwuzao.common.include.yun.QiniuUtil;
-import com.kauuze.major.domain.common.MongoUtil;
-import com.jiwuzao.common.domain.enumType.*;
+import com.jiwuzao.common.domain.enumType.BackRoleEnum;
+import com.jiwuzao.common.domain.enumType.RoleEnum;
+import com.jiwuzao.common.domain.enumType.SexEnum;
+import com.jiwuzao.common.domain.enumType.UserStateEnum;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.UserInfo;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.UserToken;
+import com.jiwuzao.common.domain.mysql.entity.Sms;
+import com.jiwuzao.common.domain.mysql.entity.User;
+import com.jiwuzao.common.include.yun.QiniuUtil;
+import com.kauuze.major.domain.common.MongoUtil;
 import com.kauuze.major.domain.mongo.repository.StoreRepository;
 import com.kauuze.major.domain.mongo.repository.UserInfoRepository;
 import com.kauuze.major.domain.mongo.repository.UserTokenRepository;
-import com.jiwuzao.common.domain.mysql.entity.Sms;
-import com.jiwuzao.common.domain.mysql.entity.User;
 import com.kauuze.major.domain.mysql.repository.SmsRepository;
 import com.kauuze.major.domain.mysql.repository.UserRepository;
 import com.kauuze.major.domain.mysql.repository.WithdrawOrderRepository;
 import com.kauuze.major.include.*;
-import com.kauuze.major.include.yun.SmsUtil;
 import com.kauuze.major.include.yun.TencentUtil;
-import com.kauuze.major.service.dto.userBasic.*;
-import org.json.JSONException;
+import com.kauuze.major.service.dto.userBasic.StoreOpenDto;
+import com.kauuze.major.service.dto.userBasic.UserOpenDto;
+import com.kauuze.major.service.dto.userBasic.UserPrivateDto;
+import com.kauuze.major.service.dto.userBasic.UserSimpleOpenDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -372,7 +372,6 @@ public class UserBasicService {
      */
     public void alterPortrait(int uid, String portrait){
         UserInfo userInfo = userInfoRepository.findByUid(uid);
-        userInfo.setPortrait(portrait);
         QiniuUtil.delFilesBatch(userInfo.getPortrait());
         userInfo.setPortrait(portrait);
         userInfoRepository.save(userInfo);
@@ -386,6 +385,28 @@ public class UserBasicService {
     public void alterPersonalSign(int uid,String personalSign){
         UserInfo userInfo = userInfoRepository.findByUid(uid);
         userInfo.setPersonalSign(personalSign);
+        userInfoRepository.save(userInfo);
+    }
+
+    /**
+     * 修改性别
+     * @param uid
+     * @param gender
+     */
+    public void alterGender(int uid, SexEnum gender) {
+        UserInfo userInfo = userInfoRepository.findByUid(uid);
+        userInfo.setSex(gender);
+        userInfoRepository.save(userInfo);
+    }
+
+    /**
+     * 修改生日
+     * @param uid
+     * @param birthday
+     */
+    public void alterBirthday(int uid, Long birthday) {
+        UserInfo userInfo = userInfoRepository.findByUid(uid);
+        userInfo.setBirthday(birthday);
         userInfoRepository.save(userInfo);
     }
 

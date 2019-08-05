@@ -3,7 +3,6 @@ package com.kauuze.major.api;
 import com.jiwuzao.common.domain.mongo.entity.Category;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
-import com.jiwuzao.common.dto.goods.GoodsSimpleDto;
 import com.jiwuzao.common.include.JsonResult;
 import com.jiwuzao.common.include.JsonUtil;
 import com.jiwuzao.common.include.PageDto;
@@ -12,14 +11,8 @@ import com.jiwuzao.common.pojo.common.CommentPojo;
 import com.jiwuzao.common.pojo.common.GidPojo;
 import com.jiwuzao.common.pojo.common.QuerySpecPojo;
 import com.jiwuzao.common.pojo.goods.*;
-import com.jiwuzao.common.vo.goods.GoodsCommentVO;
-import com.jiwuzao.common.pojo.store.StoreIdPojo;
-import com.jiwuzao.common.pojo.store.StorePagePojo;
 import com.jiwuzao.common.pojo.store.StorePojo;
-import com.jiwuzao.common.vo.goods.GoodsDetailVO;
-import com.jiwuzao.common.vo.goods.GoodsSimpleVO;
-import com.jiwuzao.common.vo.goods.MerchantGoodsVO;
-import com.jiwuzao.common.vo.goods.ViewHistoryVO;
+import com.jiwuzao.common.vo.goods.*;
 import com.kauuze.major.config.contain.ParamMismatchException;
 import com.kauuze.major.config.permission.Authorization;
 import com.kauuze.major.config.permission.Merchant;
@@ -263,11 +256,11 @@ public class GoodsController {
     @RequestMapping("/addComment")
     @Authorization
     public JsonResult addComment(@RequestAttribute int uid, @Valid @RequestBody CommentPojo pojo) {
-        String s = goodsService.addComment(uid, pojo.getGid(), pojo.getComment());
+        String s = goodsService.addComment(uid, pojo.getGoodsOrderNo(), pojo.getComment());
         if (StringUtil.isBlank(s)) {
-            return JsonResult.success();
+            return JsonResult.failure();
         } else {
-            return JsonResult.failure(s);
+            return JsonResult.success(s);
         }
     }
 
