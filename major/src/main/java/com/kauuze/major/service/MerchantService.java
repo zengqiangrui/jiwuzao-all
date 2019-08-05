@@ -5,6 +5,7 @@ import com.jiwuzao.common.domain.enumType.*;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.jiwuzao.common.domain.mongo.entity.SystemGoods;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
+import com.jiwuzao.common.domain.mongo.entity.userBastic.UserInfo;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.VerifyActor;
 import com.jiwuzao.common.domain.mysql.entity.PayOrder;
 import com.jiwuzao.common.domain.mysql.entity.User;
@@ -251,7 +252,8 @@ public class MerchantService {
         Optional<Store> byId = storeRepository.findById(storeId);
         if(byId.isPresent()){
             Store store = byId.get();
-            storeVO.setPersonSign(userInfoRepository.findByUid(store.getUid()).getPersonalSign())
+            UserInfo info = userInfoRepository.findByUid(store.getUid());
+            storeVO.setPersonSign(info.getPersonalSign()).setUid(store.getUid())
                     .setStoreBgImg(store.getStoreBgImg()).setStoreIntro(store.getStoreIntro()).setStoreName(store.getStoreName())
                     .setStoreId(storeId).setStoreIcon(store.getStoreIcon());
         }else {

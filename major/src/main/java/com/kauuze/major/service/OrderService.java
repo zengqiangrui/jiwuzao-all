@@ -378,8 +378,7 @@ public class OrderService {
         WxPayUnifiedOrderRequest req = new WxPayUnifiedOrderRequest();
         req.setSpbillCreateIp(ip);
         req.setNotifyUrl("http://api.jiwuzao.com/pay/notify/order");
-        req.setSceneInfo("{\"h5_info\": {\"type\":\"Android\",\"app_name\": \"王者荣耀\",\"package_name\": \"com.tencent.tmgp.sgame\"}}");
-        req.setTradeType("MWEB");//支付类型,jsapi需要传openid
+        req.setTradeType("APP");//支付类型,jsapi需要传openid
         req.setBody(body);//商品介绍
         req.setOutTradeNo(payOrderNo);//传给微信的订单号
         req.setTotalFee(price.multiply(BigDecimal.valueOf(100)).intValue());//金额,分

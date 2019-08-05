@@ -12,13 +12,15 @@ import lombok.experimental.Accessors;
 public class StoreVO {
     private String storeId;
 
+    private Integer uid;//所属用户id
+
     private String storeName;
 
     private String storeIcon;//头像
 
     private String storeBgImg;//背景图
 
-    private String personSign;//用户，个性签名
+    private String personSign = "匠心极物，灵美文创";//用户，个性签名
 
     private String storeIntro;//富文本介绍
 
