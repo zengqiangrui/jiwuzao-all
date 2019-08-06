@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -70,4 +71,14 @@ public class GoodsDetailVO {
      * 商品点赞数
      */
     private Long appriseCnt;
+
+    /**
+     * 是否可以点赞
+     */
+    private boolean apprised;
+
+    /**
+     * 商品点赞列表
+     */
+    private List<UserIconVO> appriseList;
 }
