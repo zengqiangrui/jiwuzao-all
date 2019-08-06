@@ -8,5 +8,6 @@ import java.util.Optional;
 
 public interface ChatGroupRepository extends MongoRepository<ChatGroup, String> {
     Optional<ChatGroup> getByUidAAndUidB(Integer uidA, Integer uidB);
-    List<ChatGroup> findByUidAOrUidB(Integer uid);
+    List<ChatGroup> findByUidAOrUidB(Integer uidA, Integer uidB);
+
 }

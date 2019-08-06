@@ -4,17 +4,21 @@ import com.jiwuzao.common.config.contain.SpringContext;
 import com.jiwuzao.common.domain.enumType.MessageTypeEnum;
 import com.jiwuzao.common.domain.enumType.OnlineStatusEnum;
 import com.jiwuzao.common.dto.chat.ChatGroupDto;
+import com.jiwuzao.common.dto.chat.ChatMessageDto;
+import com.jiwuzao.common.include.JsonResult;
+import com.jiwuzao.common.pojo.chat.ChatGroupPojo;
 import com.jiwuzao.common.pojo.common.UidPojo;
+import com.jiwuzao.common.vo.chat.ChatGroupItemVO;
 import com.kauuze.major.config.permission.Authorization;
-import com.kauuze.major.include.JsonResult;
 import com.kauuze.major.service.ChatService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.socket.config.annotation.EnableWebSocket;
 
 import javax.validation.Valid;
 import javax.websocket.*;
@@ -22,14 +26,16 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 @RestController
 @ServerEndpoint("/chat/{uid}/{groupId}")
-@RequestMapping("/chat")
+@RequestMapping("/chatControl")
 @Slf4j
 public class ChatController {
 
@@ -49,12 +55,17 @@ public class ChatController {
     @Autowired
     private ChatService chatService;
 
+    /**
+     * 初始化聊天对象
+     * @param uid
+     * @param uidB
+     * @return
+     */
     @RequestMapping("/init")
     @Authorization
     public JsonResult initChat(@RequestAttribute int uid, @Valid @RequestBody UidPojo uidB) {
-        System.out.println(uid + "," + uidB);
         ChatGroupDto chatGroupDto = chatService.initChatGroup(uid, uidB.getUid());
-        System.out.println(uid + "," + uidB);
+//        ChatGroupItemVO chatGroupItemVO = new ChatGroupItemVO();
         if (null != chatGroupDto) {
             return JsonResult.success(chatGroupDto);
         } else {
@@ -62,11 +73,49 @@ public class ChatController {
         }
     }
 
+    /**
+     * 获取用户所有聊天对象列表
+     * @param uid
+     * @return
+     */
     @RequestMapping("/getAllGroup")
     @Authorization
-    public JsonResult getAllGroup(@RequestAttribute int uid){
+    public JsonResult getAllGroup(@RequestAttribute int uid) {
         List<ChatGroupDto> userAllGroup = chatService.getUserAllGroup(uid);
-        return JsonResult.success(userAllGroup);
+        List<ChatGroupItemVO> collect = userAllGroup.stream().map(chatGroupDto -> new ChatGroupItemVO()
+                .setUid(chatGroupDto.getUidA() == uid ? chatGroupDto.getUidB() : chatGroupDto.getUidA())
+                .setNickName(chatGroupDto.getUidA() == uid ? chatGroupDto.getUserNameB() : chatGroupDto.getUserNameA())
+                .setAvatar(chatGroupDto.getUidA() == uid ? chatGroupDto.getAvatarB() : chatGroupDto.getAvatarA())
+                .setGroupId(chatGroupDto.getGroupId()).setUndoNum(chatGroupDto.getUndoNum()).setSex(chatGroupDto.getSex()))
+                .sorted(Comparator.comparing(ChatGroupItemVO::getUndoNum).reversed())//根据未处理的数量进行降序排列
+                .collect(Collectors.toList());
+        return JsonResult.success(collect);
+    }
+
+    /**
+     * 获取用户未处理消息总数
+     * @param uid
+     * @return
+     */
+    @RequestMapping("/getUserUndo")
+    @Authorization
+    public JsonResult getUserUndo(@RequestAttribute int uid) {
+        Integer userAllUndoNum = chatService.getUserAllUndoNum(uid);
+        return JsonResult.success(userAllUndoNum);
+    }
+
+    /**
+     * 根据groupId 分页获取信息列表
+     * @param pojo
+     * @return
+     */
+    @RequestMapping("/getGroupMessage")
+    @Authorization
+    public JsonResult getGroupMessage(@Valid@RequestBody ChatGroupPojo pojo){
+        List<ChatMessageDto> chatMessageByGroup = chatService.getChatMessageByGroup(pojo.getGroupId(), PageRequest.of(pojo.getPageNum(), pojo.getPageSize(),
+                Sort.by(pojo.getIsAsc() ? Sort.Direction.ASC : Sort.Direction.DESC, pojo.getCreateBy())
+        ));
+        return JsonResult.success(chatMessageByGroup);
     }
 
     /**

@@ -1,9 +1,14 @@
 package com.jiwuzao.common.dto.chat;
 
 import com.jiwuzao.common.domain.enumType.MessageTypeEnum;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Id;
-
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ChatMessageDto {
     @Id
     private String id;

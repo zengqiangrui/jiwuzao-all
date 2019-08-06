@@ -3,6 +3,7 @@ package com.kauuze.major.service;
 import com.github.qcloudsms.SmsSingleSender;
 import com.github.qcloudsms.SmsSingleSenderResult;
 import com.github.qcloudsms.httpclient.HTTPException;
+import com.jiwuzao.common.dto.user.FansAndFocusDTO;
 import com.jiwuzao.common.include.yun.QiniuUtil;
 import com.kauuze.major.domain.common.MongoUtil;
 import com.jiwuzao.common.domain.enumType.*;
@@ -55,6 +56,8 @@ public class UserBasicService {
     private WithdrawOrderRepository withdrawOrderRepository;
     @Autowired
     private TencentUtil tencentUtil;
+    @Autowired
+    private FocusService focusService;
 
     /**
      * 发送短信验证码:有效期5分钟。null为发送失败
@@ -116,7 +119,8 @@ public class UserBasicService {
         UserToken userToken = userTokenRepository.findByUid(uid);
         UserInfo userInfo = userInfoRepository.findByUid(uid);
         userToken = TokenUtil.judgeEndTime(userToken);
-        UserPrivateDto userPrivateDto = new UserPrivateDto(uid,user.getPhone(),userToken.getRole(),userToken.getBackRole(),userToken.getVip(),userToken.getVipEndTime(),userToken.getAccessToken(),userToken.getUserState(),userToken.getUserStateEndTime(),System.currentTimeMillis(),userInfo.getNickName(),userInfo.getPortrait(),userInfo.getSex(),userInfo.getBirthday(),userInfo.getProvince(),userInfo.getCity(),userInfo.getPersonalSign(),userInfo.getOpenWxId(),userInfo.getOpenQQ());
+        FansAndFocusDTO dto = focusService.getFocusAndFansNum(uid);
+        UserPrivateDto userPrivateDto = new UserPrivateDto(uid,user.getPhone(),userToken.getRole(),userToken.getBackRole(),userToken.getVip(),userToken.getVipEndTime(),userToken.getAccessToken(),userToken.getUserState(),userToken.getUserStateEndTime(),System.currentTimeMillis(),userInfo.getNickName(),userInfo.getPortrait(),userInfo.getSex(),userInfo.getBirthday(),userInfo.getProvince(),userInfo.getCity(),userInfo.getPersonalSign(),userInfo.getOpenWxId(),userInfo.getOpenQQ(),dto.getFansNum(),dto.getFocusNum());
         return userPrivateDto;
     }
 

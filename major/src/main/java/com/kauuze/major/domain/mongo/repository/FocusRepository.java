@@ -1,5 +1,6 @@
 package com.kauuze.major.domain.mongo.repository;
 
+import com.jiwuzao.common.domain.enumType.FocusStatusEnum;
 import com.jiwuzao.common.domain.mongo.entity.Focus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,4 +21,9 @@ public interface FocusRepository extends MongoRepository<Focus,String> {
     List<Focus> findAllByUidA(int uid);
 
     List<Focus> findAllByUidB(int uid);
+
+    Integer countByUidAAndStatus(Integer uid, Boolean focusStatus);
+
+    Integer countByUidBAndStatus(Integer uid, Boolean focusStatus);
+
 }
