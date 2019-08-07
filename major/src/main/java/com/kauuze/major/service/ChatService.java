@@ -7,6 +7,7 @@ import com.jiwuzao.common.domain.mongo.entity.ChatMessage;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.UserInfo;
 import com.jiwuzao.common.dto.chat.ChatGroupDto;
 import com.jiwuzao.common.dto.chat.ChatMessageDto;
+import com.jiwuzao.common.include.JsonUtil;
 import com.jiwuzao.common.include.StringUtil;
 import com.kauuze.major.domain.mongo.repository.ChatMessageRepository;
 import com.kauuze.major.domain.mongo.repository.ChatGroupRepository;
@@ -88,7 +89,7 @@ public class ChatService {
                     .setUserNameB(userB.getNickName())
                     .setAvatarA(userA.getPortrait())
                     .setAvatarB(userB.getPortrait())
-                    .setSex(uid==userA.getUid()?userB.getSex():userA.getSex())
+                    .setSex(uid == userA.getUid() ? userB.getSex() : userA.getSex())
                     .setUndoNum(getUserGroupUndoNum(uid, chatGroup.getId()));
             chatGroupDtos.add(chatGroupDto);
         }
@@ -149,19 +150,15 @@ public class ChatService {
     /**
      * 生成一条发送成功的信息
      *
-     * @param groupId
-     * @param uid
-     * @param content
-     * @param type
      * @return
      */
     @Async
-    public Future<?> createChatMessage(String groupId, int uid, String content, MessageTypeEnum type) {
+    public Future<?> createChatMessage(String message) {
         // 消息持久化,使用线程池并发执行
         return threadPoolTaskExecutor.submit(() -> {
-            ChatMessage chatMessage = new ChatMessage()
-                    .setMessageType(type).setGroupId(groupId).setUid(uid)
-                    .setContent(content).setCreateTime(System.currentTimeMillis());
+            ChatMessage chatMessage = JsonUtil.parseJsonString(message, ChatMessage.class);
+            chatMessage.setStatus(1)
+                    .setCreateTime(System.currentTimeMillis());
             ChatMessage save = chatMessageRepository.save(chatMessage);
             if (null != save) {
                 ChatMessageDto chatMessageDto = new ChatMessageDto();
@@ -187,7 +184,7 @@ public class ChatService {
         return threadPoolTaskExecutor.submit(() -> {
             List<ChatMessage> collect = chatMessageRepository.findAllByGroupIdAndStatusAndUidIsNot(groupId, 1, uid)
                     .stream().map(chatMessage -> chatMessage.setStatus(2)
-            ).collect(Collectors.toList());
+                    ).collect(Collectors.toList());
             chatMessageRepository.saveAll(collect);
         });
     }
@@ -203,7 +200,7 @@ public class ChatService {
         List<ChatMessageDto> list = new ArrayList<>();
         for (ChatMessage chatMessage : allByGroupId) {
             ChatMessageDto chatMessageDto = new ChatMessageDto();
-            BeanUtils.copyProperties(chatMessage, chatMessageDto);
+            BeanUtils.copyProperties(chatMessage, chatMessageDto,"id");
             list.add(chatMessageDto);
         }
         return list;

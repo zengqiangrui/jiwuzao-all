@@ -6,6 +6,7 @@ import com.jiwuzao.common.domain.enumType.OnlineStatusEnum;
 import com.jiwuzao.common.dto.chat.ChatGroupDto;
 import com.jiwuzao.common.dto.chat.ChatMessageDto;
 import com.jiwuzao.common.include.JsonResult;
+import com.jiwuzao.common.include.StringUtil;
 import com.jiwuzao.common.pojo.chat.ChatGroupPojo;
 import com.jiwuzao.common.pojo.common.UidPojo;
 import com.jiwuzao.common.vo.chat.ChatGroupItemVO;
@@ -50,7 +51,7 @@ public class ChatController {
 
     private String groupId = "";
     //用于延时处理信息入库的list
-    private List<Future> futures = new ArrayList<>();
+//    private List<Future> futures = new ArrayList<>();
 
     @Autowired
     private ChatService chatService;
@@ -104,6 +105,13 @@ public class ChatController {
         return JsonResult.success(userAllUndoNum);
     }
 
+    @RequestMapping("/handleMessage")
+    @Authorization
+    public JsonResult handleMessage(@RequestAttribute int uid,@Valid@RequestBody ChatGroupPojo pojo){
+        Future<?> future = chatService.handleAllUndoMessage(pojo.getGroupId(),uid);
+        return JsonResult.success();
+    }
+
     /**
      * 根据groupId 分页获取信息列表
      * @param pojo
@@ -151,8 +159,7 @@ public class ChatController {
         log.info("uid{},groupId{}", uid, groupId);
         log.info("收到来自窗口" + this.uid + "的信息:" + message);
         final ChatService chatService = SpringContext.getBean(ChatService.class);
-        Future<?> chatMessage = chatService.createChatMessage(groupId, Integer.parseInt(uid), message, MessageTypeEnum.TEXT);
-        futures.add(chatMessage);
+        chatService.createChatMessage(message);
         //群发消息
         for (ChatController item : webSocketSet) {
             try {

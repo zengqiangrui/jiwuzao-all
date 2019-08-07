@@ -17,7 +17,7 @@ public class ChatGroupPojo {
 
     private Integer pageNum = 0;
 
-    private Integer pageSize = 10;
+    private Integer pageSize = 100;
 
     private String createBy = "createTime";
 
