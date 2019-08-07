@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.GeneratedValue;
@@ -20,8 +21,14 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private String comid;
     /**
-     * 商品gid
+     * 商品订单id
      */
+    private String goodsOrderNo;
+
+    /**
+     * 商品id
+     */
+    @Indexed
     private String gid;
 
     /**

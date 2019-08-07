@@ -1,7 +1,6 @@
-package com.jiwuzao.common.pojo.common;
+package com.kauuze.major.api.pojo;
 
 import com.jiwuzao.common.include.valid.Idv;
-import com.jiwuzao.common.include.valid.StringMax;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,9 +10,9 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class CommentPojo {
+public class GetGoodsDetailPojo {
     @Idv
-    private String goodsOrderNo;
-    @StringMax
-    private String comment;
+    private String gid;
+    @Idv(require = false)
+    private Integer uid;
 }

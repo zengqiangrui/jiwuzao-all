@@ -1,9 +1,10 @@
 package com.kauuze.major.api;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jiwuzao.common.domain.mongo.entity.Category;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
-import com.jiwuzao.common.dto.goods.GoodsSimpleDto;
 import com.jiwuzao.common.include.JsonResult;
 import com.jiwuzao.common.include.JsonUtil;
 import com.jiwuzao.common.include.PageDto;
@@ -12,14 +13,9 @@ import com.jiwuzao.common.pojo.common.CommentPojo;
 import com.jiwuzao.common.pojo.common.GidPojo;
 import com.jiwuzao.common.pojo.common.QuerySpecPojo;
 import com.jiwuzao.common.pojo.goods.*;
-import com.jiwuzao.common.vo.goods.GoodsCommentVO;
-import com.jiwuzao.common.pojo.store.StoreIdPojo;
-import com.jiwuzao.common.pojo.store.StorePagePojo;
 import com.jiwuzao.common.pojo.store.StorePojo;
-import com.jiwuzao.common.vo.goods.GoodsDetailVO;
-import com.jiwuzao.common.vo.goods.GoodsSimpleVO;
-import com.jiwuzao.common.vo.goods.MerchantGoodsVO;
-import com.jiwuzao.common.vo.goods.ViewHistoryVO;
+import com.jiwuzao.common.vo.goods.*;
+import com.kauuze.major.api.pojo.GetGoodsDetailPojo;
 import com.kauuze.major.config.contain.ParamMismatchException;
 import com.kauuze.major.config.permission.Authorization;
 import com.kauuze.major.config.permission.Merchant;
@@ -152,13 +148,19 @@ public class GoodsController {
     /**
      * app端获取商品详情
      *
-     * @param gidPojo
+     * @param
      * @return
      */
+    @JsonIgnore
+    @JsonProperty(value = "uid")
     @RequestMapping("/getGoodsDetail")
-    public JsonResult getGoodsDetailApp(@Valid @RequestBody GidPojo gidPojo) {
-        log.debug(gidPojo.getGid());
-        GoodsDetailVO vo = goodsService.getGoodsDetail(gidPojo.getGid());
+    public JsonResult getGoodsDetailApp(@Valid @RequestBody GetGoodsDetailPojo pojo) {
+        log.debug("uid:" + pojo.getGid());
+        //游客访问时uid传-1
+        int uid = -1;
+        if (pojo.getUid() != null)
+            uid = pojo.getUid();
+        GoodsDetailVO vo = goodsService.getGoodsDetail(pojo.getGid(), uid);
         if (vo == null) {
             return JsonResult.failure("没有这件商品");
         } else {
@@ -175,7 +177,7 @@ public class GoodsController {
     public JsonResult getGoodsComment(@Valid @RequestBody GidPojo gidPojo) {
         List<GoodsCommentVO> volist = goodsService.getGoodsComment(gidPojo.getGid());
         if (volist == null) {
-            return JsonResult.failure("没有相关评论");
+            return JsonResult.failure("服务器内部错误");
         } else {
             return JsonResult.success(volist);
         }
@@ -263,11 +265,11 @@ public class GoodsController {
     @RequestMapping("/addComment")
     @Authorization
     public JsonResult addComment(@RequestAttribute int uid, @Valid @RequestBody CommentPojo pojo) {
-        String s = goodsService.addComment(uid, pojo.getGid(), pojo.getComment());
+        String s = goodsService.addComment(uid, pojo.getGoodsOrderNo(), pojo.getComment());
         if (StringUtil.isBlank(s)) {
-            return JsonResult.success();
+            return JsonResult.failure();
         } else {
-            return JsonResult.failure(s);
+            return JsonResult.success(s);
         }
     }
 

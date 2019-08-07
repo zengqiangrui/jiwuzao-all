@@ -9,6 +9,7 @@ import com.jiwuzao.common.domain.mongo.entity.GoodsDetail;
 import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.UserInfo;
+import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
 import com.jiwuzao.common.domain.mysql.entity.User;
 import com.jiwuzao.common.dto.goods.GoodsOpenDto;
 import com.jiwuzao.common.dto.goods.GoodsSimpleDto;
@@ -16,14 +17,11 @@ import com.jiwuzao.common.include.DateTimeUtil;
 import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.pojo.common.GoodsSpecPojo;
 import com.jiwuzao.common.pojo.goods.GoodsPagePojo;
-import com.jiwuzao.common.vo.goods.GoodsCommentVO;
-import com.jiwuzao.common.vo.goods.GoodsDetailVO;
-import com.jiwuzao.common.vo.goods.GoodsSimpleVO;
-import com.jiwuzao.common.vo.goods.MerchantGoodsVO;
-import com.jiwuzao.common.vo.goods.ViewHistoryVO;
+import com.jiwuzao.common.vo.goods.*;
 import com.kauuze.major.domain.common.EsUtil;
 import com.kauuze.major.domain.common.MongoUtil;
 import com.kauuze.major.domain.mongo.repository.*;
+import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import com.kauuze.major.domain.mysql.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -66,6 +64,8 @@ public class GoodsService {
     private AppriseRepository appriseRepository;
     @Autowired
     private ViewHistoryRepository viewHistoryRepository;
+    @Autowired
+    private GoodsOrderRepository goodsOrderRepository;
 
     /**
      * 添加商品
@@ -373,20 +373,36 @@ public class GoodsService {
      * @param gid
      * @return
      */
-    public GoodsDetailVO getGoodsDetail(String gid) {
+    public GoodsDetailVO getGoodsDetail(String gid, int uid) {
+        boolean apprised = false;
+
         GoodsDetail detail = goodsDetailRepository.findByGid(gid).get();
         Goods goods = goodsRepository.findByGid(gid);
         User user = userRepository.findById(goods.getUid()).get();
         UserInfo info = userInfoRepository.findByUid(goods.getUid());
+        if (uid != -1 && appriseRepository.findByGidAndUid(gid, uid) != null) {
+            apprised = true;
+        }
         if (detail == null || goods == null || user == null || info == null)
             return null;
+
+        //获取关注列表
+        List<UserIconVO> list = new ArrayList<>();
+        List<Apprise> appriseList = appriseRepository.findByGid(gid);
+        appriseList.forEach((item)->{
+            Integer tmpuid = item.getUid();
+            UserInfo tmpinfo = userInfoRepository.findByUid(tmpuid);
+            list.add(new UserIconVO(tmpinfo.getPortrait(), tmpuid));
+        });
+
         GoodsDetailVO vo = new GoodsDetailVO();
         vo.setTitle(goods.getTitle()).setDefaultPrice(goods.getDefaultPrice())
                 .setDetailLabel(detail.getDetailLabel()).setDetailPhotos(detail.getDetailPhotos())
                 .setPostage(goods.getPostage()).setSlideshow(detail.getSlideshow())
                 .setNickName(user.getNickName()).setPortrait(info.getPortrait())
                 .setGoodsType(detail.getGoodsType()).setGoodsTypeClass(detail.getGoodsTypeClass())
-                .setCover(goods.getCover()).setAppriseCnt(detail.getAppriseCnt());
+                .setCover(goods.getCover()).setAppriseCnt(detail.getAppriseCnt())
+                .setApprised(apprised).setAppriseList(list);
         return vo;
     }
 
@@ -493,8 +509,9 @@ public class GoodsService {
      * @param comment
      * @return
      */
-    public String addComment(int uid, String gid, String comment) {
-        Comment comment1 = new Comment(null, gid, uid, comment, System.currentTimeMillis(), false);
+    public String addComment(int uid, String goid, String comment) {
+        GoodsOrder order = goodsOrderRepository.findByGoodsOrderNo(goid).get();
+        Comment comment1 = new Comment(null, goid, order.getGid(), uid, comment, System.currentTimeMillis(), false);
         goodsCommentRepository.save(comment1);
         return "添加成功";
     }
@@ -514,11 +531,7 @@ public class GoodsService {
                     info.getPortrait(), e.getContent());
             res.add(vo);
         });
-        if (res.size() > 0)
-            return res;
-        else {
-            return null;
-        }
+        return res;
     }
 
     /**
@@ -542,7 +555,8 @@ public class GoodsService {
         appriseRepository.save(apprise);
 
         GoodsDetail detail1Up = new GoodsDetail();
-        Long cnt = detail.getAppriseCnt()+1;
+        Long cnt = detail.getAppriseCnt() + 1;
+        detail1Up.setGid(detail.getGid());
         detail1Up.setAppriseCnt(cnt);
         MongoUtil.updateNotNon("gid", detail1Up,GoodsDetail.class);
         return cnt;
