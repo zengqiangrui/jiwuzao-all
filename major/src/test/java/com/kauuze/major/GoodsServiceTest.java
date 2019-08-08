@@ -7,11 +7,13 @@ import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.jiwuzao.common.include.JsonResult;
 import com.jiwuzao.common.pojo.goods.GoodsPagePojo;
 import com.kauuze.major.domain.mongo.repository.CategoryRepository;
+import com.kauuze.major.domain.mongo.repository.ChatMessageRepository;
 import com.kauuze.major.domain.mongo.repository.ExpressRepository;
 import com.kauuze.major.domain.mongo.repository.GoodsSpecRepository;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
 import com.kauuze.major.include.StringUtil;
 import com.kauuze.major.include.yun.TencentUtil;
+import com.kauuze.major.service.ChatService;
 import com.kauuze.major.service.ExpressService;
 import com.kauuze.major.service.GoodsService;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +28,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -44,6 +48,10 @@ public class GoodsServiceTest {
     private GoodsSpecRepository goodsSpecRepository;
     @Autowired
     private TencentUtil tencentUtil;
+    @Autowired
+    private ChatService chatService;
+    @Autowired
+    private ChatMessageRepository chatMessageRepository;
 
     @Test
     public void showGoods() {
@@ -52,35 +60,40 @@ public class GoodsServiceTest {
 
     @Test
     public void showPage() throws Exception {
-        System.out.println(expressService.getOrderTracesByJson("SF","118650888018",""));
+        System.out.println(expressService.getOrderTracesByJson("SF", "118650888018", ""));
     }
 
     @Test
-    public void showPay(){
+    public void showPay() {
         System.out.println(payOrderRepository.findByPayOrderNo("aaaa"));
     }
 
     @Test
-    public void showSpec(){
+    public void showSpec() {
 //        goodsSpecRepository.findByGid()
     }
 
     @Test
-    public void getAll(){
-        GoodsPagePojo goodsPagePojo=new GoodsPagePojo();
+    public void getAll() {
+        GoodsPagePojo goodsPagePojo = new GoodsPagePojo();
         goodsPagePojo.setCurrentTab(0);
         goodsPagePojo.setCurrentPage(1);
         goodsPagePojo.setPageSize(10);
-        System.out.println("+++++++++++++++++++++"+goodsPagePojo);
+        System.out.println("+++++++++++++++++++++" + goodsPagePojo);
         List<Goods> goodsList = goodsService.getGoodsList(goodsPagePojo);
-        System.out.println("==========="+goodsList);
+        System.out.println("===========" + goodsList);
 //        System.out.println("************"+goodsList.isEmpty());
-            if(goodsList!=null) {
-                for (Goods goods : goodsList) {
-                    System.out.println(goods);
-                }
-            }else{
-                System.out.println("null");
+        if (goodsList != null) {
+            for (Goods goods : goodsList) {
+                System.out.println(goods);
             }
+        } else {
+            System.out.println("null");
+        }
+    }
+
+    @Test
+    public void show() {
+
     }
 }

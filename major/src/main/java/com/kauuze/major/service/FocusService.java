@@ -1,8 +1,8 @@
 package com.kauuze.major.service;
 
-import com.jiwuzao.common.domain.enumType.FocusStatusEnum;
 import com.jiwuzao.common.domain.mongo.entity.Focus;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.UserInfo;
+import com.jiwuzao.common.dto.user.FansAndFocusDTO;
 import com.jiwuzao.common.vo.user.FocusVO;
 import com.kauuze.major.domain.mongo.repository.FocusRepository;
 import com.kauuze.major.domain.mongo.repository.UserInfoRepository;
@@ -137,4 +137,14 @@ public class FocusService {
         return focusVOS;
     }
 
+
+    /**
+     * 获取粉丝数和关注数
+     * @param uid
+     * @return
+     */
+    public FansAndFocusDTO getFocusAndFansNum(int uid) {
+        return new FansAndFocusDTO().setFansNum(focusRepository.countByUidBAndStatus(uid,true))
+                .setFocusNum(focusRepository.countByUidAAndStatus(uid,true)).setUid(uid);
+    }
 }

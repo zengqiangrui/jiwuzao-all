@@ -98,4 +98,10 @@ public class UserPrivateDto {
      * 公开qq号
      */
     private String openQQ;
+
+    //粉丝数量
+    private Integer fansNum;
+
+    //关注数
+    private Integer focusNum;
 }

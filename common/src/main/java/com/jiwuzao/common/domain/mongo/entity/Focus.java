@@ -28,7 +28,7 @@ public class Focus {
     private Integer uidB;//接受用户
 
     /**
-     * 是否删除该对象
+     * 是否关注该对象
      */
     @Indexed
     private Boolean status = true;

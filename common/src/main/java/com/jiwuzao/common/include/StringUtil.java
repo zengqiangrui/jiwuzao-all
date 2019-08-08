@@ -66,8 +66,4 @@ public class StringUtil {
         return uri.substring(uri.lastIndexOf("/") + 1, uri.length());
     }
 
-    @Test
-    public void show() {
-        System.out.println(getUrn("http://cdn.jiwuzao.com/8141c132a13a4a7cb8db0379c1ea4f82.mp4"));
-    }
 }
