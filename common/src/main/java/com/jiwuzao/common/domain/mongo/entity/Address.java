@@ -15,6 +15,7 @@ import java.util.Date;
 
 /**
  * 地址,可能是收货，也可以是发货地址
+ *
  */
 @Document
 @Data
