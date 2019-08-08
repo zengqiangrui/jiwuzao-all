@@ -1,9 +1,15 @@
 package com.kauuze.major.api;
 
+import com.jiwuzao.common.include.DateTimeUtil;
+import com.jiwuzao.common.include.JsonResult;
+import com.jiwuzao.common.include.SHA256;
+import com.jiwuzao.common.include.StringUtil;
 import com.jiwuzao.common.pojo.common.*;
 import com.jiwuzao.common.pojo.userBasic.*;
+import com.jiwuzao.common.vo.user.UserCommentVO;
 import com.kauuze.major.config.permission.Authorization;
-import com.kauuze.major.include.*;
+import com.kauuze.major.include.StateModel;
+import com.kauuze.major.service.GoodsService;
 import com.kauuze.major.service.UserBasicService;
 import com.kauuze.major.service.dto.userBasic.UserPrivateDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @author kauuze
@@ -24,6 +31,9 @@ import javax.validation.Valid;
 public class UserBasicController {
     @Autowired
     private UserBasicService userBasicService;
+
+    @Autowired
+    private GoodsService goodsService;
 
 
     @RequestMapping("/sendSms")
@@ -190,6 +200,19 @@ public class UserBasicController {
     @RequestMapping("/findBySid")
     public JsonResult findBySid(@Valid @RequestBody SidPojo sidPojo){
         return JsonResult.success(userBasicService.findBySid(sidPojo.getSid()));
+    }
+
+    /**
+     * 通过uid获取商品评论
+     */
+    @RequestMapping("/getUserComment")
+    public JsonResult getUserComment(@Valid @RequestBody UidPojo pojo) {
+        List<UserCommentVO> list = goodsService.getUserComment(pojo.getUid());
+        if (list == null) {
+            return JsonResult.failure();
+        } else {
+            return JsonResult.success(list);
+        }
     }
 
 }

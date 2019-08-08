@@ -10,4 +10,5 @@ public interface AppriseRepository extends MongoRepository<Apprise,String> {
     Long countByGid(String gid);
     Apprise findByGidAndUid(String gid, Integer uid);
     List<Apprise> findByGid(String gid);
+    List<Apprise> findByUid(Integer uid);
 }

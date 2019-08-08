@@ -91,4 +91,9 @@ public class GoodsOrderDto {
      * 收货时间
      */
     private Long takeTime;
+
+    /**
+     * 取消时间
+     */
+    private Long cancelTime;
 }

@@ -115,7 +115,7 @@ public class GoodsOrderDetail {
     /**
      * 投诉时间
      */
-    private String complaintTime;
+    private Long complaintTime;
     /**
      * 投诉原因(富文本)
      */
