@@ -88,7 +88,7 @@ public class MerchantController {
         if (null != store) {
             return JsonResult.success(store);
         } else {
-            return JsonResult.failure("未找到店铺");
+            return JsonResult.failure("未找到店铺,请开通");
         }
     }
 
