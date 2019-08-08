@@ -4,18 +4,25 @@ import com.github.binarywang.wxpay.bean.order.WxPayMwebOrderResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
+import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
 import com.jiwuzao.common.dto.order.GoodsOrderDto;
 import com.jiwuzao.common.dto.order.GoodsOrderSimpleDto;
 import com.jiwuzao.common.include.JsonResult;
+import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.pojo.common.OrderStatusPojo;
 import com.jiwuzao.common.pojo.order.ComfirmOrderPojo;
 import com.jiwuzao.common.pojo.order.GetOrderPojo;
+import com.jiwuzao.common.pojo.order.OrderPagePojo;
 import com.kauuze.major.config.permission.Authorization;
+import com.kauuze.major.config.permission.Merchant;
 import com.kauuze.major.service.AddressService;
+import com.kauuze.major.service.MerchantService;
 import com.kauuze.major.service.OrderService;
 import com.qiniu.util.Json;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,6 +44,8 @@ public class OrderController {
     private AddressService addressService;
     @Autowired
     private WxPayService wxPayService;
+    @Autowired
+    private MerchantService merchantService;
 
     /**
      * 获取沙箱支付key
@@ -122,6 +131,24 @@ public class OrderController {
         } else {
             return JsonResult.success(result);
         }
+    }
+
+    /**
+     * 商家查看店铺所有下单情况
+     *
+     * @param uid  用户id
+     * @param page 分页参数
+     * @return pageDto 分页对象
+     */
+    @Merchant
+    @RequestMapping("/getAllMerchantOrder")
+    public JsonResult getAllMerchantOrder(@RequestAttribute int uid, @Valid @RequestBody OrderPagePojo page) {
+        Store store = merchantService.getMerchantStore(uid);
+        if (null == store) {
+            return JsonResult.error("未找到店铺");
+        }
+        PageDto<GoodsOrderDto> pageDto = orderService.findAllOrderByStore(store.getId(), PageRequest.of(page.getCurrentPage(), page.getPageSize(), Sort.by(page.getIsAsc() ? Sort.Direction.ASC : Sort.Direction.DESC, page.getSortBy())));
+        return JsonResult.success(pageDto);
     }
 
 }

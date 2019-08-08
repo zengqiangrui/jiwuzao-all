@@ -1,7 +1,9 @@
 package com.kauuze.major.service;
 
 import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
+import com.jiwuzao.common.domain.enumType.DeliveryTimeEnum;
 import com.jiwuzao.common.domain.enumType.GoodsClassifyEnum;
+import com.jiwuzao.common.domain.enumType.GoodsReturnEnum;
 import com.jiwuzao.common.domain.mongo.entity.*;
 import com.jiwuzao.common.domain.mongo.entity.Category;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
@@ -70,7 +72,7 @@ public class GoodsService {
     /**
      * 添加商品
      */
-    public String addGoods(int uid, GoodsClassifyEnum classify, String title, String cover, BigDecimal defaultPrice, String slideshow, BigDecimal postage, String detailLabel, String goodsType, String goodsTypeClass, String detailPhotos, List<GoodsSpecPojo> goodsSpecPojo) {
+    public String addGoods(int uid, GoodsClassifyEnum classify, String title, String cover, BigDecimal defaultPrice, String slideshow, BigDecimal postage, String detailLabel, String goodsType, String goodsTypeClass, String detailPhotos, List<GoodsSpecPojo> goodsSpecPojo, GoodsReturnEnum goodsReturnEnum, DeliveryTimeEnum deliveryTimeEnum) {
         Optional<Store> opt = storeRepository.findByUid(uid);
         if (!opt.isPresent()) {
             return "未开通店铺";
@@ -80,7 +82,7 @@ public class GoodsService {
         if (goodsRepository.countByUid(uid) > 100) {
             return "最多添加100个商品";
         }
-        Goods goods = new Goods(null, uid, opt.get().getId(), title, cover, classify, 0, 0, defaultPrice, postage, false, null, null, AuditTypeEnum.wait, null, System.currentTimeMillis(), null);
+        Goods goods = new Goods(null, uid, opt.get().getId(), title, cover, classify, 0, 0, defaultPrice, goodsReturnEnum, deliveryTimeEnum, postage, false, null, null, AuditTypeEnum.wait, null, System.currentTimeMillis(), null);
         goodsRepository.save(goods);
         GoodsDetail goodsDetail = new GoodsDetail(null, goods.getGid(), slideshow, detailLabel, classify, goodsType, goodsTypeClass, detailPhotos, 0L);
         goodsDetailRepository.save(goodsDetail);
@@ -389,7 +391,7 @@ public class GoodsService {
         //获取关注列表
         List<UserIconVO> list = new ArrayList<>();
         List<Apprise> appriseList = appriseRepository.findByGid(gid);
-        appriseList.forEach((item)->{
+        appriseList.forEach((item) -> {
             Integer tmpuid = item.getUid();
             UserInfo tmpinfo = userInfoRepository.findByUid(tmpuid);
             list.add(new UserIconVO(tmpinfo.getPortrait(), tmpuid));
@@ -402,6 +404,7 @@ public class GoodsService {
                 .setNickName(user.getNickName()).setPortrait(info.getPortrait())
                 .setGoodsType(detail.getGoodsType()).setGoodsTypeClass(detail.getGoodsTypeClass())
                 .setCover(goods.getCover()).setAppriseCnt(detail.getAppriseCnt())
+                .setUid(goods.getUid())
                 .setApprised(apprised).setAppriseList(list);
         return vo;
     }
@@ -483,20 +486,21 @@ public class GoodsService {
 
     /**
      * 根据店铺查询上架商品
+     *
      * @param storeId
      * @param pageable
      * @return
      */
     public PageDto<GoodsSimpleVO> getGoodsByStore(String storeId, Pageable pageable) {
-        Page<Goods> page = goodsRepository.findAllBySidAndPutaway(storeId,true, pageable);
+        Page<Goods> page = goodsRepository.findAllBySidAndPutaway(storeId, true, pageable);
         PageDto<GoodsSimpleVO> pageDto = new PageDto<>();
         pageDto.setTotal(page.getTotalElements());
         List<GoodsSimpleVO> list = new ArrayList<>();
         for (Goods goods : page.getContent()) {
-                GoodsSimpleVO goodsSimpleVO = new GoodsSimpleVO()
-                        .setGoodsId(goods.getGid()).setGoodsImg(goods.getCover())
-                        .setGoodsName(goods.getTitle()).setGoodsPrice(goods.getDefaultPrice());
-                list.add(goodsSimpleVO);
+            GoodsSimpleVO goodsSimpleVO = new GoodsSimpleVO()
+                    .setGoodsId(goods.getGid()).setGoodsImg(goods.getCover())
+                    .setGoodsName(goods.getTitle()).setGoodsPrice(goods.getDefaultPrice());
+            list.add(goodsSimpleVO);
 
         }
         pageDto.setContent(list);
@@ -505,6 +509,7 @@ public class GoodsService {
 
     /**
      * 添加评论,购买后商品的才能够评论
+     *
      * @param uid
      * @param comment
      * @return
@@ -518,13 +523,14 @@ public class GoodsService {
 
     /**
      * 获取商品评论列表
+     *
      * @param gid
      * @return
      */
     public List<GoodsCommentVO> getGoodsComment(String gid) {
         List<Comment> list = goodsCommentRepository.findByGid(gid);
         List<GoodsCommentVO> res = new ArrayList<>();
-        list.forEach((e)->{
+        list.forEach((e) -> {
             Integer uid = e.getUid();
             UserInfo info = userInfoRepository.findByUid(uid);
             GoodsCommentVO vo = new GoodsCommentVO(e.getUid(), info.getNickName(), e.getTime(),
@@ -536,6 +542,7 @@ public class GoodsService {
 
     /**
      * 用户对指定商品进行点赞
+     *
      * @param uid
      * @param gid
      * @return
@@ -558,12 +565,13 @@ public class GoodsService {
         Long cnt = detail.getAppriseCnt() + 1;
         detail1Up.setGid(detail.getGid());
         detail1Up.setAppriseCnt(cnt);
-        MongoUtil.updateNotNon("gid", detail1Up,GoodsDetail.class);
+        MongoUtil.updateNotNon("gid", detail1Up, GoodsDetail.class);
         return cnt;
     }
 
     /**
      * 取消点赞
+     *
      * @param uid
      * @param gid
      * @return
@@ -580,9 +588,9 @@ public class GoodsService {
             appriseRepository.deleteById(apprise.getId());
 
             GoodsDetail detail1Up = new GoodsDetail();
-            Long cnt = detail.getAppriseCnt()-1;
+            Long cnt = detail.getAppriseCnt() - 1;
             detail1Up.setAppriseCnt(cnt);
-            MongoUtil.updateNotNon("gid", detail1Up,GoodsDetail.class);
+            MongoUtil.updateNotNon("gid", detail1Up, GoodsDetail.class);
             return cnt;
         } else {
             return detail.getAppriseCnt();
@@ -591,15 +599,16 @@ public class GoodsService {
 
     /**
      * 获取浏览记录
+     *
      * @param uid
      * @return
      */
     public List<ViewHistoryVO> getViewHistory(int uid) {
         List<ViewHistory> list = viewHistoryRepository.findByUidAndDeleteFalse(uid);
         List<ViewHistoryVO> volist = new ArrayList<>();
-        for (ViewHistory e : list){
+        for (ViewHistory e : list) {
             Goods goods = goodsRepository.findByGid(e.getGid());
-            if (goods == null){
+            if (goods == null) {
                 continue;
             }
             ViewHistoryVO vo = new ViewHistoryVO(e.getGid(), e.getTime(), goods.getTitle(), goods.getCover());
@@ -610,6 +619,7 @@ public class GoodsService {
 
     /**
      * 添加浏览记录
+     *
      * @param uid
      * @param gid
      * @return
@@ -617,8 +627,7 @@ public class GoodsService {
     public String addViewHistory(int uid, String gid) {
         //去重判断
         ViewHistory viewHistory = viewHistoryRepository.findByUidAndGid(uid, gid);
-        if (viewHistory != null)
-        {
+        if (viewHistory != null) {
             //更新浏览时间
             viewHistory.setTime(System.currentTimeMillis());
             viewHistory.setDelete(false);
@@ -634,6 +643,7 @@ public class GoodsService {
 
     /**
      * 删除历史记录
+     *
      * @param uid
      * @param id
      * @return

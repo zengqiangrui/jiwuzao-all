@@ -1,5 +1,6 @@
 package com.jiwuzao.common.dto.chat;
 
+import com.jiwuzao.common.domain.enumType.OnlineStatusEnum;
 import com.jiwuzao.common.domain.enumType.SexEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,6 +24,10 @@ public class ChatGroupDto {
     private String avatarA;//A的头像
 
     private String userNameB;
+
+    private OnlineStatusEnum onlineStatusA;
+
+    private OnlineStatusEnum onlineStatusB;
 
     private Integer undoNum;//用户未处理信息数
 

@@ -81,6 +81,8 @@ public class ChatService {
         for (ChatGroup chatGroup : chatGroups) {
             UserInfo userA = userInfoRepository.findByUid(chatGroup.getUidA());
             UserInfo userB = userInfoRepository.findByUid(chatGroup.getUidB());
+            if(null==userA||null==userB)
+                throw new RuntimeException("未找到分组");
             ChatGroupDto chatGroupDto = new ChatGroupDto()
                     .setUidA(chatGroup.getUidA())
                     .setUidB(chatGroup.getUidB())
@@ -89,6 +91,8 @@ public class ChatService {
                     .setUserNameB(userB.getNickName())
                     .setAvatarA(userA.getPortrait())
                     .setAvatarB(userB.getPortrait())
+                    .setOnlineStatusA(chatGroup.getOnlineStatusA())
+                    .setOnlineStatusB(chatGroup.getOnlineStatusB())
                     .setSex(uid == userA.getUid() ? userB.getSex() : userA.getSex())
                     .setUndoNum(getUserGroupUndoNum(uid, chatGroup.getId()));
             chatGroupDtos.add(chatGroupDto);

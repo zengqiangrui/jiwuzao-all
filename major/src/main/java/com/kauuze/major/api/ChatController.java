@@ -58,6 +58,7 @@ public class ChatController {
 
     /**
      * 初始化聊天对象
+     *
      * @param uid
      * @param uidB
      * @return
@@ -76,6 +77,7 @@ public class ChatController {
 
     /**
      * 获取用户所有聊天对象列表
+     *
      * @param uid
      * @return
      */
@@ -87,6 +89,7 @@ public class ChatController {
                 .setUid(chatGroupDto.getUidA() == uid ? chatGroupDto.getUidB() : chatGroupDto.getUidA())
                 .setNickName(chatGroupDto.getUidA() == uid ? chatGroupDto.getUserNameB() : chatGroupDto.getUserNameA())
                 .setAvatar(chatGroupDto.getUidA() == uid ? chatGroupDto.getAvatarB() : chatGroupDto.getAvatarA())
+                .setOnlineStatus(chatGroupDto.getUidA() == uid ? chatGroupDto.getOnlineStatusB() : chatGroupDto.getOnlineStatusA())
                 .setGroupId(chatGroupDto.getGroupId()).setUndoNum(chatGroupDto.getUndoNum()).setSex(chatGroupDto.getSex()))
                 .sorted(Comparator.comparing(ChatGroupItemVO::getUndoNum).reversed())//根据未处理的数量进行降序排列
                 .collect(Collectors.toList());
@@ -95,6 +98,7 @@ public class ChatController {
 
     /**
      * 获取用户未处理消息总数
+     *
      * @param uid
      * @return
      */
@@ -107,19 +111,20 @@ public class ChatController {
 
     @RequestMapping("/handleMessage")
     @Authorization
-    public JsonResult handleMessage(@RequestAttribute int uid,@Valid@RequestBody ChatGroupPojo pojo){
-        Future<?> future = chatService.handleAllUndoMessage(pojo.getGroupId(),uid);
+    public JsonResult handleMessage(@RequestAttribute int uid, @Valid @RequestBody ChatGroupPojo pojo) {
+        Future<?> future = chatService.handleAllUndoMessage(pojo.getGroupId(), uid);
         return JsonResult.success();
     }
 
     /**
      * 根据groupId 分页获取信息列表
+     *
      * @param pojo
      * @return
      */
     @RequestMapping("/getGroupMessage")
     @Authorization
-    public JsonResult getGroupMessage(@Valid@RequestBody ChatGroupPojo pojo){
+    public JsonResult getGroupMessage(@Valid @RequestBody ChatGroupPojo pojo) {
         List<ChatMessageDto> chatMessageByGroup = chatService.getChatMessageByGroup(pojo.getGroupId(), PageRequest.of(pojo.getPageNum(), pojo.getPageSize(),
                 Sort.by(pojo.getIsAsc() ? Sort.Direction.ASC : Sort.Direction.DESC, pojo.getCreateBy())
         ));

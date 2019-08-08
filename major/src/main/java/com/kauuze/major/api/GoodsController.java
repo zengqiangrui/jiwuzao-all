@@ -67,7 +67,7 @@ public class GoodsController {
         if (countSpec != addGoodsPojo.getGoodsSpecPojo().size()) {
             throw new ParamMismatchException();
         }
-        String result = goodsService.addGoods(uid, addGoodsPojo.getGoodsClassify(), addGoodsPojo.getTitle(), addGoodsPojo.getCover(), addGoodsPojo.getDefaultPrice(), addGoodsPojo.getSlideshow(), addGoodsPojo.getPostage(), addGoodsPojo.getDetailLabel(), addGoodsPojo.getGoodsType(), addGoodsPojo.getGoodsTypeClass(), addGoodsPojo.getDetailPhotos(), addGoodsPojo.getGoodsSpecPojo());
+        String result = goodsService.addGoods(uid, addGoodsPojo.getGoodsClassify(), addGoodsPojo.getTitle(), addGoodsPojo.getCover(), addGoodsPojo.getDefaultPrice(), addGoodsPojo.getSlideshow(), addGoodsPojo.getPostage(), addGoodsPojo.getDetailLabel(), addGoodsPojo.getGoodsType(), addGoodsPojo.getGoodsTypeClass(), addGoodsPojo.getDetailPhotos(), addGoodsPojo.getGoodsSpecPojo(), addGoodsPojo.getGoodsReturn(), addGoodsPojo.getDeliveryTime());
         if (result == null) {
             return JsonResult.success();
         } else {
@@ -170,6 +170,7 @@ public class GoodsController {
 
     /**
      * 获取商品评论
+     *
      * @param gidPojo
      * @return
      */
@@ -185,6 +186,7 @@ public class GoodsController {
 
     /**
      * 获取商品规格信息
+     *
      * @param goodsSpecPojo
      * @return
      */
@@ -250,6 +252,7 @@ public class GoodsController {
 
     /**
      * 获取店铺商品信息，分页展示
+     *
      * @param pojo
      * @return
      */
@@ -289,6 +292,7 @@ public class GoodsController {
 
     /**
      * 取消点赞
+     *
      * @param uid
      * @param pojo
      * @return
