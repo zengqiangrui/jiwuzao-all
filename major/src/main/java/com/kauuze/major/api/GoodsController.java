@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jiwuzao.common.domain.mongo.entity.Category;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
+import com.jiwuzao.common.dto.goods.GoodsSimpleDto;
 import com.jiwuzao.common.include.JsonResult;
 import com.jiwuzao.common.include.JsonUtil;
 import com.jiwuzao.common.include.PageDto;
@@ -93,6 +94,25 @@ public class GoodsController {
         }
     }
 
+
+    /**
+     * 商品下架
+     *
+     * @param uid
+     * @param gidPojo
+     * @return
+     */
+    @RequestMapping("/putOff")
+    @Merchant
+    public JsonResult putOff(@RequestAttribute int uid, @Valid @RequestBody GidPojo gidPojo) {
+        String result = goodsService.putOff(uid, gidPojo.getGid());
+        if (result == null) {
+            return JsonResult.success();
+        } else {
+            return JsonResult.failure(result);
+        }
+    }
+
     /**
      * 获取商品目录
      *
@@ -135,7 +155,40 @@ public class GoodsController {
         return JsonResult.failure("没找到商品信息");
     }
 
+    /**
+     * 商户查询某审核状态下的商品信息
+     * @param uid 用户id
+     * @param goodsPagePojo 商品分页信息
+     * @return
+     */
+    @RequestMapping("/getGoodsListByStatus")
+    @Merchant
+    public JsonResult getGoodsListByStatus(@RequestAttribute int uid,@Valid @RequestBody GoodsPagePojo goodsPagePojo){
+        Pageable pageAble;
+        if (goodsPagePojo.getIsAsc()) {
+            pageAble = PageRequest.of(goodsPagePojo.getCurrentPage(), goodsPagePojo.getPageSize(), Sort.Direction.ASC, goodsPagePojo.getSortBy());
+        } else {
+            pageAble = PageRequest.of(goodsPagePojo.getCurrentPage(), goodsPagePojo.getPageSize(), Sort.Direction.DESC, goodsPagePojo.getSortBy());
+        }
+        PageDto<GoodsSimpleDto> pageDto = goodsService.getGoodsListStatus(uid,goodsPagePojo.getAuditType(),pageAble);
+        return JsonResult.success(pageDto);
+    }
+
+    @RequestMapping("/getGoodsListByPutAway")
+    @Merchant
+    public JsonResult getGoodsListByPutAway(@RequestAttribute int uid,@Valid @RequestBody GoodsPagePojo goodsPagePojo){
+        Pageable pageAble;
+        if (goodsPagePojo.getIsAsc()) {
+            pageAble = PageRequest.of(goodsPagePojo.getCurrentPage(), goodsPagePojo.getPageSize(), Sort.Direction.ASC, goodsPagePojo.getSortBy());
+        } else {
+            pageAble = PageRequest.of(goodsPagePojo.getCurrentPage(), goodsPagePojo.getPageSize(), Sort.Direction.DESC, goodsPagePojo.getSortBy());
+        }
+        PageDto<GoodsSimpleDto> pageDto = goodsService.getGoodsListByPutAway(uid,goodsPagePojo.getPutaway(),pageAble);
+        return JsonResult.success(pageDto);
+    }
+
     @RequestMapping("/merchantGetGoodsDetail")
+    @Merchant
     public JsonResult getGoodsDetail(@Valid @RequestBody GidPojo gidPojo) {
         MerchantGoodsVO goodsVO = goodsService.merchantGetGoodsDetail(gidPojo.getGid());
         if (null != goodsVO) {
@@ -252,13 +305,13 @@ public class GoodsController {
 
     /**
      * 获取店铺商品信息，分页展示
-     *
+     * putAway:上架
      * @param pojo
      * @return
      */
     @RequestMapping("/getGoodsByStore")
     public JsonResult getGoodsByStore(@Valid @RequestBody StorePojo pojo) {
-        PageDto<GoodsSimpleVO> page = goodsService.getGoodsByStore(pojo.getStoreId(), PageRequest.of(pojo.getPageNum(), pojo.getPageSize(), Sort.by(pojo.getOrderBy())));
+        PageDto<GoodsSimpleVO> page = goodsService.getGoodsByStore(pojo.getStoreId(),true, PageRequest.of(pojo.getPageNum(), pojo.getPageSize(), Sort.by(pojo.getOrderBy())));
         return JsonResult.success(page);
     }
 

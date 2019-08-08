@@ -1,9 +1,10 @@
 package com.kauuze.major.api;
 
 import com.jiwuzao.common.domain.enumType.AddressEnum;
-import com.jiwuzao.common.domain.mongo.entity.ReceiverAddress;
+import com.jiwuzao.common.domain.mongo.entity.Address;
 import com.jiwuzao.common.pojo.userBasic.AddressPojo;
 import com.kauuze.major.config.permission.Authorization;
+import com.kauuze.major.config.permission.Merchant;
 import com.kauuze.major.include.JsonResult;
 import com.kauuze.major.service.AddressService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class AddressController {
     @RequestMapping("/addUserAddress")
     @Authorization
     public JsonResult addUserAddress(@RequestAttribute int uid, @Valid @RequestBody AddressPojo addressPojo) {
-        ReceiverAddress address = addressService.addAddress(uid, addressPojo.getReceiveProvinces(), addressPojo.getReceiverAddress(), addressPojo.getReceiverPhone(), addressPojo.getReceiverTrueName(), addressPojo.getAddressStatus());
+        Address address = addressService.addAddress(uid, addressPojo.getProvinces(), addressPojo.getAddressDetail(), addressPojo.getPhone(), addressPojo.getTrueName(), addressPojo.getAddressStatus());
         if (null != address) {
             return JsonResult.success(address);
         } else {
@@ -33,7 +34,7 @@ public class AddressController {
     @Authorization
     public JsonResult defaultAddress(@RequestAttribute int uid) {
         System.out.println("defaultAddress" + uid);
-        List<ReceiverAddress> listAddress = addressService.getAddressByDelault(uid);
+        List<Address> listAddress = addressService.getAddressByDelault(uid);
         if(listAddress.size() == 0){
             return JsonResult.success();
         }
@@ -44,13 +45,22 @@ public class AddressController {
     @Authorization
     public JsonResult undeleteAddress(@RequestAttribute int uid) {
         System.out.println("undeleteAddress" + uid);
-        List<ReceiverAddress> allByUserNotDel = addressService.getAllByUserNotDel(uid);
+        List<Address> allByUserNotDel = addressService.getAllByUserNotDel(uid);
         if(allByUserNotDel!=null){
             return JsonResult.success(allByUserNotDel);
         }
         return JsonResult.failure();
     }
 
+    @RequestMapping("/senderAddress")
+    @Merchant
+    public JsonResult senderAddress(@RequestAttribute int uid) {
+        List<Address> allByUserNotDel = addressService.getAllByUserNotDel(uid);
+        if(allByUserNotDel!=null){
+            return JsonResult.success(allByUserNotDel);
+        }
+        return JsonResult.failure();
+    }
 
     @RequestMapping("/deleteAddress")
     @Authorization
@@ -58,8 +68,8 @@ public class AddressController {
         addressService.userDelById(addressPojo.getAddressId());
         System.out.println("addressId" + addressPojo.getAddressId());
         //如果删除的是缓存中的地址，则返回一个默认地址回去，以显示
-        List<ReceiverAddress> listAddress = addressService.getAddressByDelault(uid);
-        for (ReceiverAddress address : listAddress) {
+        List<Address> listAddress = addressService.getAddressByDelault(uid);
+        for (Address address : listAddress) {
             System.out.println(address);
         }
         return JsonResult.success(listAddress);
@@ -67,19 +77,16 @@ public class AddressController {
 
     @RequestMapping("/saveUserAddress")
     @Authorization
-    private JsonResult saveUserAddress(@RequestAttribute int uid, @RequestBody ReceiverAddress recAddress) {
-        List<ReceiverAddress> defaultAddress = addressService.getAddressByDelault(uid);
-        for (ReceiverAddress deAddress : defaultAddress) {
+    private JsonResult saveUserAddress(@RequestAttribute int uid, @RequestBody Address recAddress) {
+        List<Address> defaultAddress = addressService.getAddressByDelault(uid);
+        for (Address deAddress : defaultAddress) {
             if (deAddress != null) {
                 deAddress.setAddressStatus(AddressEnum.USUAL);
                 addressService.saveAddress(uid, deAddress);
             }
         }
-        System.out.println("saveUserAddress" + recAddress);
         addressService.saveAddress(uid, recAddress);
         //保存现有地址外，还应将原默认地址设为usual
         return  JsonResult.success();
     }
-
-
 }

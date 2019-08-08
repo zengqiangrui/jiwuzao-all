@@ -49,6 +49,7 @@ public class OrderController {
 
     /**
      * 获取沙箱支付key
+     *
      * @return
      * @throws WxPayException
      */
@@ -87,7 +88,7 @@ public class OrderController {
     @RequestMapping("/comfirmOrder")
     @Authorization
     public JsonResult comfirmOrder(@RequestAttribute("uid") int uid, @RequestAttribute("ip") String ip,
-                             @Valid @RequestBody ComfirmOrderPojo pojo, HttpServletResponse response) throws WxPayException, IOException {
+                                   @Valid @RequestBody ComfirmOrderPojo pojo, HttpServletResponse response) throws WxPayException, IOException {
         Object result = orderService.comfirmOrder(uid, pojo.getItemList(), pojo.getCity(),
                 pojo.getAddress(), pojo.getPhone(), pojo.getTrueName(), ip);
         if (result == null) {
@@ -107,7 +108,7 @@ public class OrderController {
     @Authorization
     public JsonResult getOrderSample(@RequestAttribute("uid") int uid, @RequestBody OrderStatusPojo pojo) {
         OrderStatusEnum status = null;
-        if (pojo != null){
+        if (pojo != null) {
             status = pojo.getStatus();
         }
 
@@ -147,7 +148,25 @@ public class OrderController {
         if (null == store) {
             return JsonResult.error("未找到店铺");
         }
-        PageDto<GoodsOrderDto> pageDto = orderService.findAllOrderByStore(store.getId(), PageRequest.of(page.getCurrentPage(), page.getPageSize(), Sort.by(page.getIsAsc() ? Sort.Direction.ASC : Sort.Direction.DESC, page.getSortBy())));
+        PageDto<GoodsOrderDto> pageDto = orderService.findAllOrderByStore(store.getId(),null, PageRequest.of(page.getCurrentPage(), page.getPageSize(), Sort.by(page.getIsAsc() ? Sort.Direction.ASC : Sort.Direction.DESC, page.getSortBy())));
+        return JsonResult.success(pageDto);
+    }
+
+    /**
+     * 商家查看店铺按照订单状态查询
+     *
+     * @param uid  用户id
+     * @param page 分页参数
+     * @return pageDto 分页对象
+     */
+    @Merchant
+    @RequestMapping("/getAllStoreOrderByStatus")
+    public JsonResult getAllMerchantOrderByStatus(@RequestAttribute int uid, @Valid @RequestBody OrderPagePojo page) {
+        Store store = merchantService.getMerchantStore(uid);
+        if (null == store) {
+            return JsonResult.error("未找到店铺");
+        }
+        PageDto<GoodsOrderDto> pageDto = orderService.findAllOrderByStore(store.getId(), page.getOrderStatus(),PageRequest.of(page.getCurrentPage(), page.getPageSize(), Sort.by(page.getIsAsc() ? Sort.Direction.ASC : Sort.Direction.DESC, page.getSortBy())));
         return JsonResult.success(pageDto);
     }
 

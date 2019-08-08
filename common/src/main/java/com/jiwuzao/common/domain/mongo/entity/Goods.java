@@ -81,7 +81,7 @@ public class Goods {
     /**
      * 下架时间:72小时可删除
      */
-    private Long soldOutTime;
+    private Long putOffTime;
     /**
      * 商品审核状态
      */

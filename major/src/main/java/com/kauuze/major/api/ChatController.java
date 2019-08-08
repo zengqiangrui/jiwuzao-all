@@ -142,13 +142,8 @@ public class ChatController {
         webSocketSet.add(this);     //加入set中
         addOnlineCount();           //在线数加1
         log.info("有用户加入:" + uid + ",当前在线人数为" + getOnlineCount());
-        try {
-            sendMessage("连接成功");
-            final ChatService chatService = SpringContext.getBean(ChatService.class);
-            chatService.switchUserGroupStatus(Integer.parseInt(uid), groupId, OnlineStatusEnum.ON_LINE);
-        } catch (IOException e) {
-            log.error("websocket IO异常");
-        }
+        final ChatService chatService = SpringContext.getBean(ChatService.class);
+        chatService.switchUserGroupStatus(Integer.parseInt(uid), groupId, OnlineStatusEnum.ON_LINE);
     }
 
     /**

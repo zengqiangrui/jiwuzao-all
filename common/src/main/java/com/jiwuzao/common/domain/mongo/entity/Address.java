@@ -14,40 +14,37 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.Date;
 
 /**
- * 收货地址
- * @author kauuze
- * @email 3412879785@qq.com
- * @time 2019-04-13 21:42
+ * 地址,可能是收货，也可以是发货地址
  */
 @Document
 @Data
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReceiverAddress {
+public class Address {
     @Id
     private String id;
     @Indexed
     private Integer uid;
 
     /**
-     * 默认收货省,市,区
+     * 默认收货省-市-区(以横线分割)
      */
-    private String receiveProvinces;
+    private String provinces;
     /**
-     *默认收货详细地址
+     *默认详细地址
      */
-    private String receiverAddress;
+    private String addressDetail;
 
     /**
      * 默认收货手机
      */
-    private String receiverPhone;
+    private String phone;
 
     /**
      * 默认收货姓名
      */
-    private String receiverTrueName;
+    private String trueName;
 
     /**
      * 枚举，地址状态,默认为普通地址

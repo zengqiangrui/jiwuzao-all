@@ -135,7 +135,7 @@ public class GoodsService {
      * @param gid
      * @return
      */
-    public String soldOut(int uid, String gid) {
+    public String putOff(int uid, String gid) {
         Goods goods = goodsRepository.findByGid(gid);
         if (goods == null) {
             return "该商品不存在";
@@ -147,12 +147,12 @@ public class GoodsService {
         if (!goods.getPutaway()) {
             return "该商品已下架";
         }
-        Map<String, String> map = new HashMap<>();
-        map.put("gid", goods.getGid());
-        map.put("putaway", "false");
-        map.put("soldOutTime", String.valueOf(System.currentTimeMillis()));
-        EsUtil.modify(map);
-        return null;
+        goods.setPutaway(false).setPutOffTime(System.currentTimeMillis());
+        Goods save = goodsRepository.save(goods);
+        if (null != save)
+            return "下架成功";
+        else
+            return "下架失败";
     }
 
     /**
@@ -171,7 +171,7 @@ public class GoodsService {
         if (goods.getPutaway()) {
             return "该商品未下架";
         }
-        if (goods.getSoldOutTime() + DateTimeUtil.getOneDayMill() * 3 > System.currentTimeMillis()) {
+        if (goods.getPutOffTime() + DateTimeUtil.getOneDayMill() * 3 > System.currentTimeMillis()) {
             return "该商品下架时间未满72小时";
         }
         goodsRepository.deleteById(gid);
@@ -491,8 +491,8 @@ public class GoodsService {
      * @param pageable
      * @return
      */
-    public PageDto<GoodsSimpleVO> getGoodsByStore(String storeId, Pageable pageable) {
-        Page<Goods> page = goodsRepository.findAllBySidAndPutaway(storeId, true, pageable);
+    public PageDto<GoodsSimpleVO> getGoodsByStore(String storeId,Boolean putAway, Pageable pageable) {
+        Page<Goods> page = goodsRepository.findAllBySidAndPutaway(storeId, putAway, pageable);
         PageDto<GoodsSimpleVO> pageDto = new PageDto<>();
         pageDto.setTotal(page.getTotalElements());
         List<GoodsSimpleVO> list = new ArrayList<>();
@@ -656,5 +656,28 @@ public class GoodsService {
             viewHistoryRepository.deleteById(id);
             return "删除成功";
         }
+    }
+
+    /**
+     * 根据审核状态查询
+     * @param uid
+     * @param auditType
+     * @param pageAble
+     * @return
+     */
+    public PageDto<GoodsSimpleDto> getGoodsListStatus(int uid, AuditTypeEnum auditType, Pageable pageAble) {
+        Page<Goods> page = goodsRepository.findAllByUidAndAuditType(uid, auditType, pageAble);
+        return getGoodsSimplePage(page);
+    }
+
+    /**
+     * 查询店铺商品是否上架分页信息
+     * @param uid
+     * @param putaway
+     * @param pageAble
+     * @return
+     */
+    public PageDto<GoodsSimpleDto> getGoodsListByPutAway(int uid, Boolean putaway, Pageable pageAble) {
+        return getGoodsSimplePage(goodsRepository.findAllByUidAndPutaway(uid,putaway,pageAble));
     }
 }

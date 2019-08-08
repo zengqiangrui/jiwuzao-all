@@ -150,6 +150,7 @@ public class OrderService {
 
     /**
      * 生成支付订单
+     *
      * @param payOrderNo
      * @param city
      * @param address
@@ -168,7 +169,8 @@ public class OrderService {
             detail.setReceiverCity(city).setReceiverAddress(address).setReceiverPhone(phone)
                     .setReceiverTrueName(name);
             goodsOrderDetailRepository.save(detail);
-        };
+        }
+        ;
         PayOrder payOrder = payOrderRepository.findByPayOrderNo(payOrderNo);
         if (payOrder.getPrepayId() != null) {
             //为过期订单设置overTime按老的订单建立新的订单,并与goodsorder关联。
@@ -222,7 +224,7 @@ public class OrderService {
      */
     public List<GoodsOrderSimpleDto> getOrderSample(int uid, OrderStatusEnum status) {
         List<GoodsOrder> goodsOrder;
-        if (status == null){
+        if (status == null) {
             goodsOrder = goodsOrderRepository.findByUid(uid);
         } else {
             goodsOrder = goodsOrderRepository.findAllByUidAndOrderStatus(uid, status);
@@ -386,8 +388,14 @@ public class OrderService {
         return this.wxPayService.createOrder(req);
     }
 
-    public PageDto<GoodsOrderDto> findAllOrderByStore(String sid, Pageable pageable) {
-        Page<GoodsOrder> goodsOrderPage = goodsOrderRepository.findAllBySid(sid, pageable);
+
+    public PageDto<GoodsOrderDto> findAllOrderByStore(String sid, OrderStatusEnum orderStatusEnum, Pageable pageable) {
+        Page<GoodsOrder> goodsOrderPage;
+        if (orderStatusEnum == null) {
+            goodsOrderPage = goodsOrderRepository.findAllBySid(sid, pageable);
+        } else {
+            goodsOrderPage = goodsOrderRepository.findAllBySidAndOrderStatus(sid, orderStatusEnum, pageable);
+        }
         List<GoodsOrder> goodsOrderList = goodsOrderPage.getContent();
         List<GoodsOrderDto> goodsOrderDtos = new ArrayList<>();
         for (GoodsOrder goodsOrder : goodsOrderList) {
@@ -396,9 +404,9 @@ public class OrderService {
                     .findById(goodsOrder.getGoodsOrderDetailId());
             if (!opt.isPresent()) {
                 throw new RuntimeException("未找到商品详情");
-            }else{
+            } else {
                 //数据拼装
-                GoodsOrderDto goodsOrderDto= createOrderDto(goodsOrder,po,opt.get());
+                GoodsOrderDto goodsOrderDto = createOrderDto(goodsOrder, po, opt.get());
                 goodsOrderDtos.add(goodsOrderDto);
             }
         }
@@ -407,4 +415,6 @@ public class OrderService {
         page.setContent(goodsOrderDtos);
         return page;
     }
+
+
 }

@@ -1,5 +1,7 @@
 package com.jiwuzao.common.pojo.order;
 
+import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
+import com.jiwuzao.common.include.valid.StringMax;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,7 +37,9 @@ public class OrderPagePojo {
     /**
      * 根据数据库中的字段排列默认为时间排序
      */
+    @StringMax
     private String sortBy = "createTime";
 
+    private OrderStatusEnum orderStatus = OrderStatusEnum.waitPay;
 
 }

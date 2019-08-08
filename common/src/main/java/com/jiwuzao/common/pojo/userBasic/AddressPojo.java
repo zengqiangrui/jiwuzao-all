@@ -16,27 +16,27 @@ import lombok.experimental.Accessors;
 public class AddressPojo {
     private String addressId;
     /**
-     * 默认收货省,市,区
+     * 默认收货省-市-区
      */
     @StringMax
-    private String receiveProvinces;
+    private String provinces;
     /**
      *默认收货详细地址
      */
     @StringMax
-    private String receiverAddress;
+    private String addressDetail;
 
     /**
      * 默认收货手机
      */
     @Phone
-    private String receiverPhone;
+    private String phone;
 
     /**
      * 默认收货姓名
      */
     @TrueName
-    private String receiverTrueName;
+    private String trueName;
 
     private AddressEnum addressStatus;
 
