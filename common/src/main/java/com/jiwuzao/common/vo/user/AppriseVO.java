@@ -1,4 +1,4 @@
-package com.jiwuzao.common.vo.goods;
+package com.jiwuzao.common.vo.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,30 +11,21 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class ViewHistoryVO {
-    /**
-     * vhid
-     */
-    private String vhid;
+public class AppriseVO {
     /**
      * gid
      */
     private String gid;
 
     /**
-     * 浏览时间
-     */
-    private Long time;
-
-    /**
-     * 商品名称
-     */
-    private String goodsTitle;
-
-    /**
      * 商品封面
      */
     private String cover;
+
+    /**
+     * 商品标题
+     */
+    private String title;
 
     /**
      * 商品默认价格

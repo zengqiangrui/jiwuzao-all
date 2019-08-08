@@ -20,6 +20,8 @@ import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.pojo.common.GoodsSpecPojo;
 import com.jiwuzao.common.pojo.goods.GoodsPagePojo;
 import com.jiwuzao.common.vo.goods.*;
+import com.jiwuzao.common.vo.user.AppriseVO;
+import com.jiwuzao.common.vo.user.UserCommentVO;
 import com.kauuze.major.domain.common.EsUtil;
 import com.kauuze.major.domain.common.MongoUtil;
 import com.kauuze.major.domain.mongo.repository.*;
@@ -514,14 +516,38 @@ public class GoodsService {
      * @param comment
      * @return
      */
-    public String addComment(int uid, String goid, String comment) {
-        GoodsOrder order = goodsOrderRepository.findByGoodsOrderNo(goid).get();
-        Comment comment1 = new Comment(null, goid, order.getGid(), uid, comment, System.currentTimeMillis(), false);
+    public String addComment(int uid, String goodsOrderNo, String comment) {
+        GoodsOrder order = goodsOrderRepository.findByGoodsOrderNo(goodsOrderNo).get();
+        if (order == null) {
+            return "没有找到该订单";
+        }
+        Comment old = goodsCommentRepository.findByGoodsOrderNoAndUid(goodsOrderNo, uid);
+        if (old != null)
+            return null;
+        Comment comment1 = new Comment(null, goodsOrderNo, order.getGid(), uid, comment, System.currentTimeMillis(), false);
         goodsCommentRepository.save(comment1);
         return "添加成功";
     }
 
     /**
+     * 删除评论
+     * @param uid
+     * @param comid
+     * @return
+     */
+    public String delComment(int uid, String comid) {
+        Comment comment = goodsCommentRepository.findById(comid).get();
+        if (comment != null) {
+            comment.setDelete(true);
+            goodsCommentRepository.save(comment);
+            return "删除成功";
+        } else {
+            return "删除失败";
+        }
+    }
+
+    /**
+     * 通过店铺获取商品评论列表
      * 获取商品评论列表
      *
      * @param gid
@@ -611,7 +637,8 @@ public class GoodsService {
             if (goods == null) {
                 continue;
             }
-            ViewHistoryVO vo = new ViewHistoryVO(e.getGid(), e.getTime(), goods.getTitle(), goods.getCover());
+            ViewHistoryVO vo = new ViewHistoryVO(e.getId(), e.getGid(), e.getTime(), goods.getTitle(), goods.getCover(), goods.getDefaultPrice());
+            volist.add(vo);
         }
         return volist;
     }
@@ -679,5 +706,41 @@ public class GoodsService {
      */
     public PageDto<GoodsSimpleDto> getGoodsListByPutAway(int uid, Boolean putaway, Pageable pageAble) {
         return getGoodsSimplePage(goodsRepository.findAllByUidAndPutaway(uid,putaway,pageAble));
+    }
+
+    /**
+     * 获取用户点赞列表
+     * @param uid
+     * @return
+     */
+    public List<AppriseVO> getAppriseList(Integer uid) {
+        List<Apprise> list = appriseRepository.findByUid(uid);
+        List<AppriseVO> volist = new ArrayList<>();
+
+        list.forEach(item->{
+            Goods goods = goodsRepository.findByGid(item.getGid());
+            volist.add(new AppriseVO(item.getGid(), goods.getCover(), goods.getTitle(), goods.getDefaultPrice()));
+        });
+        return volist;
+    }
+
+    /**
+     * 通过uid获取用户评论列表
+     * @param uid
+     * @return
+     */
+
+    public List<UserCommentVO> getUserComment(Integer uid) {
+        List<Comment> list = goodsCommentRepository.findByUid(uid);
+        List<UserCommentVO> res = new ArrayList<>();
+        list.forEach((e)->{
+            UserInfo info = userInfoRepository.findByUid(uid);
+            String gid = e.getGid();
+            Goods goods = goodsRepository.findByGid(gid);
+            UserCommentVO vo = new UserCommentVO(e.getGid(), goods.getTitle(), e.getTime(),
+                    goods.getCover(), e.getContent());
+            res.add(vo);
+        });
+        return res;
     }
 }

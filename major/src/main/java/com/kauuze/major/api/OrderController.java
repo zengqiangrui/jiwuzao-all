@@ -1,6 +1,5 @@
 package com.kauuze.major.api;
 
-import com.github.binarywang.wxpay.bean.order.WxPayMwebOrderResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
@@ -10,6 +9,7 @@ import com.jiwuzao.common.dto.order.GoodsOrderSimpleDto;
 import com.jiwuzao.common.include.JsonResult;
 import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.pojo.common.OrderStatusPojo;
+import com.jiwuzao.common.pojo.order.AskServicePojo;
 import com.jiwuzao.common.pojo.order.ComfirmOrderPojo;
 import com.jiwuzao.common.pojo.order.GetOrderPojo;
 import com.jiwuzao.common.pojo.order.OrderPagePojo;
@@ -18,7 +18,6 @@ import com.kauuze.major.config.permission.Merchant;
 import com.kauuze.major.service.AddressService;
 import com.kauuze.major.service.MerchantService;
 import com.kauuze.major.service.OrderService;
-import com.qiniu.util.Json;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -127,6 +126,48 @@ public class OrderController {
     @Authorization
     public JsonResult getOrderDetail(@RequestAttribute int uid, @Valid @RequestBody GetOrderPojo getOrderPojo) {
         GoodsOrderDto result = orderService.getOrderDetail(getOrderPojo.getGoodsOrderNo());
+        if (result == null) {
+            return JsonResult.failure();
+        } else {
+            return JsonResult.success(result);
+        }
+    }
+
+    /**
+     * 催单
+     */
+    @RequestMapping("/hastenOrder")
+    @Authorization
+    public JsonResult hastenOrder(@RequestAttribute int uid, @Valid @RequestBody GetOrderPojo getOrderPojo) {
+        String result = orderService.hastenOrder(uid, getOrderPojo.getGoodsOrderNo());
+        if (result == null) {
+            return JsonResult.failure();
+        } else {
+            return JsonResult.success(result);
+        }
+    }
+
+    /**
+     * 取消订单
+     */
+    @RequestMapping("/cancelOrder")
+    @Authorization
+    public JsonResult cancelOrder(@RequestAttribute int uid, @Valid @RequestBody GetOrderPojo getOrderPojo) {
+        String result = orderService.cancelOrder(uid, getOrderPojo.getGoodsOrderNo());
+        if (result == null) {
+            return JsonResult.failure();
+        } else {
+            return JsonResult.success(result);
+        }
+    }
+
+    /**
+     * 申请售后
+     */
+    @RequestMapping("/askService")
+    @Authorization
+    public JsonResult askService(@RequestAttribute int uid, @Valid @RequestBody AskServicePojo pojo) {
+        String result = orderService.askService(uid, pojo.getGoodsOrderNo(), pojo.getContent());
         if (result == null) {
             return JsonResult.failure();
         } else {

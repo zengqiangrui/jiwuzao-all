@@ -34,6 +34,7 @@ public class Comment {
     /**
      * uid
      */
+    @Indexed
     private Integer uid;
 
     /**

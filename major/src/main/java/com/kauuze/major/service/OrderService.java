@@ -4,6 +4,8 @@ import com.github.binarywang.wxpay.bean.order.WxPayAppOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
+import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
+import com.jiwuzao.common.domain.enumType.OrderExStatusEnum;
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
 import com.jiwuzao.common.domain.enumType.PayChannelEnum;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
@@ -139,7 +141,9 @@ public class OrderService {
                     .setFinalPay(finalPay).setUid(uid).setSid(goods.getSid())
                     .setGid(goods.getGid()).setPayOrderNo(payOrder.getPayOrderNo())
                     .setGsid(e.getSpecId()).setGoodsOrderNo(Rand.createOrderNo());//增加生成orderNo
-            goodsOrderRepository.save(goodsOrder);
+            goodsOrder = goodsOrderRepository.save(goodsOrder);
+            detail.setGoodsOrderNo(goodsOrder.getGoodsOrderNo());
+            goodsOrderDetailRepository.save(detail);
 
             price = price.add(finalPay);
         }
@@ -169,8 +173,7 @@ public class OrderService {
             detail.setReceiverCity(city).setReceiverAddress(address).setReceiverPhone(phone)
                     .setReceiverTrueName(name);
             goodsOrderDetailRepository.save(detail);
-        }
-        ;
+        };
         PayOrder payOrder = payOrderRepository.findByPayOrderNo(payOrderNo);
         if (payOrder.getPrepayId() != null) {
             //为过期订单设置overTime按老的订单建立新的订单,并与goodsorder关联。
@@ -224,7 +227,7 @@ public class OrderService {
      */
     public List<GoodsOrderSimpleDto> getOrderSample(int uid, OrderStatusEnum status) {
         List<GoodsOrder> goodsOrder;
-        if (status == null) {
+        if (status == null){
             goodsOrder = goodsOrderRepository.findByUid(uid);
         } else {
             goodsOrder = goodsOrderRepository.findAllByUidAndOrderStatus(uid, status);
@@ -283,7 +286,8 @@ public class OrderService {
                 .setBuyCount(go.getBuyCount()).setPostage(go.getPostage()).setSpecPrice(go.getSpecPrice())
                 .setFinalPay(go.getFinalPay()).setOrderStatus(go.getOrderStatus())
                 .setCreateTime(go.getCreateTime()).setPayTime(po.getPayTime())
-                .setDeliverTime(go.getDeliverTime()).setTakeTime(go.getTakeTime());
+                .setDeliverTime(go.getDeliverTime()).setTakeTime(go.getTakeTime())
+                .setCancelTime(god.getCancelTime());
         return goodsOrderDto;
     }
 
@@ -414,6 +418,65 @@ public class OrderService {
         page.setTotal(goodsOrderPage.getTotalElements());
         page.setContent(goodsOrderDtos);
         return page;
+    }
+
+    /**
+     * 催单
+     * @param uid
+     * @param goodsOrderNo
+     * @return
+     */
+    public String hastenOrder(int uid, String goodsOrderNo) {
+        // TODO: 19-8-7 通过聊天系统发送催单请求
+        return "发送催单请求";
+    }
+
+    /**
+     * 取消订单
+     * @param uid
+     * @param goodsOrderNo
+     * @return
+     */
+    public String cancelOrder(int uid, String goodsOrderNo) {
+        GoodsOrder order = goodsOrderRepository.findByGoodsOrderNo(goodsOrderNo).get();
+        GoodsOrderDetail detail = goodsOrderDetailRepository.findById(order.getGoodsOrderDetailId()).get();
+
+        if (detail == null || order == null) {
+            return null;
+        }
+
+        order.setOrderStatus(OrderStatusEnum.cancel);
+        detail.setCancelTime(System.currentTimeMillis());
+
+        goodsOrderDetailRepository.save(detail);
+        goodsOrderRepository.save(order);
+        return "取消成功";
+    }
+
+
+    /**
+     * 申请售后
+     * @param uid
+     * @param goodsOrderNo
+     * @return
+     */
+    public String askService(int uid, String goodsOrderNo, String content) {
+        GoodsOrder goodsOrder = goodsOrderRepository.findByGoodsOrderNo(goodsOrderNo).get();
+        GoodsOrderDetail detail = goodsOrderDetailRepository.findById(goodsOrder.getGoodsOrderDetailId()).get();
+
+        if (goodsOrder == null || detail == null){
+            return "订单状态不一致";
+        }
+
+        if (goodsOrder.getOrderExStatus() == OrderExStatusEnum.exception)
+            return "请勿重复申请";
+
+        goodsOrder.setOrderExStatus(OrderExStatusEnum.exception);
+        detail.setComplaint(true).setComplaintTime(System.currentTimeMillis())
+                .setComplaintReasons(content).setComplaintAuditType(AuditTypeEnum.wait);
+        goodsOrderRepository.save(goodsOrder);
+        goodsOrderDetailRepository.save(detail);
+        return "申请成功";
     }
 
 

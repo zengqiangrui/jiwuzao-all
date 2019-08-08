@@ -10,12 +10,11 @@ import com.jiwuzao.common.include.JsonResult;
 import com.jiwuzao.common.include.JsonUtil;
 import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.include.StringUtil;
-import com.jiwuzao.common.pojo.common.CommentPojo;
-import com.jiwuzao.common.pojo.common.GidPojo;
-import com.jiwuzao.common.pojo.common.QuerySpecPojo;
+import com.jiwuzao.common.pojo.common.*;
 import com.jiwuzao.common.pojo.goods.*;
 import com.jiwuzao.common.pojo.store.StorePojo;
 import com.jiwuzao.common.vo.goods.*;
+import com.jiwuzao.common.vo.user.AppriseVO;
 import com.kauuze.major.api.pojo.GetGoodsDetailPojo;
 import com.kauuze.major.config.contain.ParamMismatchException;
 import com.kauuze.major.config.permission.Authorization;
@@ -322,6 +321,20 @@ public class GoodsController {
     @Authorization
     public JsonResult addComment(@RequestAttribute int uid, @Valid @RequestBody CommentPojo pojo) {
         String s = goodsService.addComment(uid, pojo.getGoodsOrderNo(), pojo.getComment());
+        if (s == null) {
+            return JsonResult.failure();
+        } else {
+            return JsonResult.success(s);
+        }
+    }
+
+    /**
+     * 删除商品评论
+     */
+    @RequestMapping("/delComment")
+    @Authorization
+    public JsonResult delComment(@RequestAttribute int uid, @Valid @RequestBody String comid) {
+        String s = goodsService.delComment(uid, comid);
         if (StringUtil.isBlank(s)) {
             return JsonResult.failure();
         } else {
@@ -362,6 +375,19 @@ public class GoodsController {
     }
 
     /**
+     * 获取用户点赞列表
+     */
+    @RequestMapping("/getAppriseList")
+    public JsonResult getAppriseList(@Valid @RequestBody UidPojo pojo) {
+        List<AppriseVO> list= goodsService.getAppriseList(pojo.getUid());
+        if (list != null) {
+            return JsonResult.success(list);
+        } else {
+            return JsonResult.failure("获取失败");
+        }
+    }
+
+    /**
      * 获取浏览记录
      */
     @RequestMapping("getViewHistory")
@@ -369,9 +395,9 @@ public class GoodsController {
     public JsonResult getViewHistory(@RequestAttribute int uid) {
         List<ViewHistoryVO> list = goodsService.getViewHistory(uid);
         if (list.size() == 0) {
-            return JsonResult.success(list);
+            return JsonResult.success("列表为空");
         } else {
-            return JsonResult.failure("获取失败");
+            return JsonResult.success(list);
         }
     }
 
@@ -394,9 +420,9 @@ public class GoodsController {
      */
     @RequestMapping("delViewHistory")
     @Authorization
-    public JsonResult delViewHistory(@RequestAttribute int uid, @Valid @RequestBody GidPojo pojo) {
-        //这个pojo传历史记录id
-        String msg = goodsService.delViewHistory(uid, pojo.getGid());
+    public JsonResult delViewHistory(@RequestAttribute int uid, @Valid @RequestBody VhidPojo pojo) {
+        //这个pojo传历史vhid
+        String msg = goodsService.delViewHistory(uid, pojo.getVhid());
         if (msg != null) {
             return JsonResult.success(msg);
         } else {

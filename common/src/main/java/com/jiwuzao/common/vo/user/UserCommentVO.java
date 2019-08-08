@@ -1,43 +1,33 @@
-package com.jiwuzao.common.vo.goods;
+package com.jiwuzao.common.vo.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.math.BigDecimal;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class ViewHistoryVO {
+public class UserCommentVO {
     /**
-     * vhid
-     */
-    private String vhid;
-    /**
-     * gid
+     * 商品gid
      */
     private String gid;
-
     /**
-     * 浏览时间
+     * 商品名
+     */
+    private String title;
+    /**
+     * 评论时间
      */
     private Long time;
-
-    /**
-     * 商品名称
-     */
-    private String goodsTitle;
-
     /**
      * 商品封面
      */
     private String cover;
-
     /**
-     * 商品默认价格
+     * 评论内容
      */
-    private BigDecimal price;
+    private String content;
 }
