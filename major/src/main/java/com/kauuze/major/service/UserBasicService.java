@@ -1,12 +1,5 @@
 package com.kauuze.major.service;
 
-import com.github.qcloudsms.SmsSingleSender;
-import com.github.qcloudsms.SmsSingleSenderResult;
-import com.github.qcloudsms.httpclient.HTTPException;
-import com.jiwuzao.common.dto.user.FansAndFocusDTO;
-import com.jiwuzao.common.include.yun.QiniuUtil;
-import com.kauuze.major.domain.common.MongoUtil;
-import com.jiwuzao.common.domain.enumType.*;
 import com.jiwuzao.common.domain.enumType.BackRoleEnum;
 import com.jiwuzao.common.domain.enumType.RoleEnum;
 import com.jiwuzao.common.domain.enumType.SexEnum;
@@ -16,6 +9,7 @@ import com.jiwuzao.common.domain.mongo.entity.userBastic.UserInfo;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.UserToken;
 import com.jiwuzao.common.domain.mysql.entity.Sms;
 import com.jiwuzao.common.domain.mysql.entity.User;
+import com.jiwuzao.common.dto.user.FansAndFocusDTO;
 import com.jiwuzao.common.include.yun.QiniuUtil;
 import com.kauuze.major.domain.common.MongoUtil;
 import com.kauuze.major.domain.mongo.repository.StoreRepository;
@@ -382,7 +376,6 @@ public class UserBasicService {
      */
     public void alterPortrait(int uid, String portrait){
         UserInfo userInfo = userInfoRepository.findByUid(uid);
-        userInfo.setPortrait(portrait);
         QiniuUtil.delFilesBatch(userInfo.getPortrait());
         userInfo.setPortrait(portrait);
         userInfoRepository.save(userInfo);
