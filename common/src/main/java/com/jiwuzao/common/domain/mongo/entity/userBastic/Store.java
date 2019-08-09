@@ -9,6 +9,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigDecimal;
+
 /**
  * 店铺只能修改无法删除
  * @author kauuze
@@ -72,4 +74,9 @@ public class Store {
      * 营业执照
      */
     private String businessLicense;
+
+    /**
+     * 店铺可提现金额
+     */
+    private BigDecimal withdrawCash;
 }
