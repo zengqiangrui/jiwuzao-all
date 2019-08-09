@@ -29,5 +29,9 @@ public enum OrderStatusEnum {
     /**
      * 已取消
      */
-    cancel
+    cancel,
+    /**
+     * 已退款
+     */
+    refund
 }

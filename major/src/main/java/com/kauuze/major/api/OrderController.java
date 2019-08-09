@@ -1,5 +1,6 @@
 package com.kauuze.major.api;
 
+import com.github.binarywang.wxpay.bean.result.WxPayRefundResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
@@ -10,7 +11,9 @@ import com.jiwuzao.common.pojo.common.OrderStatusPojo;
 import com.jiwuzao.common.pojo.order.AskServicePojo;
 import com.jiwuzao.common.pojo.order.ComfirmOrderPojo;
 import com.jiwuzao.common.pojo.order.GetOrderPojo;
+import com.kauuze.major.api.pojo.ComfirmRefundPojo;
 import com.kauuze.major.config.permission.Authorization;
+import com.kauuze.major.config.permission.Merchant;
 import com.kauuze.major.service.AddressService;
 import com.kauuze.major.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
@@ -158,6 +161,20 @@ public class OrderController {
     @Authorization
     public JsonResult askService(@RequestAttribute int uid, @Valid @RequestBody AskServicePojo pojo) {
         String result = orderService.askService(uid, pojo.getGoodsOrderNo(), pojo.getContent());
+        if (result == null) {
+            return JsonResult.failure();
+        } else {
+            return JsonResult.success(result);
+        }
+    }
+
+    /**
+     * 商家确认退款
+     */
+    @RequestMapping("comfirmRefund")
+    @Merchant
+    public JsonResult comfirmRefund(@RequestAttribute int uid, @Valid @RequestBody ComfirmRefundPojo pojo) throws WxPayException {
+        WxPayRefundResult result = orderService.comfirmRefund(uid, pojo.getGoid(), pojo.getAmount());
         if (result == null) {
             return JsonResult.failure();
         } else {

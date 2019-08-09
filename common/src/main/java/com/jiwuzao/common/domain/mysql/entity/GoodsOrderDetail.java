@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 /**
  * @author kauuze
@@ -95,6 +96,11 @@ public class GoodsOrderDetail {
      * 退款单号
      */
     private String refundOrderNo;
+
+    /**
+     * 微信退款单号
+     */
+    private String weixinRefundId;
     /**
      * 是否退款：由商家进行退款，取消订单全额退款。
      */
@@ -102,11 +108,11 @@ public class GoodsOrderDetail {
     /**
      * 退款时间
      */
-    private Boolean refundTime;
+    private Long refundTime;
     /**
      * 退款金额
      */
-    private Boolean refundMoney;
+    private BigDecimal refundMoney;
 
     /**
      * 是否投诉

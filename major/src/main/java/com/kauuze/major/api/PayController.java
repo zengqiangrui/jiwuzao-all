@@ -2,6 +2,7 @@ package com.kauuze.major.api;
 
 import com.github.binarywang.wxpay.bean.notify.WxPayNotifyResponse;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
+import com.github.binarywang.wxpay.bean.notify.WxPayRefundNotifyResult;
 import com.github.binarywang.wxpay.bean.order.WxPayAppOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.constant.WxPayConstants;
@@ -10,13 +11,11 @@ import com.github.binarywang.wxpay.service.WxPayService;
 import com.jiwuzao.common.include.Rand;
 import com.kauuze.major.service.PayService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
 
 @RestController
 @RequestMapping("/pay")
@@ -66,8 +65,26 @@ public class PayController {
          * 解析回调的信息，完成进一步
          */
         final WxPayOrderNotifyResult notifyResult = wxPayService.parseOrderNotifyResult(xmlData);
-        log.info("回调信息",notifyResult);
+        log.info("支付回调信息",notifyResult);
         payService.handleNotify(notifyResult);
+        // TODO 根据自己业务场景需要构造返回对象
+        return WxPayNotifyResponse.success("成功");
+    }
+
+    /**
+     *
+     * @param xmlData
+     * @return
+     * @throws WxPayException
+     */
+    @PostMapping("/notify/refundOrder")
+    public String parseRefundNotifyResult(@RequestBody String xmlData) throws WxPayException {
+        /**
+         * 解析回调的信息，完成进一步
+         */
+        final WxPayRefundNotifyResult notifyResult = wxPayService.parseRefundNotifyResult(xmlData);
+        log.info("退款回调信息",notifyResult);
+        payService.handleRefundNotify(notifyResult);
         // TODO 根据自己业务场景需要构造返回对象
         return WxPayNotifyResponse.success("成功");
     }

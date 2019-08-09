@@ -69,6 +69,12 @@ public class PayOrder {
      * 最终实付款
      */
     private BigDecimal finalPay;
+
+    /**
+     * 退款后剩余金额
+     */
+    private BigDecimal afterFee;
+
     /**
      * 订单备注
      */

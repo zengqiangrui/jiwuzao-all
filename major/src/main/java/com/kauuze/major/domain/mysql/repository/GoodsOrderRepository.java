@@ -18,7 +18,7 @@ import java.util.Optional;
 @Repository
 public interface GoodsOrderRepository extends JpaRepository<GoodsOrder,Integer> {
     List<GoodsOrder> findByUid(int uid);
-    List<GoodsOrder> findByPayOrderNo(String pid);
+    List<GoodsOrder> findByPayid(Integer pid);
     Optional<GoodsOrder> findByGoodsOrderNo(String goodsOrderNo);
 
     /**

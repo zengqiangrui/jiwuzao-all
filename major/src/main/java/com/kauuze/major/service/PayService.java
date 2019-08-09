@@ -1,9 +1,12 @@
 package com.kauuze.major.service;
 
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
+import com.github.binarywang.wxpay.bean.notify.WxPayRefundNotifyResult;
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
+import com.jiwuzao.common.domain.mysql.entity.GoodsOrderDetail;
 import com.jiwuzao.common.domain.mysql.entity.PayOrder;
+import com.kauuze.major.domain.mysql.repository.GoodsOrderDetailRepository;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +24,8 @@ public class PayService {
     private PayOrderRepository payOrderRepository;
     @Autowired
     private GoodsOrderRepository goodsOrderRepository;
+    @Autowired
+    private GoodsOrderDetailRepository goodsOrderDetailRepository;
 
     @Transactional(rollbackOn = Exception.class)
     public void handleNotify(WxPayOrderNotifyResult notifyResult) {
@@ -28,6 +33,11 @@ public class PayService {
         String payOrderNo = notifyResult.getOutTradeNo();
         String transactionId = notifyResult.getTransactionId();
         PayOrder payOrder = payOrderRepository.findByPayOrderNo(payOrderNo);
+
+        //判断是否是重复通知
+        if (payOrder.getTransactionId() != null)
+            return;
+
         //判断支付费用是否一致
         if (payOrder.getFinalPay().multiply(BigDecimal.valueOf(100)).intValue()
                 != notifyResult.getTotalFee()) {
@@ -38,11 +48,44 @@ public class PayService {
         payOrder.setPayTime(System.currentTimeMillis());
         payOrderRepository.save(payOrder);
 
-        List<GoodsOrder> list = goodsOrderRepository.findByPayOrderNo(payOrderNo);
+        List<GoodsOrder> list = goodsOrderRepository.findByPayid(payOrder.getId());
         list.forEach(e->{
             e.setOrderStatus(OrderStatusEnum.waitDeliver);
             goodsOrderRepository.save(e);
         });
 
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public void handleRefundNotify(WxPayRefundNotifyResult notifyResult) {
+        log.info(notifyResult.toString());
+        String outRefundNo = notifyResult.getReqInfo().getOutRefundNo();
+        String refundId = notifyResult.getReqInfo().getRefundId();
+        String goodsOrderNo = notifyResult.getReqInfo().getOutTradeNo();
+
+        GoodsOrderDetail detail = goodsOrderDetailRepository.findByRefundOrderNo(refundId).get();
+
+        //判断是否是重复通知
+        if (detail.getWeixinRefundId() != null)
+            return;
+
+        //判断退款费用是否一致
+        if (detail.getRefundMoney().multiply(BigDecimal.valueOf(100)).intValue()
+                != notifyResult.getReqInfo().getRefundFee()) {
+            log.warn("订单金额不一致refundOrderNo：" + detail.getRefundOrderNo());
+            return;
+        }
+
+        PayOrder payOrder = payOrderRepository.findByPayOrderNo(goodsOrderNo);
+        GoodsOrder order = goodsOrderRepository.findByGoodsOrderNo(goodsOrderNo).get();
+        order.setRefundTime(System.currentTimeMillis());
+        order.setOrderStatus(OrderStatusEnum.refund);
+
+        detail.setWeixinRefundId(refundId);
+        BigDecimal fee = payOrder.getAfterFee();
+        payOrder.setAfterFee(fee.subtract(detail.getRefundMoney()));
+
+        goodsOrderDetailRepository.save(detail);
+        payOrderRepository.save(payOrder);
     }
 }

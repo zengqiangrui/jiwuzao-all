@@ -35,9 +35,10 @@ public class GoodsOrder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private Integer uid;//用户id
+    private Integer uid2;//匠人id
     private String sid;//店铺id
     private String gid;//商品id
-    private String payOrderNo;
+    private Integer payid;
     private Integer goodsOrderDetailId;
     private Long createTime;
 
@@ -101,4 +102,9 @@ public class GoodsOrder {
      * 收货时间
      */
     private Long takeTime;
+
+    /**
+     * 退款时间
+     */
+    private Long refundTime;
 }

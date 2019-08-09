@@ -70,7 +70,7 @@ public class OrderServiceTest {
         payOrder.setPayTime(System.currentTimeMillis());
         payOrderRepository.save(payOrder);
 
-        List<GoodsOrder> list = goodsOrderRepository.findByPayOrderNo(pid);
+        List<GoodsOrder> list = goodsOrderRepository.findByPayid(1);
         list.forEach(e->{
             e.setOrderStatus(OrderStatusEnum.waitDeliver);
             goodsOrderRepository.save(e);
