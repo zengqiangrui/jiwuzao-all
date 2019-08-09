@@ -2,7 +2,9 @@ package com.jiwuzao.common.domain.mongo.entity;
 
 
 import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
+import com.jiwuzao.common.domain.enumType.DeliveryTimeEnum;
 import com.jiwuzao.common.domain.enumType.GoodsClassifyEnum;
+import com.jiwuzao.common.domain.enumType.GoodsReturnEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -59,6 +61,11 @@ public class Goods {
      * 默认价格：可排序
      */
     private BigDecimal defaultPrice;
+
+    private GoodsReturnEnum goodsReturn;
+
+    private DeliveryTimeEnum deliveryTime;
+
     /**
      * 邮费
      */
@@ -74,7 +81,7 @@ public class Goods {
     /**
      * 下架时间:72小时可删除
      */
-    private Long soldOutTime;
+    private Long putOffTime;
     /**
      * 商品审核状态
      */

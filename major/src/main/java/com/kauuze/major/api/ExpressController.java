@@ -79,21 +79,6 @@ public class ExpressController {
 
 
     /**
-     * 商家查看店铺所有下单情况
-     *
-     * @param uid  用户id
-     * @param page 分页参数
-     * @return pageDto 分页对象
-     */
-    @Merchant
-    @RequestMapping("/getAllDelivery")
-    public JsonResult getAllDelivery(@RequestAttribute int uid, @Valid @RequestBody OrderPagePojo page) {
-        Store store = checkStoreStatus(uid);
-        PageDto<GoodsOrderDto> pageDto = orderService.findAllOrderByStore(store.getId(), PageRequest.of(page.getCurrentPage(), page.getPageSize(), Sort.by(page.getIsAsc() ? Sort.Direction.ASC : Sort.Direction.DESC, page.getSortBy())));
-        return JsonResult.success(pageDto);
-    }
-
-    /**
      * 商家查看店铺未发货订单情况
      *
      * @param uid
@@ -188,7 +173,7 @@ public class ExpressController {
      * @param uid 用户id
      * @return
      */
-    private Store checkStoreStatus(int uid) {
+    public Store checkStoreStatus(int uid) {
         Store store = merchantService.getMerchantStore(uid);
         if (null == store) {
             throw new StoreException(StoreExceptionEnum.STORE_NOT_FOUND);//未找到店铺

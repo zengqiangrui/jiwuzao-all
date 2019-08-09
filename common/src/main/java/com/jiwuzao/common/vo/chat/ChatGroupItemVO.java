@@ -1,5 +1,6 @@
 package com.jiwuzao.common.vo.chat;
 
+import com.jiwuzao.common.domain.enumType.OnlineStatusEnum;
 import com.jiwuzao.common.domain.enumType.SexEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,6 +19,8 @@ public class ChatGroupItemVO {
     private String avatar;
     
     private String nickName;
+
+    private OnlineStatusEnum onlineStatus;
 
     private SexEnum sex;
     

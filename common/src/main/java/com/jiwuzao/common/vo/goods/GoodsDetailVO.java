@@ -13,6 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 @Accessors(chain = true)
 public class GoodsDetailVO {
+
+    private int uid;
     /**
      * 短视频或图片轮播最多5，分析连接
      */

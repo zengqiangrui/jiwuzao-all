@@ -1,5 +1,6 @@
 package com.jiwuzao.common.pojo.goods;
 
+import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,10 @@ public class GoodsPagePojo {
      * 当前页
      */
     private Integer currentPage = 0;
+
+    private AuditTypeEnum auditType = AuditTypeEnum.wait;
+
+    private Boolean putaway = false;
 
     /**
      * 是否是升序排列，默认是

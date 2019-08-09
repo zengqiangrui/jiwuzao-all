@@ -1,15 +1,15 @@
 package com.kauuze.major;
 
 
+import com.jiwuzao.common.domain.enumType.DeliveryTimeEnum;
 import com.jiwuzao.common.domain.enumType.ExpressEnum;
+import com.jiwuzao.common.domain.enumType.GoodsReturnEnum;
 import com.jiwuzao.common.domain.mongo.entity.Express;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.jiwuzao.common.include.JsonResult;
+import com.jiwuzao.common.include.Rand;
 import com.jiwuzao.common.pojo.goods.GoodsPagePojo;
-import com.kauuze.major.domain.mongo.repository.CategoryRepository;
-import com.kauuze.major.domain.mongo.repository.ChatMessageRepository;
-import com.kauuze.major.domain.mongo.repository.ExpressRepository;
-import com.kauuze.major.domain.mongo.repository.GoodsSpecRepository;
+import com.kauuze.major.domain.mongo.repository.*;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
 import com.kauuze.major.include.StringUtil;
 import com.kauuze.major.include.yun.TencentUtil;
@@ -27,9 +27,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -46,6 +48,8 @@ public class GoodsServiceTest {
     private PayOrderRepository payOrderRepository;
     @Autowired
     private GoodsSpecRepository goodsSpecRepository;
+    @Autowired
+    private GoodsRepository goodsRepository;
     @Autowired
     private TencentUtil tencentUtil;
     @Autowired
@@ -94,6 +98,9 @@ public class GoodsServiceTest {
 
     @Test
     public void show() {
-
+//        List<Goods> all = goodsRepository.findAll();
+//        List<Goods> collect = all.stream().map(res -> res.setDeliveryTime(DeliveryTimeEnum.values()[Rand.getRand(6)]).setGoodsReturn(GoodsReturnEnum.values()[Rand.getRand(2)])).collect(Collectors.toList());
+//        List<Goods> goods = goodsRepository.saveAll(collect);
+//        goods.forEach(System.out::println);
     }
 }

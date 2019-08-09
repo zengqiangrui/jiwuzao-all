@@ -396,8 +396,14 @@ public class OrderService {
         return this.wxPayService.createOrder(req);
     }
 
-    public PageDto<GoodsOrderDto> findAllOrderByStore(String sid, Pageable pageable) {
-        Page<GoodsOrder> goodsOrderPage = goodsOrderRepository.findAllBySid(sid, pageable);
+
+    public PageDto<GoodsOrderDto> findAllOrderByStore(String sid, OrderStatusEnum orderStatusEnum, Pageable pageable) {
+        Page<GoodsOrder> goodsOrderPage;
+        if (orderStatusEnum == null) {
+            goodsOrderPage = goodsOrderRepository.findAllBySid(sid, pageable);
+        } else {
+            goodsOrderPage = goodsOrderRepository.findAllBySidAndOrderStatus(sid, orderStatusEnum, pageable);
+        }
         List<GoodsOrder> goodsOrderList = goodsOrderPage.getContent();
         List<GoodsOrderDto> goodsOrderDtos = new ArrayList<>();
         for (GoodsOrder goodsOrder : goodsOrderList) {
@@ -406,9 +412,9 @@ public class OrderService {
                     .findById(goodsOrder.getGoodsOrderDetailId());
             if (!opt.isPresent()) {
                 throw new RuntimeException("未找到商品详情");
-            }else{
+            } else {
                 //数据拼装
-                GoodsOrderDto goodsOrderDto= createOrderDto(goodsOrder,po,opt.get());
+                GoodsOrderDto goodsOrderDto = createOrderDto(goodsOrder, po, opt.get());
                 goodsOrderDtos.add(goodsOrderDto);
             }
         }
@@ -476,6 +482,8 @@ public class OrderService {
         goodsOrderDetailRepository.save(detail);
         return "申请成功";
     }
+
+
 
     /**
      * 商家确认退款

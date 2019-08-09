@@ -1,6 +1,8 @@
 package com.jiwuzao.common.pojo.goods;
 
+import com.jiwuzao.common.domain.enumType.DeliveryTimeEnum;
 import com.jiwuzao.common.domain.enumType.GoodsClassifyEnum;
+import com.jiwuzao.common.domain.enumType.GoodsReturnEnum;
 import com.jiwuzao.common.include.valid.*;
 import com.jiwuzao.common.pojo.common.GoodsSpecPojo;
 import lombok.AllArgsConstructor;
@@ -28,6 +30,10 @@ public class AddGoodsPojo {
     private String goodsClassDetail;
     @StringMax(max = 40)
     private String title;
+    @NotNull
+    private GoodsReturnEnum goodsReturn;
+    @NotNull
+    private DeliveryTimeEnum deliveryTime;
     @Url
     private String cover;
     @Decimal

@@ -1,7 +1,8 @@
 package com.kauuze.major.service;
 
 import com.jiwuzao.common.domain.enumType.AddressEnum;
-import com.jiwuzao.common.domain.mongo.entity.ReceiverAddress;
+import com.jiwuzao.common.domain.mongo.entity.Address;
+import com.jiwuzao.common.domain.mongo.entity.SenderAddress;
 import com.kauuze.major.domain.mongo.repository.AddressRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,16 +22,16 @@ public class AddressService {
      * 用户增加地址
      *
      * @param uid
-     * @param receiveProvinces
-     * @param receiverAddress
-     * @param receiverPhone
-     * @param receiverTrueName
+     * @param provinces
+     * @param defaultStatus
+     * @param defaultStatus
+     * @param trueName
      * @return
      */
-    public ReceiverAddress addAddress(int uid, String receiveProvinces, String receiverAddress, String receiverPhone, String receiverTrueName, AddressEnum defaultStatus) {
+    public Address addAddress(int uid, String provinces, String addressDetail, String phone, String trueName, AddressEnum defaultStatus) {
         //查询用户所有未被删除的地址
-        List<ReceiverAddress> list = addressRepository.findAllByUidAndAddressStatusIsNot(uid, AddressEnum.DELETE);
-        ReceiverAddress address = new ReceiverAddress(null, uid, receiveProvinces, receiverAddress, receiverPhone, receiverTrueName, null, System.currentTimeMillis(), null);
+        List<Address> list = addressRepository.findAllByUidAndAddressStatusIsNot(uid, AddressEnum.DELETE);
+        Address address = new Address(null, uid, provinces, addressDetail, phone, trueName, null, System.currentTimeMillis(), null);
         if (list.isEmpty()) {
             //如果是初次添加就是添加默认的地址
             address.setAddressStatus(AddressEnum.DEFAULT);
@@ -47,10 +48,10 @@ public class AddressService {
      * @param addressId
      * @return
      */
-    public ReceiverAddress userDelById(String addressId) {
-        Optional<ReceiverAddress> opt = addressRepository.findById(addressId);
+    public Address userDelById(String addressId) {
+        Optional<Address> opt = addressRepository.findById(addressId);
         if (opt.isPresent()) {
-            ReceiverAddress address = opt.get();
+            Address address = opt.get();
             address.setAddressStatus(AddressEnum.DELETE).setUpdateTime(System.currentTimeMillis());
             return addressRepository.save(address);
         } else {
@@ -66,14 +67,14 @@ public class AddressService {
      * @param addressId
      * @return
      */
-    public ReceiverAddress setDefaultAddress(int uid, String addressId) {
+    public Address setDefaultAddress(int uid, String addressId) {
         //查询用户所有未被删除的地址
-        List<ReceiverAddress> list = getAllByUserNotDel(uid);
+        List<Address> list = getAllByUserNotDel(uid);
         if (list.isEmpty()) {
             throw new RuntimeException("没找到地址");
         }
         int reIdx = 0;
-        for (ReceiverAddress address : list) {
+        for (Address address : list) {
             int idx = list.indexOf(address);
             if (address.getId().equals(addressId)) {
                 address.setAddressStatus(AddressEnum.DEFAULT).setUpdateTime(System.currentTimeMillis());
@@ -94,9 +95,8 @@ public class AddressService {
      * @param uid
      * @return
      */
-    public List<ReceiverAddress> getAllByUserNotDel(int uid) {
+    public List<Address> getAllByUserNotDel(int uid) {
         return addressRepository.findAllByUidAndAddressStatusIsNot(uid, AddressEnum.DELETE);
-
     }
 
     /**
@@ -105,9 +105,9 @@ public class AddressService {
      * @param uid
      * @return
      */
-    public List<ReceiverAddress> getAddressByDelault(int uid) {
-        List<ReceiverAddress> list = addressRepository.findAllByUidAndAddressStatus(uid, AddressEnum.DEFAULT);
-        for (ReceiverAddress address : list) {
+    public List<Address> getAddressByDelault(int uid) {
+        List<Address> list = addressRepository.findAllByUidAndAddressStatus(uid, AddressEnum.DEFAULT);
+        for (Address address : list) {
             System.out.println(address);
         }
 
@@ -120,14 +120,14 @@ public class AddressService {
      * @param addressInfo
      * @return
      */
-    public void saveAddress(@RequestAttribute int uid, @RequestBody ReceiverAddress addressInfo) {
-        List<ReceiverAddress> allByUid = addressRepository.findAllByUid(uid);
+    public void saveAddress(@RequestAttribute int uid, @RequestBody Address addressInfo) {
+        List<Address> allByUid = addressRepository.findAllByUid(uid);
 
-        for (ReceiverAddress receiverAddress : allByUid) {
-            System.out.println(receiverAddress);
-            System.out.println(receiverAddress.getId().equals(addressInfo.getId()));;
-            if(receiverAddress.getId().equals(addressInfo.getId())){
-                addressInfo.setCreateTime(receiverAddress.getCreateTime());
+        for (Address address : allByUid) {
+            System.out.println(address);
+            System.out.println(address.getId().equals(addressInfo.getId()));;
+            if(address.getId().equals(addressInfo.getId())){
+                addressInfo.setCreateTime(address.getCreateTime());
                 addressInfo.setUpdateTime(System.currentTimeMillis());
                 addressInfo.setUid(uid);
 

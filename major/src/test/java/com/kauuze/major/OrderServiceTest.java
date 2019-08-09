@@ -79,11 +79,6 @@ public class OrderServiceTest {
 
 
     @Test
-    public void showOrderPage(){
-        orderService.findAllOrderByStore("5d241a0a3e6e8aadf857f2f9", PageRequest.of(0,2)).getContent().forEach(System.out::println);
-    }
-
-    @Test
     public void showExpress(){
         try {
             ExpressResult sf = expressService.getOrderTracesByJson("SF", "1234564", "111");

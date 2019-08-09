@@ -1,5 +1,6 @@
 package com.kauuze.major.domain.mongo.repository;
 
+import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
 import com.jiwuzao.common.domain.enumType.GoodsClassifyEnum;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.sun.org.apache.xpath.internal.operations.Bool;
@@ -11,19 +12,22 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface GoodsRepository extends MongoRepository<Goods,String> {
+public interface GoodsRepository extends MongoRepository<Goods, String> {
     Integer countByUid(int uid);
 
     Goods findByGid(String gid);
 
     List<Goods> findByUid(int uid);
 
-    Page<Goods> findByUid(int uid,Pageable pageable);
+    Page<Goods> findByUid(int uid, Pageable pageable);
 
+    Page<Goods> findAllByUidAndAuditType(int uid, AuditTypeEnum auditType, Pageable pageAble);
 
-    List<Goods> findByClassify(Pageable pageable , GoodsClassifyEnum classify);
+    Page<Goods> findAllByUidAndPutaway(int uid,Boolean putAway,Pageable pageable);
 
-    Page<Goods> findAllBySid(String sid,Pageable pageable);
+    List<Goods> findByClassify(Pageable pageable, GoodsClassifyEnum classify);
+
+    Page<Goods> findAllBySid(String sid, Pageable pageable);
 
     Page<Goods> findAllBySidAndPutaway(String storeId, Boolean putAway, Pageable pageable);
 }
