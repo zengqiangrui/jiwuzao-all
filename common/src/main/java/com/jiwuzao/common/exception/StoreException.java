@@ -6,6 +6,8 @@ import lombok.Getter;
 
 @Getter
 public class StoreException extends RuntimeException {
+
+
     private Integer code;
 
     public StoreException(StoreExceptionEnum storeException){

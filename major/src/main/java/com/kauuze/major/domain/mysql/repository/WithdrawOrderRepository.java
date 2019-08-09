@@ -21,4 +21,5 @@ public interface WithdrawOrderRepository extends JpaRepository<WithdrawOrder,Int
     @Lock(value = LockModeType.PESSIMISTIC_WRITE)
     @Query(value = "select e from WithdrawOrder e where e.id = ?1")
     WithdrawOrder findByIdForUpdate(int id);
+
 }

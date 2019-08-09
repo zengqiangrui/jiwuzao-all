@@ -4,9 +4,13 @@ import lombok.Getter;
 
 @Getter
 public enum StoreExceptionEnum {
-
+    VERIFY_NOT_AGREE(-1,"店铺未获取资质"),
     STORE_NOT_FOUND(1, "店铺信息没找到"),
-    STORE_ILLEGAL(2,"店铺违规");
+    STORE_ILLEGAL(2,"店铺违规"),
+    STORE_OVER_WITHDRAW(3,"店铺当日提现次数已达上限"),
+    STORE_REMIT_SHORTAGE(4,"提现金额不足"),
+    STORE_REMIT_EXCEED(4,"提现金额超过可提现金额")
+    ;
     private Integer code;
 
     private String msg;

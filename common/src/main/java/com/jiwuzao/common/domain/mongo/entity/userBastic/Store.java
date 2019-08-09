@@ -79,4 +79,10 @@ public class Store {
      * 店铺可提现金额
      */
     private BigDecimal withdrawCash;
+
+    /**
+     * 店铺当日已提现次数，每日次数上限可以根据需求设置
+     * 同时需要定时任务处理将其归零
+     */
+    private Integer withdrawNum = 0;
 }

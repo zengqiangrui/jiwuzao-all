@@ -63,7 +63,6 @@ public class GoodsOrderDetail {
      */
     private String receiverAddress;
 
-
     /**
      * 邮编
      */
