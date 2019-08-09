@@ -74,8 +74,8 @@ public class StoreViewService {
 
         List<Goods> list = goodsRepository.findByUid(uid);
         for (Goods goods : list) {
-            goods.setSoldOutTime(System.currentTimeMillis());
-            goods.setPutaway(true);
+            goods.setPutOffTime(System.currentTimeMillis());
+            goods.setPutaway(false);
             goodsRepository.save(goods);
 
         }
