@@ -1,6 +1,7 @@
 package com.kauuze.major.api;
 
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
+import com.jiwuzao.common.domain.mongo.entity.Express;
 import com.jiwuzao.common.domain.mongo.entity.ExpressResult;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
@@ -15,6 +16,7 @@ import com.jiwuzao.common.include.JsonUtil;
 import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.include.StringUtil;
 import com.jiwuzao.common.pojo.common.PagePojo;
+import com.jiwuzao.common.pojo.express.ExpressCategoryPojo;
 import com.jiwuzao.common.pojo.express.ExpressNoPojo;
 import com.jiwuzao.common.pojo.order.ExpressPojo;
 import com.jiwuzao.common.pojo.order.GetOrderPojo;
@@ -165,6 +167,22 @@ public class ExpressController {
         ExpressNotifySendDto expressNotifySendDto = expressService.handleNotify(requestData, dataSign, requestType);
         log.info("expressDto",expressNotifySendDto);
         return JsonUtil.toJsonString(expressNotifySendDto);
+    }
+
+    /**
+     * 获取店铺快递公司列表
+     * @param uid
+     * @return
+     */
+    @RequestMapping("/getExpressCategory")
+    @Merchant
+    public JsonResult getExpressCategory(@RequestAttribute int uid,@Valid @RequestBody ExpressCategoryPojo pojo){
+        if(null ==checkStoreStatus(uid).getId()){
+            return JsonResult.failure("店铺异常");
+        }else {
+            List<Express> expressCategory = expressService.getExpressCategory(pojo.getExpressStatus());
+            return JsonResult.success(expressCategory);
+        }
     }
 
     /**

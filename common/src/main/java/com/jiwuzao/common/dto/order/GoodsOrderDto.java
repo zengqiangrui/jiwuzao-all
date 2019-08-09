@@ -14,6 +14,10 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class GoodsOrderDto {
     /**
+     * 订单号
+     */
+    private String goodsOrderNo;
+    /**
      * 店铺id
      */
     private String sid;

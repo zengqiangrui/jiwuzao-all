@@ -282,7 +282,7 @@ public class OrderService {
      */
     private GoodsOrderDto createOrderDto(GoodsOrder go, PayOrder po, GoodsOrderDetail god) {
         GoodsOrderDto goodsOrderDto = new GoodsOrderDto();
-        goodsOrderDto.setSid(go.getSid()).setGid(go.getGid())
+        goodsOrderDto.setSid(go.getSid()).setGid(go.getGid()).setGoodsOrderNo(go.getGoodsOrderNo())
                 .setExpressNo(god.getExpressNo()).setReceiverCity(god.getReceiverCity())
                 .setReceiverAddress(god.getReceiverAddress()).setReceiverTrueName(god.getReceiverTrueName())
                 .setReceiverPhone(god.getReceiverPhone()).setGoodsTitle(go.getGoodsTitle())

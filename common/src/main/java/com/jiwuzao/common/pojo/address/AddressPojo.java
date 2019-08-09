@@ -1,4 +1,4 @@
-package com.jiwuzao.common.pojo.userBasic;
+package com.jiwuzao.common.pojo.address;
 
 import com.jiwuzao.common.domain.enumType.AddressEnum;
 import com.jiwuzao.common.include.valid.Phone;
@@ -8,13 +8,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.springframework.core.annotation.AliasFor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
 public class AddressPojo {
-    @StringMax
     private String addressId;
     /**
      * 默认收货省-市-区

@@ -1,5 +1,6 @@
 package com.kauuze.major.service;
 
+import com.jiwuzao.common.domain.enumType.ExpressEnum;
 import com.jiwuzao.common.domain.enumType.OrderExStatusEnum;
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
 import com.jiwuzao.common.domain.mongo.entity.Express;
@@ -31,10 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -154,7 +152,7 @@ public class ExpressService {
                     throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
                 } else {
                     GoodsOrder goodsOrder = orderOptional.get();
-                    if (goodsOrder.getOrderStatus() != OrderStatusEnum.waitDeliver || goodsOrder.getOrderExStatus() != OrderExStatusEnum.normal)
+                    if (goodsOrder.getOrderStatus() != OrderStatusEnum.waitDeliver)
                         throw new OrderException(OrderExceptionEnum.EXCEPTION_ORDER);
                     //查找商品库存（规格信息）
                     if (StringUtil.isBlank(goodsOrder.getGsid())) {
@@ -166,13 +164,13 @@ public class ExpressService {
                     }
                     GoodsSpec goodsSpec = specOptional.get();
                     //扣除库存
-                    if (goodsSpec.getSpecInventory() < goodsOrder.getBuyCount()) {
-                        throw new OrderException(OrderExceptionEnum.NOT_ENOUGH_STOCK);
-                    }
                     goodsSpec.setSpecInventory(goodsSpec.getSpecInventory() - goodsOrder.getBuyCount());
                     GoodsSpec save = goodsSpecRepository.save(goodsSpec);
                     if (null == save) {
                         throw new OrderException(OrderExceptionEnum.DEDUCTION_STOCK_ERROR);
+                    }
+                    if (save.getSpecInventory() < 0) {
+                        throw new OrderException(OrderExceptionEnum.NOT_ENOUGH_STOCK);
                     }
                     goodsOrder.setDeliverTime(System.currentTimeMillis())//用户系统处理快递时间
                             .setOrderStatus(OrderStatusEnum.waitReceive);//更改订单状态为待收货
@@ -204,9 +202,10 @@ public class ExpressService {
 
     /**
      * 查询内部的数据库物流订单数据信息
+     *
      * @return
      */
-    public ExpressShowDto getExpressOneByLogistic(String logisticNo){
+    public ExpressShowDto getExpressOneByLogistic(String logisticNo) {
         Optional<ExpressResult> byLogisticCode = resultRepository.findByLogisticCode(logisticNo);
         if (byLogisticCode.isPresent()) {
             ExpressResult expressResult = byLogisticCode.get();
@@ -230,29 +229,37 @@ public class ExpressService {
             log.info("未获取签名信息");
             return notifySendDto.setSuccess(false).setReason("未获取签名信息");
         }
-        if(!"101".equals(requestType)) {
+        if (!"101".equals(requestType)) {
             log.info("不支持的请求类型");
             return notifySendDto.setSuccess(false).setReason("不支持的请求类型");
         }
         ExpressPushPojo expressPushPojo = JsonUtil.parseJsonString(requestData, ExpressPushPojo.class);
-        if (expressPushPojo.getCount() > 0 && !expressPushPojo.getData().isEmpty()){
+        if (expressPushPojo.getCount() > 0 && !expressPushPojo.getData().isEmpty()) {
             for (ExpressPushDataPojo dataPojo : expressPushPojo.getData()) {
                 Optional<ExpressResult> expressResultOptional = resultRepository.findByLogisticCode(dataPojo.getLogisticCode());
-                if(expressResultOptional.isPresent()){
+                if (expressResultOptional.isPresent()) {
                     ExpressResult expressResult = new ExpressResult();
-                    BeanUtils.copyProperties(dataPojo,expressResult);
+                    BeanUtils.copyProperties(dataPojo, expressResult);
                     expressResult.setId(expressResultOptional.get().getId());
                     ExpressResult save = resultRepository.save(expressResult);//更新物流订单信息
-                    log.info("更新物流订单信息:",save);
-                }else {
-                   return notifySendDto.setSuccess(false).setReason("该运单物流跟踪未订阅");
+                    log.info("更新物流订单信息:", save);
+                } else {
+                    return notifySendDto.setSuccess(false).setReason("该运单物流跟踪未订阅");
                 }
             }
             return notifySendDto.setSuccess(true);
-        }else{
+        } else {
             log.info("未接收到轨迹信息");
             return notifySendDto.setSuccess(false).setReason("未接收到轨迹信息");
         }
     }
 
+    /**
+     * 根据公司类型获取所有支持快递公司信息
+     *
+     * @return
+     */
+    public List<Express> getExpressCategory(ExpressEnum expressType) {
+        return expressRepository.findAllByExpressType(expressType);
+    }
 }

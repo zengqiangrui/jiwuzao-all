@@ -2,7 +2,8 @@ package com.kauuze.major.api;
 
 import com.jiwuzao.common.domain.enumType.AddressEnum;
 import com.jiwuzao.common.domain.mongo.entity.Address;
-import com.jiwuzao.common.pojo.userBasic.AddressPojo;
+import com.jiwuzao.common.pojo.address.AddressIdPojo;
+import com.jiwuzao.common.pojo.address.AddressPojo;
 import com.kauuze.major.config.permission.Authorization;
 import com.kauuze.major.config.permission.Merchant;
 import com.kauuze.major.include.JsonResult;
@@ -64,7 +65,7 @@ public class AddressController {
 
     @RequestMapping("/deleteAddress")
     @Authorization
-    public JsonResult deleteAddress(@RequestAttribute int uid, @RequestBody AddressPojo addressPojo) {
+    public JsonResult deleteAddress(@RequestAttribute int uid, @RequestBody AddressIdPojo addressPojo) {
         addressService.userDelById(addressPojo.getAddressId());
         System.out.println("addressId" + addressPojo.getAddressId());
         //如果删除的是缓存中的地址，则返回一个默认地址回去，以显示

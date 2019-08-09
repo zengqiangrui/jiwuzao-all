@@ -48,6 +48,12 @@ public class GoodsOrderDetail {
      * 物流单号
      */
     private String expressNo;
+
+    /**
+     * 是否订阅成功
+     */
+    private Boolean isSubscribe;
+
     /**
      * 收货省市区
      */
@@ -56,6 +62,7 @@ public class GoodsOrderDetail {
      * 收货详细地址
      */
     private String receiverAddress;
+
 
     /**
      * 邮编
