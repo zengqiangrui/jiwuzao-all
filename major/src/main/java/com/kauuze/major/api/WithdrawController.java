@@ -35,10 +35,12 @@ public class WithdrawController {
             return JsonResult.failure();
         }
     }
-//
-//    @RequestMapping("/addWithDraw")
-//    @Merchant
-//    public JsonResult addWithDraw(@RequestAttribute int uid,@Valid @RequestBody WithDrawAddPojo pojo){
-//
-//    }
+
+    @RequestMapping("/addWithDraw")
+    @Merchant
+    public JsonResult addWithDraw(@RequestAttribute int uid,@Valid @RequestBody WithDrawAddPojo pojo){
+
+        //todo
+        return null;
+    }
 }

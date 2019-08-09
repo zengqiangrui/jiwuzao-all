@@ -84,6 +84,9 @@ public class GoodsOrder {
      * 最终实付款
      */
     private BigDecimal finalPay;
+
+    private Boolean remitStatus = false;//商家是否对该订单提现
+
     /**
      * 订单状态
      */

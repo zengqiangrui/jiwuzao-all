@@ -108,6 +108,7 @@ public class WithdrawService {
                 .setBankNo(verifyActor.getBankNo()).setBankTrueName(verifyActor.getBankTrueName()).setOpeningBank(verifyActor.getOpeningBank())
                 .setUid(uid).setRemitMoney(remitMoney).setCreateTime(System.currentTimeMillis())
                 .setRemark(remark);
+
         return withdrawOrderRepository.save(withdrawOrder);
     }
 
