@@ -39,8 +39,7 @@ public class WithdrawController {
     @RequestMapping("/addWithDraw")
     @Merchant
     public JsonResult addWithDraw(@RequestAttribute int uid,@Valid @RequestBody WithDrawAddPojo pojo){
-
-        //todo
+//        withdrawService.merchantCreateCommonWithDraw();
         return null;
     }
 }

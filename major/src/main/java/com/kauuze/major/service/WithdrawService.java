@@ -48,16 +48,16 @@ public class WithdrawService {
      * @return
      */
     public StoreWithdrawVO getWithDraw(String storeId) {
-        //获取订单
+        //获取订单,对订单进行提现
         Store store = checkAndGetStore(storeId);
         List<GoodsOrder> list = goodsOrderRepository.findAllBySidAndOrderStatus(storeId, OrderStatusEnum.finish);
         BigDecimal withdrawAbleCash = store.getWithdrawCash();
         for (GoodsOrder goodsOrder : list) {
             Optional<PayOrder> byId = payOrderRepository.findById(goodsOrder.getPayid());
-            if (byId.isPresent()) {
+            if (byId.isPresent()&&!goodsOrder.getRemitStatus()) {//用户已经支付，订单完成而且没有提现
                 PayOrder payOrder = byId.get();
                 if (null != payOrder.getPayTime() && payOrder.getPayTime() > 0) {
-                    if (System.currentTimeMillis() - payOrder.getPayTime() > 1000 * 60 * 60 * 24 * 15) {//15天内不可提现
+                    if (System.currentTimeMillis() - payOrder.getPayTime() > 1000 * 60 * 60 * 24 * 15) {//用户支付订单15天内不可提现
                         withdrawAbleCash = withdrawAbleCash.add(goodsOrder.getFinalPay().multiply(new BigDecimal(0.8)));
                     }
                 }
@@ -89,7 +89,15 @@ public class WithdrawService {
     }
 
 
-    public WithdrawOrder merchantCreateCommonWithDraw(int uid, String storeId, BigDecimal remitMoney, Long bankNo, OpeningBankEnum openingBank, String remark) {
+    /**
+     * 商家申请提现
+     * @param uid 用户id
+     * @param storeId 店铺id
+     * @param remitMoney 提现金额
+     * @param remark 备注
+     * @return
+     */
+    public WithdrawOrder merchantCreateCommonWithDraw(int uid, String storeId, BigDecimal remitMoney, String remark) {
         if (remitMoney.compareTo(new BigDecimal(1000)) < 0) {//提现金额不足
             throw new StoreException(StoreExceptionEnum.STORE_REMIT_SHORTAGE);
         }
@@ -108,7 +116,6 @@ public class WithdrawService {
                 .setBankNo(verifyActor.getBankNo()).setBankTrueName(verifyActor.getBankTrueName()).setOpeningBank(verifyActor.getOpeningBank())
                 .setUid(uid).setRemitMoney(remitMoney).setCreateTime(System.currentTimeMillis())
                 .setRemark(remark);
-
         return withdrawOrderRepository.save(withdrawOrder);
     }
 

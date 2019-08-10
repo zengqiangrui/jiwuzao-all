@@ -80,6 +80,7 @@ public class GoodsOrder {
      * 运费
      */
     private BigDecimal postage;
+
     /**
      * 最终实付款
      */
