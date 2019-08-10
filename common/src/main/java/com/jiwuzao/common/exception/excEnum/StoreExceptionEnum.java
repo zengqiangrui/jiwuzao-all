@@ -9,7 +9,8 @@ public enum StoreExceptionEnum {
     STORE_ILLEGAL(2,"店铺违规"),
     STORE_OVER_WITHDRAW(3,"店铺当日提现次数已达上限"),
     STORE_REMIT_SHORTAGE(4,"提现金额不足"),
-    STORE_REMIT_EXCEED(4,"提现金额超过可提现金额")
+    STORE_REMIT_EXCEED(5,"提现金额超过可提现金额"),
+    STORE_NO_REMIT(6,"店铺未申请提现")
     ;
     private Integer code;
 

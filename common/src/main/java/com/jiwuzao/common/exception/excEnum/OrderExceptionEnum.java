@@ -11,7 +11,9 @@ public enum OrderExceptionEnum {
     NOT_SUPPORT_EXPRESS_CODE(4, "不支持的快递公司编码"),
     DEDUCTION_STOCK_ERROR(5, "扣库异常"),
     EXCEPTION_ORDER(6,"异常订单"),
-    ORDER_DETAIL_NOT_FOUND(7, "订单信息没有找到")
+    ORDER_DETAIL_NOT_FOUND(7, "订单信息没有找到"),
+    ORDER_PAY_NOT_FIT(8,"支付金额不匹配"),
+    REPEAT_PAY_ORDER(9,"重复支付回调")
     ;
 
     private Integer code;

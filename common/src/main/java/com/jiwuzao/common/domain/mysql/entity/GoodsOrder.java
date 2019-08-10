@@ -22,13 +22,13 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Entity
 @Table(indexes = {
-        @Index(name = "index_goodsOrder_uid",columnList = "uid"),
-        @Index(name = "index_goodsOrder_sid",columnList = "sid"),
-        @Index(name = "index_goodsOrder_gid",columnList = "gid"),
-        @Index(name = "index_goodsOrder_goodsOrderDetailId",columnList = "goodsOrderDetailId",unique = true),
-        @Index(name = "index_goodsOrder_createTime",columnList = "createTime"),
-        @Index(name = "index_goodsOrder_goodsOrderNo",columnList = "goodsOrderNo",unique = true),
-        @Index(name = "index_goodsOrder_orderStatus",columnList = "orderStatus")
+        @Index(name = "index_goodsOrder_uid", columnList = "uid"),
+        @Index(name = "index_goodsOrder_sid", columnList = "sid"),
+        @Index(name = "index_goodsOrder_gid", columnList = "gid"),
+        @Index(name = "index_goodsOrder_goodsOrderDetailId", columnList = "goodsOrderDetailId", unique = true),
+        @Index(name = "index_goodsOrder_createTime", columnList = "createTime"),
+        @Index(name = "index_goodsOrder_goodsOrderNo", columnList = "goodsOrderNo", unique = true),
+        @Index(name = "index_goodsOrder_orderStatus", columnList = "orderStatus")
 })
 public class GoodsOrder {
     @Id
@@ -76,6 +76,7 @@ public class GoodsOrder {
      * 购买数量
      */
     private Integer buyCount;
+
     /**
      * 运费
      */
@@ -86,7 +87,11 @@ public class GoodsOrder {
      */
     private BigDecimal finalPay;
 
-    private Boolean remitStatus = false;//商家是否对该订单提现
+    //该订单可提现金额，（finalPay-postage)*0.8
+    private BigDecimal withdrawal;
+
+    //商家是否可提现，默认不可提现，在成功支付15天后可提现，定时任务实现
+    private Boolean canRemit = false;
 
     /**
      * 订单状态
@@ -111,4 +116,5 @@ public class GoodsOrder {
      * 退款时间
      */
     private Long refundTime;
+
 }

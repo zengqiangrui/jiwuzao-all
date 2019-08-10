@@ -22,4 +22,6 @@ public interface WithdrawOrderRepository extends JpaRepository<WithdrawOrder,Int
     @Query(value = "select e from WithdrawOrder e where e.id = ?1")
     WithdrawOrder findByIdForUpdate(int id);
 
+    List<WithdrawOrder> findAllByWithdrawStatus(WithdrawStatusEnum withdrawStatus);
+
 }

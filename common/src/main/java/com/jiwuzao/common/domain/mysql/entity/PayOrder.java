@@ -36,6 +36,7 @@ public class PayOrder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private Integer uid;
+    private String openid;//微信openid
     /**
      * 创建时间
      */

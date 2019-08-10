@@ -171,7 +171,7 @@ public class OrderService {
     private Object genPayOrder(Integer payid, String city, String address,
                                String phone, String name, String ip) throws WxPayException {
         List<GoodsOrder> list = goodsOrderRepository.findByPayid(payid);
-        String body = new String("极物造-商品支付");
+        String body = "极物造-商品支付";
         for (GoodsOrder e : list) {
             GoodsOrderDetail detail = goodsOrderDetailRepository.findById(e.getGoodsOrderDetailId()).get();
             detail.setReceiverCity(city).setReceiverAddress(address).setReceiverPhone(phone)

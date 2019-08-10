@@ -34,6 +34,7 @@ public class WithdrawOrder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private Integer uid;
+    private String orderId;
     private Long createTime;
 
     /**
