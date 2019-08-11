@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.LockModeType;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author kauuze
@@ -24,4 +25,5 @@ public interface WithdrawOrderRepository extends JpaRepository<WithdrawOrder,Int
 
     List<WithdrawOrder> findAllByWithdrawStatus(WithdrawStatusEnum withdrawStatus);
 
+    Optional<WithdrawOrder> findByStoreIdAndWithdrawStatus(String storeId,WithdrawStatusEnum status);
 }

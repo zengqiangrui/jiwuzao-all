@@ -36,6 +36,7 @@ public interface GoodsOrderRepository extends JpaRepository<GoodsOrder,Integer> 
      * @return list
      */
     List<GoodsOrder> findAllBySidAndOrderStatus(String sid, OrderStatusEnum orderStatus);
+    List<GoodsOrder> findAllBySidAndOrderStatusOrderByCreateTimeAsc(String sid,OrderStatusEnum orderStatus);
 
     /**
      * 查找某店铺所有订单
@@ -61,4 +62,11 @@ public interface GoodsOrderRepository extends JpaRepository<GoodsOrder,Integer> 
      * @return list
      */
     List<GoodsOrder> findAllByUidAndOrderStatus(int uid, OrderStatusEnum orderStatus);
+
+    /**
+     * 根据订单状态查询
+     * @param status
+     * @return
+     */
+    List<GoodsOrder> findAllByOrderStatus(OrderStatusEnum status);
 }

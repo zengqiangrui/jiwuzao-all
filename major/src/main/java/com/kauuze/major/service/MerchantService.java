@@ -156,7 +156,8 @@ public class MerchantService {
      */
     public String getDepositQrCode(int uid, String userIp) {
         SystemGoods systemGoods = systemGoodsRepository.findByName(SystemGoodsNameEnum.deposit);
-        PayOrder payOrder = new PayOrder(null, uid, System.currentTimeMillis(), null, true, false, true, null, systemGoods.getId(), systemGoods.getPrice(), systemGoods.getPrice(), systemGoods.getName().name, null, null, false, null, null);
+        String sid = storeRepository.findByUid(uid).get().getId();
+        PayOrder payOrder = new PayOrder(null, uid, sid, System.currentTimeMillis(), null, true, false, true, null, systemGoods.getId(), systemGoods.getPrice(), systemGoods.getPrice(), systemGoods.getName().name, null, null, false, null, null);
         payOrderRepository.save(payOrder);
         payOrderRepository.save(payOrderRepository.findByIdForUpdate(payOrder.getId()).setPayOrderNo(OrderUtil.getOrderNo(payOrder.getId(), "p")));
         return WxPayUtil.generateWxPayQrCode(systemGoods.getId(), systemGoods.getName().name, payOrder.getPayOrderNo(), payOrder.getFinalPay(), ConfigUtil.payCallBackDomain + PayCallBackUrl.systemGoodsWxNoticeWxQrCode, userIp);
@@ -182,38 +183,12 @@ public class MerchantService {
         }
         User user = userRepository.findByIdForUpdate(uid);
         VerifyActor verifyActor = verifyActorRepository.findByUid(uid);
-        WithdrawOrder withdrawOrder = new WithdrawOrder(null, uid, System.currentTimeMillis(), true, WithdrawStatusEnum.wait, null, user.getDeposit(), verifyActor.getBankNo(), verifyActor.getBankTrueName(), verifyActor.getOpeningBank(), "取出保证金", null, null, null);
+        WithdrawOrder withdrawOrder = new WithdrawOrder(null, uid, opt.get().getId(),System.currentTimeMillis(), true, WithdrawStatusEnum.wait, null, user.getDeposit(), verifyActor.getBankNo(), verifyActor.getBankTrueName(), verifyActor.getOpeningBank(), "取出保证金", null, null, null);
         withdrawOrderRepository.save(withdrawOrder);
         withdrawOrderRepository.save(withdrawOrderRepository.findByIdForUpdate(withdrawOrder.getId()).setWithdrawOrderNo(OrderUtil.getOrderNo(withdrawOrder.getId(), "w")));
         return null;
     }
 
-    /**
-     * 商家提现
-     *
-     * @param uid
-     * @param money
-     * @return
-     */
-    public String withdraw(int uid, BigDecimal money) {
-        User user = userRepository.findByIdForUpdate(uid);
-        if (user.getTodayWithdrawal()) {
-            return "今日已提现";
-        }
-        if (user.getWithdrawal().compareTo(money) < 0) {
-            return "余额不足";
-        }
-        VerifyActor verifyActor = verifyActorRepository.findByUid(uid);
-        if (verifyActor == null || verifyActor.getAuditType() != AuditTypeEnum.agree) {
-            return "操作失败";
-        }
-        user.setWithdrawal(user.getWithdrawal().subtract(money));
-        user.setTodayWithdrawal(true);
-        userRepository.save(user);
-        WithdrawOrder withdrawOrder = new WithdrawOrder(null, uid, System.currentTimeMillis(), false, WithdrawStatusEnum.wait, null, money, verifyActor.getBankNo(), verifyActor.getBankTrueName(), verifyActor.getOpeningBank(), null, null, null, null);
-        withdrawOrderRepository.save(withdrawOrder);
-        return null;
-    }
 
     /**
      * 商户获取店铺信息
@@ -227,6 +202,7 @@ public class MerchantService {
 
     /**
      * 根据店铺风格获取店铺分页信息
+     *
      * @param style
      * @param pageable
      * @return
@@ -241,22 +217,22 @@ public class MerchantService {
                     .setStoreIcon(store.getStoreIcon()).setStoreId(store.getId())
                     .setStoreName(store.getStoreName()).setStyle(store.getStoreStyle())
                     .setDescription(userBasicService.getUserOpenDto(store.getUid()).getPersonalSign());
-                    list.add(storeSimpleVO);
+            list.add(storeSimpleVO);
         }
         pageDto.setContent(list);
         return pageDto;
     }
 
-    public StoreVO getStoreVO(String storeId){
+    public StoreVO getStoreVO(String storeId) {
         StoreVO storeVO = new StoreVO();
         Optional<Store> byId = storeRepository.findById(storeId);
-        if(byId.isPresent()){
+        if (byId.isPresent()) {
             Store store = byId.get();
             UserInfo info = userInfoRepository.findByUid(store.getUid());
             storeVO.setPersonSign(info.getPersonalSign()).setUid(store.getUid())
                     .setStoreBgImg(store.getStoreBgImg()).setStoreIntro(store.getStoreIntro()).setStoreName(store.getStoreName())
                     .setStoreId(storeId).setStoreIcon(store.getStoreIcon());
-        }else {
+        } else {
             throw new RuntimeException("店铺没找到");
         }
         return storeVO;

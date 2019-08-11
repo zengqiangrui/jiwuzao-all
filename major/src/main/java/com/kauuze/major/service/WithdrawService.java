@@ -1,15 +1,14 @@
 package com.kauuze.major.service;
 
-import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
-import com.jiwuzao.common.domain.enumType.OpeningBankEnum;
-import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
-import com.jiwuzao.common.domain.enumType.WithdrawStatusEnum;
+import com.jiwuzao.common.domain.enumType.*;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.VerifyActor;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
 import com.jiwuzao.common.domain.mysql.entity.PayOrder;
 import com.jiwuzao.common.domain.mysql.entity.WithdrawOrder;
+import com.jiwuzao.common.exception.OrderException;
 import com.jiwuzao.common.exception.StoreException;
+import com.jiwuzao.common.exception.excEnum.OrderExceptionEnum;
 import com.jiwuzao.common.exception.excEnum.StoreExceptionEnum;
 import com.jiwuzao.common.vo.store.ManageWithdrawVO;
 import com.jiwuzao.common.vo.store.StoreWithdrawVO;
@@ -19,14 +18,23 @@ import com.kauuze.major.domain.mysql.repository.GoodsOrderDetailRepository;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
 import com.kauuze.major.domain.mysql.repository.WithdrawOrderRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.util.function.SingletonSupplier;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Service
+@EnableScheduling
+@Slf4j
 public class WithdrawService {
 
     @Autowired
@@ -42,6 +50,30 @@ public class WithdrawService {
     @Autowired
     private VerifyActorRepository verifyActorRepository;
 
+    @Scheduled(cron = "0 0 1 * * ?")//每天凌晨1点扫描订单信息
+    public void refreshOrderWithDrawAble() {
+        goodsOrderRepository.saveAll(goodsOrderRepository.findAll().stream()
+                .filter(goodsOrder -> goodsOrder.getOrderStatus() == OrderStatusEnum.finish)
+                .filter(goodsOrder -> goodsOrder.getOrderExStatus() != OrderExStatusEnum.exception)//过滤异常订单
+                .filter(goodsOrder -> {
+                    Optional<PayOrder> opt = payOrderRepository.findById(goodsOrder.getPayid());//过滤订单未支付,或者支付时间不足15天的订单
+                    return opt.isPresent() && opt.get().getPay() && (System.currentTimeMillis() - opt.get().getPayTime() > 15 * 24 * 60 * 60 * 1000);
+                })
+                .map(goodsOrder -> goodsOrder.setCanRemit(true).setWithdrawal(goodsOrder.getFinalPay().subtract(goodsOrder.getPostage()).multiply(new BigDecimal(0.8))))
+                .collect(Collectors.toList()));
+    }
+
+    /**
+     * 每日0点扫描店铺信息，更新提现上限
+     */
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void refreshStore() {
+        storeRepository.saveAll(storeRepository.findAll().stream()
+                .filter(store -> !store.getViolation())
+                .map(store -> store.setWithdrawNum(0))
+                .collect(Collectors.toList()));
+    }
+
     /**
      * 获取店铺可提现金额
      *
@@ -51,16 +83,15 @@ public class WithdrawService {
     public StoreWithdrawVO getWithDraw(String storeId) {
         //获取订单,对订单进行提现
         Store store = checkAndGetStore(storeId);
+        //订单完成可提现
         List<GoodsOrder> list = goodsOrderRepository.findAllBySidAndOrderStatus(storeId, OrderStatusEnum.finish);
         BigDecimal withdrawAbleCash = store.getWithdrawCash();
         for (GoodsOrder goodsOrder : list) {
             Optional<PayOrder> byId = payOrderRepository.findById(goodsOrder.getPayid());
-            if (byId.isPresent()&&goodsOrder.getCanRemit()) {//用户已经支付，订单完成而且可提现
+            if (byId.isPresent() && goodsOrder.getCanRemit()) {//用户已经支付，订单完成而且可提现
                 PayOrder payOrder = byId.get();
                 if (null != payOrder.getPayTime() && payOrder.getPayTime() > 0) {
-                    if (System.currentTimeMillis() - payOrder.getPayTime() > 1000 * 60 * 60 * 24 * 15) {//用户支付订单15天内不可提现
-//                        withdrawAbleCash = withdrawAbleCash.add(goodsOrder.getFinalPay().multiply(new BigDecimal(0.8)));
-                    }
+                    withdrawAbleCash = withdrawAbleCash.add(goodsOrder.getWithdrawal());
                 }
             }
         }
@@ -88,29 +119,64 @@ public class WithdrawService {
         return store;
     }
 
+    /**
+     * 商家根据订单提现
+     *
+     * @param uid
+     * @param goodsOrderNo
+     * @param remark
+     * @return
+     */
+    public WithdrawOrder merchantCreateOrderWithDraw(int uid, String goodsOrderNo, String remark) {
+        VerifyActor actor = verifyActorRepository.findByUid(uid);
+        if (null == actor || actor.getAuditType() != AuditTypeEnum.agree) {
+            throw new RuntimeException("用户认证异常！");
+        }
+        Optional<GoodsOrder> opt = goodsOrderRepository.findByGoodsOrderNo(goodsOrderNo);
+        if (opt.isPresent()) {
+            GoodsOrder goodsOrder = opt.get();
+            if (goodsOrder.getCanRemit()) {
+                WithdrawOrder withdrawOrder = new WithdrawOrder()
+                        .setRemark(remark).setCreateTime(System.currentTimeMillis()).setUid(uid)
+                        .setBankTrueName(actor.getBankTrueName()).setBankNo(actor.getBankNo()).setOpeningBank(actor.getOpeningBank())
+                        .setWithdrawStatus(WithdrawStatusEnum.wait).setStoreId(goodsOrder.getSid())
+                        .setRemitMoney(goodsOrder.getWithdrawal());
+                return withdrawOrderRepository.save(withdrawOrder);
+            } else {
+                throw new OrderException(OrderExceptionEnum.CAN_NOT_REMIT);
+            }
+        } else {
+            throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
+        }
+    }
+
 
     /**
-     * 商家申请提现,本质上针对每一个订单，
+     * 商家根据金额申请提现,本质上针对每一个订单，
      * 有一个可提现金额，用户支付的*0.8
      *
-     * @Author Johnny
-     * @param uid 用户id
-     * @param storeId 店铺id
+     * @param uid        用户id
+     * @param storeId    店铺id
      * @param remitMoney 提现金额
-     * @param remark 备注
+     * @param remark     备注
      * @return 提现申请
      */
     public WithdrawOrder merchantCreateCommonWithDraw(int uid, String storeId, BigDecimal remitMoney, String remark) {
-        if (remitMoney.compareTo(new BigDecimal(1000)) < 0) {//提现金额不足
+        if (remitMoney.compareTo(new BigDecimal(1000)) < 0) {//提现金额不足1000,无法提现
             throw new StoreException(StoreExceptionEnum.STORE_REMIT_SHORTAGE);
         }
+        Optional<WithdrawOrder> opt = withdrawOrderRepository.findByStoreIdAndWithdrawStatus(storeId, WithdrawStatusEnum.wait);
+        if (opt.isPresent()) return null;//如果存在待处理的提现请求，不能继续提现
         Store store = checkAndGetStore(storeId);
+        if (store.getWithdrawNum() > 3) {//一天只能提现3次
+            throw new StoreException(StoreExceptionEnum.STORE_OVER_WITHDRAW);
+        }
         if (remitMoney.compareTo(store.getWithdrawCash()) > 0) {//超出可提现金额
             throw new StoreException(StoreExceptionEnum.STORE_REMIT_EXCEED);
         }
         VerifyActor verifyActor = verifyActorRepository.findByUid(uid);
         if (null == verifyActor) {
-            return null;
+            return null;//非认证的店铺和人员
         }
         if (verifyActor.getAuditType() != AuditTypeEnum.agree) {
             throw new StoreException(StoreExceptionEnum.VERIFY_NOT_AGREE);
@@ -119,31 +185,80 @@ public class WithdrawService {
                 .setBankNo(verifyActor.getBankNo()).setBankTrueName(verifyActor.getBankTrueName()).setOpeningBank(verifyActor.getOpeningBank())
                 .setUid(uid).setRemitMoney(remitMoney).setCreateTime(System.currentTimeMillis())
                 .setRemark(remark);
+        storeRepository.save(store.setWithdrawNum(store.getWithdrawNum() + 1));
+        return withdrawOrderRepository.save(withdrawOrder);
+    }
+
+
+    /**
+     * 获取店铺提现申请列表
+     *
+     * @param withdrawStatus
+     * @return
+     */
+    public List<ManageWithdrawVO> managerShowVO(WithdrawStatusEnum withdrawStatus) {
+        return withdrawOrderRepository.findAllByWithdrawStatus(withdrawStatus).stream().map(withdrawOrder -> {
+            ManageWithdrawVO manageWithdrawVO = new ManageWithdrawVO();
+            BeanUtils.copyProperties(withdrawOrder, manageWithdrawVO);//获取申请提现的信息
+            manageWithdrawVO.setStoreName(checkAndGetStore(withdrawOrder.getStoreId()).getStoreName());//获取店铺名称
+            return manageWithdrawVO;
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * 此为财务人员确认提现的方法
+     *
+     * @param storeId
+     * @param withdrawId
+     */
+    public WithdrawOrder confirmWithDraw(String storeId, Integer withdrawId) {
+        checkAndGetStore(storeId);
+        Optional<WithdrawOrder> optional = withdrawOrderRepository.findById(withdrawId);
+        if (!optional.isPresent())
+            throw new StoreException(StoreExceptionEnum.STORE_NO_REMIT);
+        WithdrawOrder withdrawOrder = optional.get();
+        if (withdrawOrder.getWithdrawStatus() != WithdrawStatusEnum.wait) {
+            throw new RuntimeException("提现请求状态异常");
+        }
+        withdrawOrder.setWithdrawStatus(WithdrawStatusEnum.processing).setProcessingTime(System.currentTimeMillis());//资金提出
         return withdrawOrderRepository.save(withdrawOrder);
     }
 
     /**
-     * 此为财务人员确认提现的方法，
+     * 处理提现是否成功
+     * 成功提现的处理是将已完成的订单按照排序，依次提现处理，有剩余加入最近的一个订单上。
+     *
      * @param storeId
-     * @param withdrawId
+     * @param withDrawId
+     * @return
      */
-    public WithdrawOrder confirmWithDraw(String storeId,Integer withdrawId){
+    public WithdrawOrder handleWithDraw(String storeId, Integer withDrawId, Boolean success, String reason) {
         Store store = checkAndGetStore(storeId);
-        Optional<WithdrawOrder> optional = withdrawOrderRepository.findById(withdrawId);
-        if(!optional.isPresent())
-            throw new StoreException(StoreExceptionEnum.STORE_NO_REMIT);
-        WithdrawOrder withdrawOrder = optional.get();
-        if(withdrawOrder.getWithdrawStatus() != WithdrawStatusEnum.wait){
-            throw new RuntimeException("提现请求状态异常");
+        Optional<WithdrawOrder> opt = withdrawOrderRepository.findById(withDrawId);
+        if (!opt.isPresent())
+            throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
+        WithdrawOrder withdrawOrder = opt.get();
+        if (success) {//处理成功提现
+            BigDecimal remitMoney = withdrawOrder.getRemitMoney();
+            //获取已完成订单按照时间升序排列
+            List<GoodsOrder> list = goodsOrderRepository.findAllBySidAndOrderStatusOrderByCreateTimeAsc(storeId, OrderStatusEnum.finish);
+            for (GoodsOrder goodsOrder : list) {
+                if (goodsOrder.getCanRemit())
+                    if (remitMoney.subtract(goodsOrder.getWithdrawal()).compareTo(BigDecimal.ZERO) > 0) {
+                        remitMoney = remitMoney.subtract(goodsOrder.getWithdrawal());
+                        //订单成功提现并入库
+                        goodsOrderRepository.save(goodsOrder.setWithdrawal(BigDecimal.ZERO).setCanRemit(false));
+                    } else {
+                        GoodsOrder save = goodsOrderRepository.save(goodsOrder.setWithdrawal(goodsOrder.getWithdrawal().subtract(remitMoney)));
+                        log.info("成功提现的最后的订单是:{}", save);
+                        break;
+                    }
+            }
+            return withdrawOrderRepository.save(withdrawOrder.setWithdrawStatus(WithdrawStatusEnum.success).setFinishTime(System.currentTimeMillis()));
+        } else {//处理失败的提现
+            log.info("提现失败的处理");
+            return withdrawOrderRepository.save(withdrawOrder.setWithdrawStatus(WithdrawStatusEnum.failure).setFailureReason(reason).setFinishTime(System.currentTimeMillis()));
         }
-        withdrawOrder.setWithdrawStatus(WithdrawStatusEnum.processing);
-        return withdrawOrderRepository.save(withdrawOrder);
-    }
-
-    public List<ManageWithdrawVO> managerShowVO(WithdrawStatusEnum withdrawStatus){
-        List<WithdrawOrder> list = withdrawOrderRepository.findAllByWithdrawStatus(withdrawStatus);
-//        list.stream().map(withdrawOrder -> {new ManageWithdrawVO()})
-        return null;//todo 提现金额
     }
 
 }

@@ -114,16 +114,6 @@ public class MerchantController {
         }
     }
 
-    @RequestMapping("/withdraw")
-    @Merchant
-    public JsonResult withdraw(@RequestAttribute int uid, @Valid @RequestBody WithdrawPojo withdrawPojo) {
-        String result = merchantService.withdraw(uid, withdrawPojo.getMoney());
-        if (result != null) {
-            return JsonResult.success();
-        } else {
-            return JsonResult.failure();
-        }
-    }
 
     @RequestMapping("/getStorePage")
     public JsonResult getStorePage(@Valid@RequestBody StorePagePojo pagePojo) {

@@ -13,7 +13,12 @@ public enum OrderExceptionEnum {
     EXCEPTION_ORDER(6,"异常订单"),
     ORDER_DETAIL_NOT_FOUND(7, "订单信息没有找到"),
     ORDER_PAY_NOT_FIT(8,"支付金额不匹配"),
-    REPEAT_PAY_ORDER(9,"重复支付回调")
+    REPEAT_PAY_ORDER(9,"重复支付回调"),
+
+    CAN_NOT_REMIT(10,"不可提现"),
+
+
+
     ;
 
     private Integer code;

@@ -51,11 +51,8 @@ public class PayService {
         List<GoodsOrder> list = goodsOrderRepository.findByPayid(payOrder.getId());
         list.forEach(e->{
             e.setOrderStatus(OrderStatusEnum.waitDeliver);
-            //针对订单计算可提现金额，对应到每件商品
-            e.setRemitStatus(false).setWithdrawal(e.getFinalPay().subtract(e.getPostage()).multiply(new BigDecimal(0.8)));
             goodsOrderRepository.save(e);
         });
-
     }
 
     @Transactional(rollbackOn = Exception.class)
