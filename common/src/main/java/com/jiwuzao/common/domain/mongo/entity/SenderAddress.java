@@ -9,6 +9,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+
 /**
  * 寄件地址，用于店铺物流信息跟踪的订阅
  */
@@ -19,6 +22,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 public class SenderAddress {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
 
     private String sid;//店铺id

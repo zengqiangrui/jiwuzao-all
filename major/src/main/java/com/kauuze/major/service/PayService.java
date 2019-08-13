@@ -37,7 +37,7 @@ public class PayService {
         String openId = notifyResult.getOpenid();
         PayOrder payOrder = payOrderRepository.findByPayOrderNo(payOrderNo);
         //判断是否是重复通知
-        if (payOrder.getTransactionId() != null)
+        if (null != payOrder.getTransactionId())
             throw new OrderException(OrderExceptionEnum.REPEAT_PAY_ORDER);
         //判断支付费用是否一致
         if (payOrder.getFinalPay().multiply(BigDecimal.valueOf(100)).intValue()
@@ -46,10 +46,10 @@ public class PayService {
             throw new OrderException(OrderExceptionEnum.ORDER_PAY_NOT_FIT);
         }
         payOrder.setTransactionId(transactionId).setOpenid(openId)
-        .setPayTime(System.currentTimeMillis());
+                .setPayTime(System.currentTimeMillis());
         payOrderRepository.save(payOrder);
         List<GoodsOrder> list = goodsOrderRepository.findByPayid(payOrder.getId());
-        list.forEach(e->{
+        list.forEach(e -> {
             e.setOrderStatus(OrderStatusEnum.waitDeliver);
             goodsOrderRepository.save(e);
         });
@@ -65,7 +65,7 @@ public class PayService {
         GoodsOrderDetail detail = goodsOrderDetailRepository.findByRefundOrderNo(refundId).get();
 
         //判断是否是重复通知
-        if (detail.getWeixinRefundId() != null)
+        if (null != detail.getWeixinRefundId())
             throw new OrderException(OrderExceptionEnum.REPEAT_PAY_ORDER);
 
         //判断退款费用是否一致

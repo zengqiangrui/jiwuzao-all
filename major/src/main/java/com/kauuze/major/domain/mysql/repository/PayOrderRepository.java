@@ -16,7 +16,6 @@ import java.util.List;
  */
 @Repository
 public interface PayOrderRepository extends JpaRepository<PayOrder,Integer>  {
-    List<PayOrder> findByUidAndSystemGoodsId(int uid, String systemGoodsId);
     PayOrder findByPayOrderNo(String payOrderNo);
     List<PayOrder> findByUid(int uid);
 

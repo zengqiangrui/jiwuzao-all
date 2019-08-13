@@ -9,10 +9,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ExpressRepositoryTest {
     @Autowired
     private ExpressRepository expressRepository;
+
 //    @Autowired
 //    private StringRedisTemplate redisTemplate;
 //
@@ -29,6 +30,11 @@ public class ExpressRepositoryTest {
 
         String str = "FEDEX_GJ";
         System.out.println(expressRepository.findByCode(code));
+    }
+
+    @Test
+    public void showT(){
+
     }
 
 }

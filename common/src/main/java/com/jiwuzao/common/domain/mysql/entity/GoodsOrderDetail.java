@@ -48,6 +48,10 @@ public class GoodsOrderDetail {
      * 物流单号
      */
     private String expressNo;
+    /**
+     * 快递公司编码
+     */
+    private String expCode;
 
     /**
      * 是否订阅成功

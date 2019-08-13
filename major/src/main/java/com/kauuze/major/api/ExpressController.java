@@ -61,22 +61,24 @@ public class ExpressController {
     @Merchant
     public JsonResult deliveryGoods(@RequestAttribute int uid, @RequestBody @Valid ExpressPojo express) {
         checkStoreStatus(uid);
-        GoodsOrder goodsOrder = expressService.addExpressOrder(express.getExpCode(), express.getExpNo(), express.getOrderNo());
-        if (goodsOrder != null) {
-            try {
-                /**
-                 * 订阅物流轨迹的推送
-                 */
-                ExpressRequestReturnDto returnDto = expressService.orderTracesSubByJson(express.getExpCode(), express.getExpNo(), express.getOrderNo(), express.getSenderAddressId());
-                if (returnDto.getSuccess())
-                    return JsonResult.success(returnDto);
-                else
-                    return JsonResult.failure(returnDto.getReason());
-            } catch (Exception e) {
-                e.printStackTrace();
+        try {
+            /**
+             * 订阅物流轨迹的推送
+             */
+            ExpressRequestReturnDto returnDto = expressService.orderTracesSubByJson(express.getExpCode(), express.getExpNo(), express.getOrderNo(), express.getAddressId());
+            if (returnDto.getSuccess()) {
+                //订阅成功
+                expressService.addExpressOrder(express.getExpCode(), express.getExpNo(), express.getOrderNo(),true);
+                return JsonResult.success();
+            } else {
+                //订阅失败
+                expressService.addExpressOrder(express.getExpCode(), express.getExpNo(), express.getOrderNo(),false);
+                return JsonResult.failure(returnDto.getReason());
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return JsonResult.failure();
+        return JsonResult.failure("发货失败");
     }
 
 
@@ -123,12 +125,13 @@ public class ExpressController {
 
     /**
      * 根据物流id，获取单一商品订单物流轨迹
+     *
      * @param expressNo
      * @return
      */
     @RequestMapping("/getTraceByExpNo")
     @Authorization
-    public JsonResult getTraceByExpNo(@Valid @RequestBody ExpressNoPojo expressNo){
+    public JsonResult getTraceByExpNo(@Valid @RequestBody ExpressNoPojo expressNo) {
         ExpressShowDto showDto = expressService.getExpressOneByOrder(expressNo.getExpressNo());
         return JsonResult.success(showDto);
     }
@@ -158,28 +161,29 @@ public class ExpressController {
      * @return
      */
     @RequestMapping("/notify")
-    public String getExpressNotify(HttpServletRequest request){
-        log.info("request",request);
+    public String getExpressNotify(HttpServletRequest request) {
+        log.info("request", request);
         Map<String, String[]> parameterMap = request.getParameterMap();
         String requestData = parameterMap.get("RequestData")[0];//{"PushTime":"2019-07-25 16:32:16","EBusinessID":"test1554228","Data":[{"LogisticCode":"1234561","ShipperCode":"SF","Traces":[{"AcceptStation":"顺丰速运已收取快件","AcceptTime":"2019-07-25 16:32:16","Remark":""},{"AcceptStation":"货物已经到达深圳","AcceptTime":"2019-07-25 16:32:162","Remark":""},{"AcceptStation":"货物到达福田保税区网点","AcceptTime":"2019-07-25 16:32:163","Remark":""},{"AcceptStation":"货物已经被张三签收了","AcceptTime":"2019-07-25 16:32:164","Remark":""}],"State":"3","EBusinessID":"test1554228","Success":true,"Reason":"","CallBack":"","EstimatedDeliveryTime":"2019-07-25 16:32:16"}],"Count":"1"}
         String dataSign = parameterMap.get("DataSign")[0];//MjcwOGRmOTEyNTVjYjM5OWEwY2I1Yzc5MjRhODQxOGU=
         String requestType = parameterMap.get("RequestType")[0];//101
         ExpressNotifySendDto expressNotifySendDto = expressService.handleNotify(requestData, dataSign, requestType);
-        log.info("expressDto",expressNotifySendDto);
+        log.info("expressDto", expressNotifySendDto);
         return JsonUtil.toJsonString(expressNotifySendDto);
     }
 
     /**
      * 获取店铺快递公司列表
+     *
      * @param uid
      * @return
      */
     @RequestMapping("/getExpressCategory")
     @Merchant
-    public JsonResult getExpressCategory(@RequestAttribute int uid,@Valid @RequestBody ExpressCategoryPojo pojo){
-        if(null ==checkStoreStatus(uid).getId()){
+    public JsonResult getExpressCategory(@RequestAttribute int uid, @Valid @RequestBody ExpressCategoryPojo pojo) {
+        if (null == checkStoreStatus(uid).getId()) {
             return JsonResult.failure("店铺异常");
-        }else {
+        } else {
             List<Express> expressCategory = expressService.getExpressCategory(pojo.getExpressStatus());
             return JsonResult.success(expressCategory);
         }
@@ -191,7 +195,7 @@ public class ExpressController {
      * @param uid 用户id
      * @return
      */
-    public Store checkStoreStatus(int uid) {
+    private Store checkStoreStatus(int uid) {
         Store store = merchantService.getMerchantStore(uid);
         if (null == store) {
             throw new StoreException(StoreExceptionEnum.STORE_NOT_FOUND);//未找到店铺

@@ -10,6 +10,7 @@ import com.jiwuzao.common.exception.OrderException;
 import com.jiwuzao.common.exception.StoreException;
 import com.jiwuzao.common.exception.excEnum.OrderExceptionEnum;
 import com.jiwuzao.common.exception.excEnum.StoreExceptionEnum;
+import com.jiwuzao.common.include.StringUtil;
 import com.jiwuzao.common.vo.store.ManageWithdrawVO;
 import com.jiwuzao.common.vo.store.StoreWithdrawVO;
 import com.kauuze.major.domain.mongo.repository.StoreRepository;
@@ -18,6 +19,7 @@ import com.kauuze.major.domain.mysql.repository.GoodsOrderDetailRepository;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
 import com.kauuze.major.domain.mysql.repository.WithdrawOrderRepository;
+import com.kauuze.major.include.Rand;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.function.SingletonSupplier;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +38,7 @@ import java.util.stream.Collectors;
 @Service
 @EnableScheduling
 @Slf4j
+@Transactional
 public class WithdrawService {
 
     @Autowired
@@ -61,6 +65,7 @@ public class WithdrawService {
                 })
                 .map(goodsOrder -> goodsOrder.setCanRemit(true).setWithdrawal(goodsOrder.getFinalPay().subtract(goodsOrder.getPostage()).multiply(new BigDecimal(0.8))))
                 .collect(Collectors.toList()));
+
     }
 
     /**
@@ -137,7 +142,7 @@ public class WithdrawService {
             GoodsOrder goodsOrder = opt.get();
             if (goodsOrder.getCanRemit()) {
                 WithdrawOrder withdrawOrder = new WithdrawOrder()
-                        .setRemark(remark).setCreateTime(System.currentTimeMillis()).setUid(uid)
+                        .setRemark(remark).setCreateTime(System.currentTimeMillis()).setUid(uid).setWithdrawOrderNo(Rand.createOrderNo())
                         .setBankTrueName(actor.getBankTrueName()).setBankNo(actor.getBankNo()).setOpeningBank(actor.getOpeningBank())
                         .setWithdrawStatus(WithdrawStatusEnum.wait).setStoreId(goodsOrder.getSid())
                         .setRemitMoney(goodsOrder.getWithdrawal());
@@ -181,7 +186,7 @@ public class WithdrawService {
         if (verifyActor.getAuditType() != AuditTypeEnum.agree) {
             throw new StoreException(StoreExceptionEnum.VERIFY_NOT_AGREE);
         }
-        WithdrawOrder withdrawOrder = new WithdrawOrder().setWithdrawStatus(WithdrawStatusEnum.wait)
+        WithdrawOrder withdrawOrder = new WithdrawOrder().setWithdrawStatus(WithdrawStatusEnum.wait).setWithdrawOrderNo(Rand.createOrderNo())
                 .setBankNo(verifyActor.getBankNo()).setBankTrueName(verifyActor.getBankTrueName()).setOpeningBank(verifyActor.getOpeningBank())
                 .setUid(uid).setRemitMoney(remitMoney).setCreateTime(System.currentTimeMillis())
                 .setRemark(remark);

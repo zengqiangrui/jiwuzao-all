@@ -16,7 +16,8 @@ public enum OrderExceptionEnum {
     REPEAT_PAY_ORDER(9,"重复支付回调"),
 
     CAN_NOT_REMIT(10,"不可提现"),
-
+    NOT_PAID(11,"未支付"),
+    DELIVER_FAIL(12,"发货失败")
 
 
     ;

@@ -19,6 +19,8 @@ import com.jiwuzao.common.domain.mysql.entity.PayOrder;
 import com.jiwuzao.common.dto.order.GoodsOrderDto;
 import com.jiwuzao.common.dto.order.GoodsOrderSimpleDto;
 import com.jiwuzao.common.dto.order.UserGoodsOrderDto;
+import com.jiwuzao.common.exception.OrderException;
+import com.jiwuzao.common.exception.excEnum.OrderExceptionEnum;
 import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.pojo.shopcart.AddItemPojo;
 import com.kauuze.major.domain.mongo.repository.GoodsRepository;
@@ -126,6 +128,7 @@ public class OrderService {
                 .setCreateTime(System.currentTimeMillis()).setOvertime(false)
                 .setSystemGoods(false).setQrCode(false).setUid(uid);
         payOrder = payOrderRepository.save(payOrder);
+        log.info("payorder:{}",payOrder);
         //遍历购买列表， 为每件物品生成goodsOrder,将所有费用相加放入payOrder
         for (AddItemPojo e : itemList) {
             Goods goods = goodsRepository.findByGid(e.getGid());
@@ -217,7 +220,6 @@ public class OrderService {
         List<GoodsOrder> list = goodsOrderRepository.findByPayid(payOrder.getId());
         list.forEach(e -> {
             e.setPayid(newOrder.getId());
-
             goodsOrderRepository.save(e);
         });
         return newOrder;
@@ -407,7 +409,11 @@ public class OrderService {
         List<GoodsOrder> goodsOrderList = goodsOrderPage.getContent();
         List<GoodsOrderDto> goodsOrderDtos = new ArrayList<>();
         for (GoodsOrder goodsOrder : goodsOrderList) {
-            PayOrder po = payOrderRepository.findByPayOrderNo(goodsOrder.getGoodsOrderNo());
+            Optional<PayOrder> optional = payOrderRepository.findById(goodsOrder.getPayid());
+            if(!optional.isPresent()){
+                throw new OrderException(OrderExceptionEnum.NOT_PAID);
+            }
+            PayOrder po = optional.get();
             Optional<GoodsOrderDetail> opt = goodsOrderDetailRepository
                     .findById(goodsOrder.getGoodsOrderDetailId());
             if (!opt.isPresent()) {

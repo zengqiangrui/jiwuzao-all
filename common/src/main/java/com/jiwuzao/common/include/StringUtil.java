@@ -62,8 +62,10 @@ public class StringUtil {
         return str;
     }
 
+
+
     public static String getUrn(String uri) {
-        return uri.substring(uri.lastIndexOf("/") + 1, uri.length());
+        return uri.substring(uri.lastIndexOf("/") + 1);
     }
 
 }

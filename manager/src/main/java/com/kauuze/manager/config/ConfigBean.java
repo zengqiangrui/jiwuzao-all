@@ -4,6 +4,7 @@ package com.kauuze.manager.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.mongodb.MongoClientOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -33,5 +34,14 @@ public class ConfigBean implements WebMvcConfigurer {
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         return objectMapper;
+    }
+
+    @Bean
+    public MongoClientOptions mongoOptions() {
+        return MongoClientOptions
+                .builder()
+                .maxConnectionIdleTime(60000)
+                //todo mogoDb连接配置与优化
+                .build();
     }
 }

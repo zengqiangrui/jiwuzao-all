@@ -98,4 +98,5 @@ public class Rand {
         int ran = (int) (RANDOM.nextDouble() * (99999 - 10000 + 1)) + 10000;// 获取5位随机数
         return str + ran;
     }
+
 }

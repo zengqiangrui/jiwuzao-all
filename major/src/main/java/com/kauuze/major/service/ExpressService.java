@@ -3,10 +3,7 @@ package com.kauuze.major.service;
 import com.jiwuzao.common.domain.enumType.ExpressEnum;
 import com.jiwuzao.common.domain.enumType.OrderExStatusEnum;
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
-import com.jiwuzao.common.domain.mongo.entity.Express;
-import com.jiwuzao.common.domain.mongo.entity.ExpressResult;
-import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
-import com.jiwuzao.common.domain.mongo.entity.SenderAddress;
+import com.jiwuzao.common.domain.mongo.entity.*;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrderDetail;
 import com.jiwuzao.common.dto.express.*;
@@ -18,10 +15,7 @@ import com.jiwuzao.common.include.yun.KdniaoUtil;
 import com.jiwuzao.common.pojo.express.ExpressPushDataPojo;
 import com.jiwuzao.common.pojo.express.ExpressPushPojo;
 import com.kauuze.major.config.contain.properties.KdniaoProperties;
-import com.kauuze.major.domain.mongo.repository.ExpressRepository;
-import com.kauuze.major.domain.mongo.repository.ExpressResultRepository;
-import com.kauuze.major.domain.mongo.repository.GoodsSpecRepository;
-import com.kauuze.major.domain.mongo.repository.SenderAddressRepository;
+import com.kauuze.major.domain.mongo.repository.*;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderDetailRepository;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import com.qiniu.util.Json;
@@ -29,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,7 +47,7 @@ public class ExpressService {
     @Autowired
     private ExpressResultRepository resultRepository;
     @Autowired
-    private SenderAddressRepository senderAddressRepository;
+    private AddressRepository addressRepository;
 
     /**
      * Json方式 查询订单物流轨迹
@@ -76,6 +71,7 @@ public class ExpressService {
         Optional<ExpressResult> byOrderCode = resultRepository.findByOrderCode(orderCode);
         ExpressResult expressResult = byOrderCode.orElse(new ExpressResult());
         BeanUtils.copyProperties(expressResultDto, expressResult);
+        log.info("快递物流信息expressResult", expressResult);
         //保存或更新快递信息
         return resultRepository.save(expressResult);
     }
@@ -89,7 +85,7 @@ public class ExpressService {
      * @return
      * @throws Exception
      */
-    public ExpressRequestReturnDto orderTracesSubByJson(String expCode, String expNo, String orderCode, String senderAddressId) throws Exception {
+    public ExpressRequestReturnDto orderTracesSubByJson(String expCode, String expNo, String orderCode, String addressId) throws Exception {
         Optional<GoodsOrderDetail> byGoodsOrderNo = goodsOrderDetailRepository.findByGoodsOrderNo(orderCode);//查找订单详情
         if (!byGoodsOrderNo.isPresent()) {
             throw new OrderException(OrderExceptionEnum.ORDER_DETAIL_NOT_FOUND);
@@ -99,13 +95,14 @@ public class ExpressService {
         ExpressUserDto expressUserDto = new ExpressUserDto().
                 setProvinceName(provinces[0]).setCityName(provinces[1]).setExpAreaName(provinces[2]).setAddress(goodsOrderDetail.getReceiverAddress())
                 .setMobile(goodsOrderDetail.getReceiverPhone()).setName(goodsOrderDetail.getReceiverTrueName());
-        Optional<SenderAddress> addressOptional = senderAddressRepository.findById(senderAddressId);
+        Optional<Address> addressOptional = addressRepository.findById(addressId);
         if (!addressOptional.isPresent()) {
             throw new RuntimeException("寄件人务必完善地址信息");
         }
-        SenderAddress senderAddress = addressOptional.get();
-        ExpressUserDto sender = new ExpressUserDto().setProvinceName(senderAddress.getProvince()).setCityName(senderAddress.getCity()).setExpAreaName(senderAddress.getArea())
-                .setName(senderAddress.getName()).setPostCode(senderAddress.getPostCode()).setMobile(senderAddress.getPhone()).setTel(senderAddress.getTel());
+        Address address = addressOptional.get();
+        String[] split = address.getProvinces().split("-");
+        ExpressUserDto sender = new ExpressUserDto().setProvinceName(split[0]).setCityName(split[1]).setExpAreaName(split[2]).setAddress(address.getAddressDetail())
+                .setName(address.getTrueName()).setMobile(address.getPhone()).setTel(address.getPhone());//电话还是暂定手机号
         ExpressRequestDataDto requestDataDto = new ExpressRequestDataDto()
                 .setShipperCode(expCode).setLogisticCode(expNo).setReceiver(expressUserDto).setSender(sender);
         String requestData = JsonUtil.toJsonString(requestDataDto);
@@ -139,48 +136,74 @@ public class ExpressService {
      * @param expNo
      * @return
      */
-    public GoodsOrder addExpressOrder(String expCode, String expNo, String orderNo) {
+    public GoodsOrder addExpressOrder(String expCode, String expNo, String orderNo, Boolean isSub) {
         Optional<Express> code = expressRepository.findByCode(expCode);
         if (!code.isPresent()) {
             throw new OrderException(OrderExceptionEnum.NOT_SUPPORT_EXPRESS_CODE);
         }
         try {
-            //首先查询物流信息是否追踪到
-            if (getOrderTracesByJson(expCode, expNo, orderNo).getSuccess()) {
-                Optional<GoodsOrder> orderOptional = goodsOrderRepository.findByGoodsOrderNo(orderNo);
-                if (!orderOptional.isPresent()) {
-                    throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
-                } else {
-                    GoodsOrder goodsOrder = orderOptional.get();
-                    if (goodsOrder.getOrderStatus() != OrderStatusEnum.waitDeliver)
-                        throw new OrderException(OrderExceptionEnum.EXCEPTION_ORDER);
-                    //查找商品库存（规格信息）
-                    if (StringUtil.isBlank(goodsOrder.getGsid())) {
-                        throw new OrderException(OrderExceptionEnum.SPEC_NOT_FOUND);//规格信息没有找到
+            Optional<GoodsOrderDetail> byGoodsOrderNo = goodsOrderDetailRepository.findByGoodsOrderNo(orderNo);
+            if (!byGoodsOrderNo.isPresent()) {
+                throw new OrderException(OrderExceptionEnum.DELIVER_FAIL);
+            } else {
+                GoodsOrderDetail goodsOrderDetail = byGoodsOrderNo.get();
+                goodsOrderDetail.setExpressNo(expNo).setExpCode(expCode);
+                if (!isSub) {//先处理订阅失败
+                    //首先查询物流信息是否追踪到
+                    if (getOrderTracesByJson(expCode, expNo, orderNo).getSuccess()) {
+                        goodsOrderDetailRepository.save(goodsOrderDetail.setIsSubscribe(false));
+                        return createDeliver(orderNo);
+                    } else {
+                        //未找到信息则发货失败
+                        throw new OrderException(OrderExceptionEnum.DELIVER_FAIL);
                     }
-                    Optional<GoodsSpec> specOptional = goodsSpecRepository.findById(goodsOrder.getGsid());
-                    if (!specOptional.isPresent()) {
-                        throw new OrderException(OrderExceptionEnum.SPEC_NOT_FOUND);
-                    }
-                    GoodsSpec goodsSpec = specOptional.get();
-                    //扣除库存
-                    goodsSpec.setSpecInventory(goodsSpec.getSpecInventory() - goodsOrder.getBuyCount());
-                    GoodsSpec save = goodsSpecRepository.save(goodsSpec);
-                    if (null == save) {
-                        throw new OrderException(OrderExceptionEnum.DEDUCTION_STOCK_ERROR);
-                    }
-                    if (save.getSpecInventory() < 0) {
-                        throw new OrderException(OrderExceptionEnum.NOT_ENOUGH_STOCK);
-                    }
-                    goodsOrder.setDeliverTime(System.currentTimeMillis())//用户系统处理快递时间
-                            .setOrderStatus(OrderStatusEnum.waitReceive);//更改订单状态为待收货
-                    return goodsOrderRepository.save(goodsOrder);
+                } else {//订阅成功
+                    goodsOrderDetailRepository.save(goodsOrderDetail.setIsSubscribe(true));
+                    return createDeliver(orderNo);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * 生成发货订单
+     *
+     * @param orderNo
+     * @return
+     */
+    private GoodsOrder createDeliver(String orderNo) {
+        Optional<GoodsOrder> orderOptional = goodsOrderRepository.findByGoodsOrderNo(orderNo);
+        if (!orderOptional.isPresent()) {
+            throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
+        } else {
+            GoodsOrder goodsOrder = orderOptional.get();
+            if (goodsOrder.getOrderStatus() != OrderStatusEnum.waitDeliver)
+                throw new OrderException(OrderExceptionEnum.EXCEPTION_ORDER);
+            //查找商品库存（规格信息）
+            if (StringUtil.isBlank(goodsOrder.getGsid())) {
+                throw new OrderException(OrderExceptionEnum.SPEC_NOT_FOUND);//规格信息没有找到
+            }
+            Optional<GoodsSpec> specOptional = goodsSpecRepository.findById(goodsOrder.getGsid());
+            if (!specOptional.isPresent()) {
+                throw new OrderException(OrderExceptionEnum.SPEC_NOT_FOUND);
+            }
+            GoodsSpec goodsSpec = specOptional.get();
+            //扣除库存
+            goodsSpec.setSpecInventory(goodsSpec.getSpecInventory() - goodsOrder.getBuyCount());
+            GoodsSpec save = goodsSpecRepository.save(goodsSpec);
+            if (null == save) {
+                throw new OrderException(OrderExceptionEnum.DEDUCTION_STOCK_ERROR);
+            }
+            if (save.getSpecInventory() < 0) {
+                throw new OrderException(OrderExceptionEnum.NOT_ENOUGH_STOCK);
+            }
+            goodsOrder.setDeliverTime(System.currentTimeMillis())//用户系统处理快递时间
+                    .setOrderStatus(OrderStatusEnum.waitReceive);//更改订单状态为待收货
+            return goodsOrderRepository.save(goodsOrder);
+        }
     }
 
 
@@ -191,12 +214,12 @@ public class ExpressService {
      * @return
      */
     public ExpressShowDto getExpressOneByOrder(String goodsOrderNo) {
-        Optional<ExpressResult> byOrderCode = resultRepository.findByOrderCode(goodsOrderNo);
-        if (byOrderCode.isPresent()) {
-            ExpressResult expressResult = byOrderCode.get();
-            return new ExpressShowDto().setExpNo(expressResult.getLogisticCode()).setOrderNo(expressResult.getOrderCode()).setTraces(expressResult.getTraces());
+        Optional<GoodsOrderDetail> optional = goodsOrderDetailRepository.findByGoodsOrderNo(goodsOrderNo);
+        if (!optional.isPresent()) {
+            throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
         } else {
-            throw new RuntimeException("物流信息未找到");
+            GoodsOrderDetail goodsOrderDetail = optional.get();
+            return getExpressOneByLogistic(goodsOrderDetail.getExpressNo());
         }
     }
 

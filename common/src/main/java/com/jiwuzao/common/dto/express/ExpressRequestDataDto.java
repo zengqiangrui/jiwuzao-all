@@ -18,6 +18,12 @@ public class ExpressRequestDataDto {
     private String shipperCode;//快递公司编码
     @JsonProperty("LogisticCode")
     private String logisticCode;//快递单号
+    @JsonProperty("PayType")
+    private String payType = "1";//支付类型
+    @JsonProperty("ExpType")
+    private String expType;//快递类型
+
+
     @JsonProperty("Receiver")
     private ExpressUserDto receiver;//收件人信息
     @JsonProperty("Sender")
