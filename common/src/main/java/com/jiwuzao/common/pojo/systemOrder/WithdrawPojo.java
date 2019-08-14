@@ -1,6 +1,7 @@
 package com.jiwuzao.common.pojo.systemOrder;
 
 import com.jiwuzao.common.include.valid.Decimal;
+import com.jiwuzao.common.include.valid.StringMax;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class WithdrawPojo {
-    @Decimal
-    private BigDecimal money;
+    @StringMax//店铺id
+    private String storeId;
+
 }

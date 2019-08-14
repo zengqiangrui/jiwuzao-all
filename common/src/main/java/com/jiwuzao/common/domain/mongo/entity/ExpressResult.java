@@ -34,7 +34,7 @@ public class ExpressResult {
     private String shipperCode;
 
     /**
-     * 订单编号，非必须
+     * 订单编号，非必须，关联本地codeNo
      */
     private String orderCode;
 

@@ -340,6 +340,16 @@ public class UserBasicService {
         return new StateModel("success", userTokenUp.getAccessToken());
     }
 
+    public boolean checkPwd(int uid ,String pwd){
+        UserToken userToken = userTokenRepository.findByUid(uid);
+        if (TokenUtil.isBan(userToken)) {
+            //用户被封禁
+            return false;
+        }
+        User user = userRepository.findById(uid);
+        return StringUtil.isEq(user.getPwd(), SHA256.encryptAddSalt(pwd, user.getPwdSalt()));
+    }
+
     /**
      * 修改密码:0--未注册,2--验证码错误,3--与原密码一致,1--修改成功
      *

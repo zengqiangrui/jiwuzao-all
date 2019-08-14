@@ -10,6 +10,8 @@ import com.jiwuzao.common.domain.mongo.entity.userBastic.VerifyActor;
 import com.jiwuzao.common.domain.mysql.entity.PayOrder;
 import com.jiwuzao.common.domain.mysql.entity.User;
 import com.jiwuzao.common.domain.mysql.entity.WithdrawOrder;
+import com.jiwuzao.common.exception.StoreException;
+import com.jiwuzao.common.exception.excEnum.StoreExceptionEnum;
 import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.vo.store.StoreSimpleVO;
 import com.jiwuzao.common.vo.store.StoreVO;
@@ -197,8 +199,14 @@ public class MerchantService {
      * @return
      */
     public Store getMerchantStore(int uid) {
-        return storeRepository.findByUid(uid).orElse(null);
+        Optional<Store> byUid = storeRepository.findByUid(uid);
+        if (byUid.isPresent()){
+            return byUid.get();
+        }else {
+            throw new StoreException(StoreExceptionEnum.STORE_NOT_FOUND);
+        }
     }
+
 
     /**
      * 根据店铺风格获取店铺分页信息

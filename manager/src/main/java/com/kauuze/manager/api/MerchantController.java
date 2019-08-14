@@ -67,4 +67,6 @@ public class MerchantController {
             return JsonResult.failure(result);
         }
     }
+
+
 }

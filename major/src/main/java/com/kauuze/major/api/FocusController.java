@@ -1,11 +1,13 @@
 package com.kauuze.major.api;
 
 import com.jiwuzao.common.domain.mongo.entity.Focus;
+import com.jiwuzao.common.domain.mysql.entity.User;
 import com.jiwuzao.common.include.JsonResult;
 import com.jiwuzao.common.pojo.common.UidPojo;
 import com.jiwuzao.common.vo.user.FocusVO;
 import com.kauuze.major.config.permission.Authorization;
 import com.kauuze.major.service.FocusService;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,6 +45,7 @@ public class FocusController {
             return JsonResult.failure();
         }
     }
+
 
     @RequestMapping("/get")
     @Authorization

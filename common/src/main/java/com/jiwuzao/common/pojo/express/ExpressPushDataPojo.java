@@ -24,6 +24,14 @@ public class ExpressPushDataPojo {
     @JsonProperty("Traces")
     private List<ExpressTraceDto> traces;
 
+    /**
+     * 物 流 状 态 ：
+     * 0-无 轨 迹
+     * 1-已揽收
+     * 2-在途中
+     * 3-签收
+     * 4-问题件
+     */
     @JsonProperty("State")
     private String state;
 

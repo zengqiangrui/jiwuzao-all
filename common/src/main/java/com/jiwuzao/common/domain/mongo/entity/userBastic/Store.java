@@ -78,7 +78,7 @@ public class Store {
     /**
      * 店铺可提现金额
      */
-    private BigDecimal withdrawCash;
+    private BigDecimal withdrawCash = BigDecimal.ZERO;
 
     /**
      * 店铺当日已提现次数，每日次数上限可以根据需求设置

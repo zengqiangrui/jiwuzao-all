@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  * @email 3412879785@qq.com
  * @time 2019-04-20 20:14
  */
-@Target({ElementType.METHOD})
+@Target({ElementType.METHOD,ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Merchant {
 }

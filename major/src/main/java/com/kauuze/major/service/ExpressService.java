@@ -259,16 +259,19 @@ public class ExpressService {
         ExpressPushPojo expressPushPojo = JsonUtil.parseJsonString(requestData, ExpressPushPojo.class);
         if (expressPushPojo.getCount() > 0 && !expressPushPojo.getData().isEmpty()) {
             for (ExpressPushDataPojo dataPojo : expressPushPojo.getData()) {
+                Optional<GoodsOrderDetail> goodsOrderDetail = goodsOrderDetailRepository.findByExpressNo(dataPojo.getLogisticCode()).filter(GoodsOrderDetail::getIsSubscribe);
+                if (!goodsOrderDetail.isPresent() || !goodsOrderDetail.get().getIsSubscribe()) continue;
                 Optional<ExpressResult> expressResultOptional = resultRepository.findByLogisticCode(dataPojo.getLogisticCode());
-                if (expressResultOptional.isPresent()) {
-                    ExpressResult expressResult = new ExpressResult();
+                ExpressResult expressResult = new ExpressResult();
+                if (!expressResultOptional.isPresent()) {
                     BeanUtils.copyProperties(dataPojo, expressResult);
-                    expressResult.setId(expressResultOptional.get().getId());
-                    ExpressResult save = resultRepository.save(expressResult);//更新物流订单信息
-                    log.info("更新物流订单信息:", save);
-                } else {
-                    return notifySendDto.setSuccess(false).setReason("该运单物流跟踪未订阅");
+                }else{
+                    expressResult = expressResultOptional.get();
+                    BeanUtils.copyProperties(dataPojo, expressResult,"id");
                 }
+                ExpressResult save = resultRepository.save(expressResult);//更新物流订单信息
+                if(userReceiveGoods(save))//判断用户是否收货
+                    log.info("用户成功收货:{}",save);
             }
             return notifySendDto.setSuccess(true);
         } else {
@@ -276,6 +279,37 @@ public class ExpressService {
             return notifySendDto.setSuccess(false).setReason("未接收到轨迹信息");
         }
     }
+
+    /**
+     * 处理用户签收信息
+     *
+     * @param result
+     * @return
+     */
+    private Boolean userReceiveGoods(ExpressResult result) {
+        if (StringUtil.isBlank(result.getState()))
+            return false;
+        if (!"3".equals(result.getState())) {//如果未收货
+            return false;
+        } else {//处理已收货
+            if (StringUtil.isBlank(result.getLogisticCode())) {
+                return false;
+            } else {
+                //根据物流单号获取订单详情
+                Optional<GoodsOrderDetail> opt = goodsOrderDetailRepository.findByExpressNo(result.getLogisticCode());
+                if (!opt.isPresent())//如果没有，有可能是商家未发货或者用户未支付
+                    return false;
+                GoodsOrderDetail goodsOrderDetail = opt.get();
+                Optional<GoodsOrder> byGoodsOrderNo = goodsOrderRepository.findByGoodsOrderNo(goodsOrderDetail.getGoodsOrderNo());
+                if (!byGoodsOrderNo.isPresent())
+                    return false;
+                GoodsOrder goodsOrder = byGoodsOrderNo.get();
+                GoodsOrder save = goodsOrderRepository.save(goodsOrder.setOrderStatus(OrderStatusEnum.waitAppraise));
+                return null != save;
+            }
+        }
+    }
+
 
     /**
      * 根据公司类型获取所有支持快递公司信息

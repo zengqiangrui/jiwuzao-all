@@ -16,4 +16,11 @@ public interface GoodsOrderDetailRepository extends JpaRepository<GoodsOrderDeta
     Optional<GoodsOrderDetail> findByGoodsOrderNo(String goodsOrderNo);
 
     Optional<GoodsOrderDetail> findByRefundOrderNo(String refundNo);
+
+    /**
+     * 根据物流单号查询
+     * @param expressNo
+     * @return
+     */
+    Optional<GoodsOrderDetail> findByExpressNo(String expressNo);
 }

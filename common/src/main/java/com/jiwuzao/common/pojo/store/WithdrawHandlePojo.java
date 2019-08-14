@@ -1,29 +1,25 @@
 package com.jiwuzao.common.pojo.store;
 
-import com.jiwuzao.common.include.valid.*;
+import com.jiwuzao.common.include.valid.StringMax;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.math.BigDecimal;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class WithDrawAddPojo {
-
+public class WithdrawHandlePojo {
     @StringMax
     private String storeId;
 
     @StringMax
-    private String pwd;
+    private String withdrawOrderNo;
+
+    private Boolean success;
 
     @StringMax(require = false)
-    private String remark;
-
-    @Decimal
-    private BigDecimal remitMoney;
+    private String reason;
 
 }

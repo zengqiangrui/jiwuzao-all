@@ -147,7 +147,7 @@ public class Interceptor implements HandlerInterceptor {
 
 
     /**
-     * @Description: 获取客户端IP地址
+     * @description: 获取客户端IP地址
      */
     private String getIpAddr(HttpServletRequest request) {
            String ip = request.getHeader("x-forwarded-for");

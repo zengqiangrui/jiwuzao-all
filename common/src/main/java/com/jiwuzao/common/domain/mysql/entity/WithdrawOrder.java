@@ -40,7 +40,7 @@ public class WithdrawOrder {
     /**
      * 是否是保证金
      */
-    private Boolean deposit;
+    private Boolean deposit = false;
     /**
      * 提现状态
      */

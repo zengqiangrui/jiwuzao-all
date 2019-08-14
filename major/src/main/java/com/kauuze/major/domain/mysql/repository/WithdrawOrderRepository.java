@@ -26,4 +26,10 @@ public interface WithdrawOrderRepository extends JpaRepository<WithdrawOrder,Int
     List<WithdrawOrder> findAllByWithdrawStatus(WithdrawStatusEnum withdrawStatus);
 
     Optional<WithdrawOrder> findByStoreIdAndWithdrawStatus(String storeId,WithdrawStatusEnum status);
+
+    Optional<WithdrawOrder> findByWithdrawOrderNo(String withdrawOrderNo);
+
+    List<WithdrawOrder> findAllByStoreIdOrderByCreateTimeDesc(String storeId);
+
+    List<WithdrawOrder> findAllByStoreId(String storeId);
 }

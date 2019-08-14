@@ -45,7 +45,7 @@ public class PayService {
             log.warn("订单金额不一致payOrderNo：" + payOrderNo);
             throw new OrderException(OrderExceptionEnum.ORDER_PAY_NOT_FIT);
         }
-        payOrder.setTransactionId(transactionId).setOpenid(openId)
+        payOrder.setTransactionId(transactionId).setOpenid(openId).setPay(true)
                 .setPayTime(System.currentTimeMillis());
         payOrderRepository.save(payOrder);
         List<GoodsOrder> list = goodsOrderRepository.findByPayid(payOrder.getId());

@@ -6,11 +6,13 @@ import com.jiwuzao.common.domain.mongo.entity.ExpressResult;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
 import com.jiwuzao.common.domain.mysql.entity.PayOrder;
 import com.jiwuzao.common.pojo.shopcart.AddItemPojo;
+import com.jiwuzao.common.vo.store.AllEarningVO;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
 import com.kauuze.major.service.ExpressService;
 import com.kauuze.major.service.OrderService;
 import com.kauuze.major.service.PayService;
+import com.kauuze.major.service.WithdrawService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,8 @@ public class OrderServiceTest {
     GoodsOrderRepository goodsOrderRepository;
     @Autowired
     private ExpressService expressService;
+    @Autowired
+    private WithdrawService withdrawService;
 
     @Test
     public void genOrder(){
@@ -86,5 +90,11 @@ public class OrderServiceTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void showWithdraw(){
+        AllEarningVO allEarningVO = withdrawService.merchantGetAllEarning("5d241a0a3e6e8aadf857f2f9");
+        System.out.println(allEarningVO);
     }
 }
