@@ -26,6 +26,8 @@ public class WithdrawHistoryVO {
 
     private String remark;
 
+    private String failureReason;
+
     private WithdrawStatusEnum withdrawStatus;
 
     private Long createTime;

@@ -160,7 +160,7 @@ public class ChatController {
         log.info("收到来自窗口" + this.uid + "的信息:" + message);
         final ChatService chatService = SpringContext.getBean(ChatService.class);
         chatService.createChatMessage(message);
-        //群发消息
+        //转发消息
         for (ChatController item : webSocketSet) {
             try {
                 if (item.groupId.equals(groupId) && !item.uid.equals(uid))
