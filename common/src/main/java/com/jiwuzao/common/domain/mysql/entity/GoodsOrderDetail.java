@@ -71,10 +71,12 @@ public class GoodsOrderDetail {
      * 邮编
      */
     private String postCode;
+
     /**
      * 收货人
      */
     private String receiverTrueName;
+
     /**
      * 收货人手机
      */
@@ -83,7 +85,6 @@ public class GoodsOrderDetail {
      * 发货前卖家对订单的备注
      */
     private String orderNote;
-
     /**
      * 是否申请取消订单:未审批无法发货
      */

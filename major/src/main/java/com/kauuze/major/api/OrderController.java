@@ -4,23 +4,27 @@ import com.github.binarywang.wxpay.bean.result.WxPayRefundResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
+import com.jiwuzao.common.domain.enumType.ReceiptEnum;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
+import com.jiwuzao.common.domain.mysql.entity.Receipt;
 import com.jiwuzao.common.dto.order.GoodsOrderDto;
 import com.jiwuzao.common.dto.order.GoodsOrderSimpleDto;
 import com.jiwuzao.common.include.JsonResult;
 import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.pojo.common.OrderStatusPojo;
 import com.jiwuzao.common.pojo.order.AskServicePojo;
-import com.jiwuzao.common.pojo.order.ComfirmOrderPojo;
+import com.jiwuzao.common.pojo.order.ConfirmOrderPojo;
 import com.jiwuzao.common.pojo.order.GetOrderPojo;
-import com.kauuze.major.api.pojo.ComfirmRefundPojo;
 import com.jiwuzao.common.pojo.order.OrderPagePojo;
+import com.jiwuzao.common.vo.order.ReceiptVO;
+import com.kauuze.major.api.pojo.ConfirmRefundPojo;
 import com.kauuze.major.config.permission.Authorization;
 import com.kauuze.major.config.permission.Merchant;
 import com.kauuze.major.service.AddressService;
 import com.kauuze.major.service.MerchantService;
 import com.kauuze.major.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -64,15 +68,15 @@ public class OrderController {
     /**
      * 用户传入收货信息、商品数组确认订单
      *
-     * @param pojo
+     * @param pojo 订单确认对象
      * @return
      */
-    @RequestMapping("/comfirmOrder")
+    @RequestMapping("/confirmOrder")
     @Authorization
-    public JsonResult comfirmOrder(@RequestAttribute("uid") int uid, @RequestAttribute("ip") String ip,
-                                   @Valid @RequestBody ComfirmOrderPojo pojo, HttpServletResponse response) throws WxPayException, IOException {
-        Object result = orderService.comfirmOrder(uid, pojo.getItemList(), pojo.getCity(),
-                pojo.getAddress(), pojo.getPhone(), pojo.getTrueName(), ip);
+    public JsonResult confirmOrder(@RequestAttribute("uid") int uid, @RequestAttribute("ip") String ip,
+                                   @Valid @RequestBody ConfirmOrderPojo pojo, HttpServletResponse response) throws WxPayException, IOException {
+        Object result = orderService.confirmOrder(uid, pojo.getItemList(), pojo.getCity(),
+                pojo.getAddress(), pojo.getPhone(), pojo.getTrueName(), ip, pojo.getReceipt());
         if (result == null) {
             return JsonResult.failure();
         } else {
@@ -115,6 +119,24 @@ public class OrderController {
             return JsonResult.success(result);
         }
     }
+
+    /**
+     * 获取订单详细信息
+     */
+    @RequestMapping("/getOrderReceipt")
+    @Authorization
+    public JsonResult getOrderReceipt(@RequestAttribute int uid, @Valid @RequestBody GetOrderPojo getOrderPojo) {
+        Receipt receipt = orderService.getOrderReceipt(getOrderPojo.getGoodsOrderNo());
+        if (receipt == null) {
+            return JsonResult.failure();
+        } else {
+            ReceiptVO receiptVO = new ReceiptVO();
+            BeanUtils.copyProperties(receipt, receiptVO, "type");
+            receiptVO.setType(receipt.getType().getMsg());
+            return JsonResult.success(receiptVO);
+        }
+    }
+
 
     /**
      * 催单
@@ -161,10 +183,10 @@ public class OrderController {
     /**
      * 商家确认退款
      */
-    @RequestMapping("comfirmRefund")
+    @RequestMapping("/confirmRefund")
     @Merchant
-    public JsonResult comfirmRefund(@RequestAttribute int uid, @Valid @RequestBody ComfirmRefundPojo pojo) throws WxPayException {
-        WxPayRefundResult result = orderService.comfirmRefund(uid, pojo.getGoid(), pojo.getAmount());
+    public JsonResult confirmRefund(@RequestAttribute int uid, @Valid @RequestBody ConfirmRefundPojo pojo) throws WxPayException {
+        WxPayRefundResult result = orderService.confirmRefund(uid, pojo.getGoodsOrderNo(), pojo.getAmount());
         if (result == null) {
             return JsonResult.failure();
         } else {
@@ -186,7 +208,7 @@ public class OrderController {
         if (null == store) {
             return JsonResult.error("未找到店铺");
         }
-        PageDto<GoodsOrderDto> pageDto = orderService.findAllOrderByStore(store.getId(),null, PageRequest.of(page.getCurrentPage(), page.getPageSize(), Sort.by(page.getIsAsc() ? Sort.Direction.ASC : Sort.Direction.DESC, page.getSortBy())));
+        PageDto<GoodsOrderDto> pageDto = orderService.findAllOrderByStore(store.getId(), null, PageRequest.of(page.getCurrentPage(), page.getPageSize(), Sort.by(page.getIsAsc() ? Sort.Direction.ASC : Sort.Direction.DESC, page.getSortBy())));
         return JsonResult.success(pageDto);
     }
 
@@ -204,7 +226,7 @@ public class OrderController {
         if (null == store) {
             return JsonResult.error("未找到店铺");
         }
-        PageDto<GoodsOrderDto> pageDto = orderService.findAllOrderByStore(store.getId(), page.getOrderStatus(),PageRequest.of(page.getCurrentPage(), page.getPageSize(), Sort.by(page.getIsAsc() ? Sort.Direction.ASC : Sort.Direction.DESC, page.getSortBy())));
+        PageDto<GoodsOrderDto> pageDto = orderService.findAllOrderByStore(store.getId(), page.getOrderStatus(), PageRequest.of(page.getCurrentPage(), page.getPageSize(), Sort.by(page.getIsAsc() ? Sort.Direction.ASC : Sort.Direction.DESC, page.getSortBy())));
         return JsonResult.success(pageDto);
     }
 

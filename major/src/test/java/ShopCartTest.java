@@ -1,4 +1,6 @@
+import com.jiwuzao.common.domain.enumType.ReceiptEnum;
 import com.kauuze.major.MajorApplication;
+import com.kauuze.major.domain.mysql.repository.ReceiptRepository;
 import com.kauuze.major.service.ShopCartService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -16,6 +18,14 @@ import java.util.List;
 public class ShopCartTest{
     @Autowired
     ShopCartService shopCartService;
+    @Autowired
+    private ReceiptRepository receiptRepository;
+
+    @Test
+    public void testReceipt(){
+//        receiptRepository.findAll().forEach(System.out::println);
+        receiptRepository.findByType(ReceiptEnum.COMPANY).forEach(System.out::println);
+    }
 
     @Test
     public void addItem(){

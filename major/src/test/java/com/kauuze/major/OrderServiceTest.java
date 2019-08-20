@@ -53,16 +53,16 @@ public class OrderServiceTest {
      * genOrder生成订单后，在数据库中取出payOrderNo
      * @throws WxPayException
      */
-    @Test
-    public void comfirmOrder() throws WxPayException {
-        List<AddItemPojo> list = new ArrayList<>();
-        AddItemPojo item = new AddItemPojo("5d2c0a292197fd13b83d7311","5d2c0a292197fd13b83d7314",2);
-        list.add(item);
-        item = new AddItemPojo("5d2c0b332197fd13b83d7349","5d2c0b332197fd13b83d734b",2);
-        list.add(item);
-
-        orderService.comfirmOrder(4, list, "重庆市渝中区", "金童路叠彩中心","18671450715","刘元庭","127.0.0.1");
-    }
+//    @Test
+//    public void comfirmOrder() throws WxPayException {
+//        List<AddItemPojo> list = new ArrayList<>();
+//        AddItemPojo item = new AddItemPojo("5d2c0a292197fd13b83d7311","5d2c0a292197fd13b83d7314",2);
+//        list.add(item);
+//        item = new AddItemPojo("5d2c0b332197fd13b83d7349","5d2c0b332197fd13b83d734b",2);
+//        list.add(item);
+//
+//        orderService.confirmOrder(4, list, "重庆市渝中区", "金童路叠彩中心","18671450715","刘元庭","127.0.0.1");
+//    }
 
     @Test
     public void handleNotify(){

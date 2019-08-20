@@ -11,17 +11,20 @@ import com.jiwuzao.common.domain.enumType.OrderExStatusEnum;
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
 import com.jiwuzao.common.domain.enumType.PayChannelEnum;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
+import com.jiwuzao.common.domain.mongo.entity.GoodsDetail;
 import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrderDetail;
 import com.jiwuzao.common.domain.mysql.entity.PayOrder;
+import com.jiwuzao.common.domain.mysql.entity.Receipt;
 import com.jiwuzao.common.dto.order.GoodsOrderDto;
 import com.jiwuzao.common.dto.order.GoodsOrderSimpleDto;
 import com.jiwuzao.common.dto.order.UserGoodsOrderDto;
 import com.jiwuzao.common.exception.OrderException;
 import com.jiwuzao.common.exception.excEnum.OrderExceptionEnum;
 import com.jiwuzao.common.include.PageDto;
+import com.jiwuzao.common.pojo.order.ReceiptPojo;
 import com.jiwuzao.common.pojo.shopcart.AddItemPojo;
 import com.kauuze.major.domain.mongo.repository.GoodsRepository;
 import com.kauuze.major.domain.mongo.repository.GoodsSpecRepository;
@@ -45,6 +48,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(rollbackOn = Exception.class)
@@ -64,6 +68,8 @@ public class OrderService {
     private PayOrderRepository payOrderRepository;
     @Autowired
     private StoreRepository storeRepository;
+    @Autowired
+    private ReceiptService receiptService;
 
     /**
      * 用户通过购物车或者单个商品结算，传入商品数组生成订单
@@ -118,8 +124,8 @@ public class OrderService {
      * @param
      * @return
      */
-    public Object comfirmOrder(int uid, List<AddItemPojo> itemList, String city, String address,
-                               String phone, String name, String ip) throws WxPayException {
+    public Object confirmOrder(int uid, List<AddItemPojo> itemList, String city, String address,
+                               String phone, String name, String ip, ReceiptPojo receipt) throws WxPayException {
         BigDecimal price = new BigDecimal(BigInteger.ZERO);
         //生成支付订单
         PayOrder payOrder = new PayOrder().setPay(false)
@@ -128,7 +134,7 @@ public class OrderService {
                 .setCreateTime(System.currentTimeMillis()).setOvertime(false)
                 .setSystemGoods(false).setQrCode(false).setUid(uid);
         payOrder = payOrderRepository.save(payOrder);
-        log.info("payorder:{}",payOrder);
+        log.info("payorder:{}", payOrder);
         //遍历购买列表， 为每件物品生成goodsOrder,将所有费用相加放入payOrder
         for (AddItemPojo e : itemList) {
             Goods goods = goodsRepository.findByGid(e.getGid());
@@ -142,13 +148,17 @@ public class OrderService {
             BigDecimal finalPay = goods.getPostage()
                     .add(goodsSpec.getSpecPrice().multiply(BigDecimal.valueOf(e.getNum())));
             //生成GoodsOrder放入detail的id
+            String goodsOrderNo = Rand.createOrderNo();
             GoodsOrder goodsOrder = new GoodsOrder().setGoodsOrderDetailId(detail.getId()).setGoodsTitle(goods.getTitle())
                     .setOrderStatus(OrderStatusEnum.waitPay).setBuyCount(e.getNum())
                     .setCover(goods.getCover()).setCreateTime(System.currentTimeMillis())
                     .setPostage(goods.getPostage()).setSpecClass(goodsSpec.getSpecClass())
                     .setFinalPay(finalPay).setUid(uid).setSid(goods.getSid())
                     .setGid(goods.getGid()).setPayid(payOrder.getId()).setSpecPrice(goodsSpec.getSpecPrice())
-                    .setGsid(e.getSpecId()).setGoodsOrderNo(Rand.createOrderNo());//增加生成orderNo
+                    .setGsid(e.getSpecId()).setGoodsOrderNo(goodsOrderNo);//增加生成orderNo
+            if (receipt.getIsReceipt()) {//生成发票
+                receiptService.createOne(goodsOrder, receipt.getName(), receipt.getType(), receipt.getTaxId());
+            }
             goodsOrder = goodsOrderRepository.save(goodsOrder);
             detail.setGoodsOrderNo(goodsOrder.getGoodsOrderNo());
             goodsOrderDetailRepository.save(detail);
@@ -162,6 +172,7 @@ public class OrderService {
 
     /**
      * 生成支付订单
+     *
      * @param payid
      * @param city
      * @param address
@@ -180,7 +191,8 @@ public class OrderService {
             detail.setReceiverCity(city).setReceiverAddress(address).setReceiverPhone(phone)
                     .setReceiverTrueName(name);
             goodsOrderDetailRepository.save(detail);
-        };
+        }
+        ;
         PayOrder payOrder = payOrderRepository.findById(payid).get();
         if (payOrder.getPrepayId() != null) {
             //为过期订单设置overTime按老的订单建立新的订单,并与goodsorder关联。
@@ -233,7 +245,7 @@ public class OrderService {
      */
     public List<GoodsOrderSimpleDto> getOrderSample(int uid, OrderStatusEnum status) {
         List<GoodsOrder> goodsOrder;
-        if (status == null){
+        if (status == null) {
             goodsOrder = goodsOrderRepository.findByUid(uid);
         } else {
             goodsOrder = goodsOrderRepository.findAllByUidAndOrderStatus(uid, status);
@@ -268,10 +280,11 @@ public class OrderService {
         if (!detailOptional.isPresent())
             return null;
         GoodsOrderDetail god = detailOptional.get();
-        PayOrder po = payOrderRepository.findById(go.getPayid()).get();
-        if (po == null)
+        Optional<PayOrder> byId = payOrderRepository.findById(go.getPayid());
+        if (!byId.isPresent())
             return null;
-        return createOrderDto(go, po, god);
+        PayOrder payOrder = byId.get();
+        return createOrderDto(go, payOrder, god);
     }
 
     /**
@@ -407,10 +420,11 @@ public class OrderService {
             goodsOrderPage = goodsOrderRepository.findAllBySidAndOrderStatus(sid, orderStatusEnum, pageable);
         }
         List<GoodsOrder> goodsOrderList = goodsOrderPage.getContent();
+        goodsOrderList = goodsOrderList.stream().filter(goodsOrder -> goodsOrder.getOrderExStatus() != OrderExStatusEnum.exception).collect(Collectors.toList());
         List<GoodsOrderDto> goodsOrderDtos = new ArrayList<>();
         for (GoodsOrder goodsOrder : goodsOrderList) {
             Optional<PayOrder> optional = payOrderRepository.findById(goodsOrder.getPayid());
-            if(!optional.isPresent()){
+            if (!optional.isPresent()) {
                 throw new OrderException(OrderExceptionEnum.NOT_PAID);
             }
             PayOrder po = optional.get();
@@ -432,6 +446,7 @@ public class OrderService {
 
     /**
      * 催单
+     *
      * @param uid
      * @param goodsOrderNo
      * @return
@@ -443,6 +458,7 @@ public class OrderService {
 
     /**
      * 取消订单
+     *
      * @param uid
      * @param goodsOrderNo
      * @return
@@ -466,15 +482,15 @@ public class OrderService {
 
     /**
      * 申请售后
+     *
      * @param uid
      * @param goodsOrderNo
      * @return
      */
     public String askService(int uid, String goodsOrderNo, String content) {
-        GoodsOrder goodsOrder = goodsOrderRepository.findByGoodsOrderNo(goodsOrderNo).get();
+        GoodsOrder goodsOrder = getByGoodsOrderNo(goodsOrderNo);
         GoodsOrderDetail detail = goodsOrderDetailRepository.findById(goodsOrder.getGoodsOrderDetailId()).get();
-
-        if (goodsOrder == null || detail == null){
+        if (goodsOrder == null || detail == null) {
             return "订单状态不一致";
         }
 
@@ -490,42 +506,76 @@ public class OrderService {
     }
 
 
-
     /**
      * 商家确认退款
+     *
      * @param uid
-     * @param goid
+     * @param
      * @param amount
      * @return
      */
-    public WxPayRefundResult comfirmRefund(int uid, Integer goid, BigDecimal amount) throws WxPayException{
-        GoodsOrder goodsOrder = goodsOrderRepository.findById(goid).get();
-        PayOrder order = payOrderRepository.findById(goodsOrder.getPayid()).get();
-        if (goodsOrder != null && goodsOrder.getUid2() == uid) {
+    public WxPayRefundResult confirmRefund(int uid, String goodsOrderNo, BigDecimal amount) throws WxPayException {
+        GoodsOrder goodsOrder = getByGoodsOrderNo(goodsOrderNo);
+        Optional<PayOrder> payOrderOptional = payOrderRepository.findById(goodsOrder.getPayid());
+        if (!payOrderOptional.isPresent()) throw new OrderException(OrderExceptionEnum.NOT_PAID);
+        PayOrder order = payOrderOptional.get();
+        if (goodsOrder.getUid2() == uid) {
             return null;
         }
         BigDecimal afterFee = order.getAfterFee();
-        if (afterFee.compareTo(amount) < 0){
+        if (afterFee.compareTo(amount) < 0) {//如果可退款金额小于退款金额
             return null;
         }
-
         //开始退款流程
-        GoodsOrderDetail detail = goodsOrderDetailRepository.findById(goodsOrder.getGoodsOrderDetailId()).get();
+        Optional<GoodsOrderDetail> orderDetailOptional = goodsOrderDetailRepository.findById(goodsOrder.getGoodsOrderDetailId());
+        if (!orderDetailOptional.isPresent()) throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
+        GoodsOrderDetail detail = orderDetailOptional.get();
         //不允许一笔商品订单重复退款
-        if (detail == null || detail.getRefundOrderNo()!=null)
+        if (detail.getRefundOrderNo() != null)
             return null;
         //生成退款单号
+        String refundOrderNo = Rand.getUUID();
         detail.setRefund(true).setRefundMoney(amount).setRefundTime(System.currentTimeMillis())
-                .setRefundOrderNo(UUID.randomUUID().toString().replace("-", ""));
+                .setRefundOrderNo(refundOrderNo);
         goodsOrderDetailRepository.save(detail);
         //发起退款请求
         WxPayRefundRequest req = new WxPayRefundRequest();
         req.setNotifyUrl("http://api.jiwuzao.com/pay/notify/refundOrder");
         req.setOutTradeNo(goodsOrder.getGoodsOrderNo());//传给微信的订单号
-        req.setOutRefundNo(detail.getRefundOrderNo());
+        req.setOutRefundNo(refundOrderNo);
         req.setTotalFee(order.getFinalPay().multiply(BigDecimal.valueOf(100)).intValue());//金额,分
         req.setRefundFee(amount.multiply(BigDecimal.valueOf(100)).intValue());
-        log.info("请求参数", req);
+        log.info("请求参数:{}", req);
         return wxPayService.refund(req);
+    }
+
+    /**
+     * @param goodsOrderNo
+     * @return
+     */
+    public String getGoodsDescription(String goodsOrderNo) {
+        Optional<GoodsOrder> orderOptional = goodsOrderRepository.findByGoodsOrderNo(goodsOrderNo);
+        if (!orderOptional.isPresent()) {
+            throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
+        }
+        GoodsOrder goodsOrder = orderOptional.get();
+        return "商品名:" + goodsOrder.getGoodsTitle() + "规格:" + goodsOrder.getSpecClass();
+    }
+
+    public GoodsOrder getByGoodsOrderNo(String goodsOrderNo) {
+        Optional<GoodsOrder> optional = goodsOrderRepository.findByGoodsOrderNo(goodsOrderNo);
+        if (!optional.isPresent())
+            throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
+        return optional.get();
+    }
+
+    /**
+     * 获取发票信息
+     *
+     * @param goodsOrderNo
+     * @return
+     */
+    public Receipt getOrderReceipt(String goodsOrderNo) {
+        return receiptService.getOne(goodsOrderNo);
     }
 }

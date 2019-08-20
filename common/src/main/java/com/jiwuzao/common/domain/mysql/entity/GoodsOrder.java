@@ -93,6 +93,9 @@ public class GoodsOrder {
     //商家是否可提现，默认不可提现，在成功支付15天后可提现，定时任务实现
     private Boolean canRemit = false;
 
+    //是否开发票
+    private Boolean isReceipt = false;
+
     /**
      * 订单状态
      */

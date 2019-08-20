@@ -9,6 +9,7 @@ import com.jiwuzao.common.dto.express.*;
 import com.jiwuzao.common.dto.order.GoodsOrderDto;
 import com.jiwuzao.common.dto.order.GoodsOrderSimpleDto;
 import com.jiwuzao.common.dto.order.UserGoodsOrderDto;
+import com.jiwuzao.common.exception.OrderException;
 import com.jiwuzao.common.exception.StoreException;
 import com.jiwuzao.common.exception.excEnum.StoreExceptionEnum;
 import com.jiwuzao.common.include.JsonResult;
@@ -18,15 +19,18 @@ import com.jiwuzao.common.include.StringUtil;
 import com.jiwuzao.common.pojo.common.PagePojo;
 import com.jiwuzao.common.pojo.express.ExpressCategoryPojo;
 import com.jiwuzao.common.pojo.express.ExpressNoPojo;
+import com.jiwuzao.common.pojo.order.CancelDeliverPojo;
 import com.jiwuzao.common.pojo.order.ExpressPojo;
 import com.jiwuzao.common.pojo.order.GetOrderPojo;
 import com.jiwuzao.common.pojo.order.OrderPagePojo;
+import com.jiwuzao.common.vo.order.ExpressCancelVO;
 import com.kauuze.major.config.permission.Authorization;
 import com.kauuze.major.config.permission.GreenWay;
 import com.kauuze.major.config.permission.Merchant;
 import com.kauuze.major.service.ExpressService;
 import com.kauuze.major.service.MerchantService;
 import com.kauuze.major.service.OrderService;
+import com.kauuze.major.service.UserBasicService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +60,8 @@ public class ExpressController {
     private OrderService orderService;
     @Autowired
     private MerchantService merchantService;
+    @Autowired
+    private UserBasicService userBasicService;
 
     @RequestMapping("/deliveryOne")
     @Merchant
@@ -68,17 +74,30 @@ public class ExpressController {
             ExpressRequestReturnDto returnDto = expressService.orderTracesSubByJson(express.getExpCode(), express.getExpNo(), express.getOrderNo(), express.getAddressId());
             if (returnDto.getSuccess()) {
                 //订阅成功
-                expressService.addExpressOrder(express.getExpCode(), express.getExpNo(), express.getOrderNo(),true);
+                expressService.addExpressOrder(express.getExpCode(), express.getExpNo(), express.getOrderNo(), true);
                 return JsonResult.success();
             } else {
                 //订阅失败
-                expressService.addExpressOrder(express.getExpCode(), express.getExpNo(), express.getOrderNo(),false);
+                expressService.addExpressOrder(express.getExpCode(), express.getExpNo(), express.getOrderNo(), false);
                 return JsonResult.failure(returnDto.getReason());
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return JsonResult.failure("发货失败");
+    }
+
+    @RequestMapping("/cancelDeliver")
+    @Merchant
+    public JsonResult cancelDeliver(@RequestAttribute int uid, @Valid @RequestBody CancelDeliverPojo pojo) {
+        if (!userBasicService.checkPwd(uid, pojo.getPwd()))
+            return JsonResult.failure("密码错误");
+        ExpressCancelVO expressCancelVO = expressService.cancelExpress(pojo.getGoodsOrderNo(), pojo.getCancelReason());
+        if (null != expressCancelVO) {
+            return JsonResult.success(expressCancelVO);
+        } else {
+            return JsonResult.failure("取消失败");
+        }
     }
 
 

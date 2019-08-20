@@ -1,5 +1,7 @@
 package com.kauuze.major.service;
 
+import com.jiwuzao.common.domain.common.MongoUtil;
+import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
 import com.jiwuzao.common.domain.enumType.ExpressEnum;
 import com.jiwuzao.common.domain.enumType.OrderExStatusEnum;
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
@@ -14,6 +16,8 @@ import com.jiwuzao.common.include.StringUtil;
 import com.jiwuzao.common.include.yun.KdniaoUtil;
 import com.jiwuzao.common.pojo.express.ExpressPushDataPojo;
 import com.jiwuzao.common.pojo.express.ExpressPushPojo;
+import com.jiwuzao.common.pojo.order.ExpressPojo;
+import com.jiwuzao.common.vo.order.ExpressCancelVO;
 import com.kauuze.major.config.contain.properties.KdniaoProperties;
 import com.kauuze.major.domain.mongo.repository.*;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderDetailRepository;
@@ -208,6 +212,35 @@ public class ExpressService {
 
 
     /**
+     * 处理商家无法发货
+     *
+     * @param goodsOrderNo
+     * @param reason
+     */
+    public ExpressCancelVO cancelExpress(String goodsOrderNo, String reason) {
+        Optional<GoodsOrder> optional = goodsOrderRepository.findByGoodsOrderNo(goodsOrderNo);
+        if (!optional.isPresent())
+            throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
+        GoodsOrder goodsOrder = optional.get();
+        if (goodsOrder.getOrderStatus() != OrderStatusEnum.waitDeliver)
+            throw new OrderException(OrderExceptionEnum.ORDER_STATUS_NO_FIT);
+        goodsOrder.setOrderExStatus(OrderExStatusEnum.exception);
+        if (null != goodsOrderRepository.save(goodsOrder)) {
+            Optional<GoodsOrderDetail> byGoodsOrderNo = goodsOrderDetailRepository.findByGoodsOrderNo(goodsOrderNo);
+            if (!byGoodsOrderNo.isPresent()) throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
+            GoodsOrderDetail goodsOrderDetail = byGoodsOrderNo.get().setApplyCancel(true).setApplyCancelMerchantAudit(AuditTypeEnum.wait)
+                    .setApplyCancelMerchantRefuseCause(reason).setApplyCancelTime(System.currentTimeMillis());
+            GoodsOrderDetail save = goodsOrderDetailRepository.save(goodsOrderDetail);
+            return new ExpressCancelVO().setCreateTime(save.getCancelTime()).setGoodsOrderNo(goodsOrderNo)
+                    .setReason(save.getApplyCancelMerchantRefuseCause())
+                    .setType(AuditTypeEnum.wait.getMsg());
+        } else {
+            throw new RuntimeException("订单入库异常");
+        }
+    }
+
+
+    /**
      * 根据单一订单查询物流轨迹
      *
      * @param goodsOrderNo
@@ -265,13 +298,13 @@ public class ExpressService {
                 ExpressResult expressResult = new ExpressResult();
                 if (!expressResultOptional.isPresent()) {
                     BeanUtils.copyProperties(dataPojo, expressResult);
-                }else{
+                } else {
                     expressResult = expressResultOptional.get();
-                    BeanUtils.copyProperties(dataPojo, expressResult,"id");
+                    BeanUtils.copyProperties(dataPojo, expressResult, "id");
                 }
                 ExpressResult save = resultRepository.save(expressResult);//更新物流订单信息
-                if(userReceiveGoods(save))//判断用户是否收货
-                    log.info("用户成功收货:{}",save);
+                if (userReceiveGoods(save))//todo 判断用户是否收货
+                    log.info("用户成功收货:{}", save);
             }
             return notifySendDto.setSuccess(true);
         } else {
@@ -282,6 +315,7 @@ public class ExpressService {
 
     /**
      * 处理用户签收信息
+     * 用户收货
      *
      * @param result
      * @return
@@ -304,7 +338,7 @@ public class ExpressService {
                 if (!byGoodsOrderNo.isPresent())
                     return false;
                 GoodsOrder goodsOrder = byGoodsOrderNo.get();
-                GoodsOrder save = goodsOrderRepository.save(goodsOrder.setOrderStatus(OrderStatusEnum.waitAppraise));
+                GoodsOrder save = goodsOrderRepository.save(goodsOrder.setTakeTime(System.currentTimeMillis()).setOrderStatus(OrderStatusEnum.waitAppraise));
                 return null != save;
             }
         }

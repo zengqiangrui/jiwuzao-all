@@ -17,6 +17,8 @@ public class ExpressPojo {
     private String orderNo;//订单号
     @StringMax(max = 32)
     private String expNo;//快递物流号
+    @StringMax(require = false,max = 200)
+    private String orderNote;
     @StringMax(max = 32)
     private String addressId;//寄件人的地址id
 }

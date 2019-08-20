@@ -11,11 +11,11 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class ComfirmRefundPojo {
+public class ConfirmRefundPojo {
     /**
      * 商品订单号
      */
-    private Integer goid;
+    private String goodsOrderNo;
 
     /**
      * 确认退款金额

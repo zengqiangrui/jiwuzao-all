@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -55,35 +56,37 @@ public class PayService {
         });
     }
 
+    /**
+     * 处理退款成功回调
+     * @param notifyResult
+     */
     @Transactional(rollbackOn = Exception.class)
     public void handleRefundNotify(WxPayRefundNotifyResult notifyResult) {
         log.info(notifyResult.toString());
         String outRefundNo = notifyResult.getReqInfo().getOutRefundNo();
         String refundId = notifyResult.getReqInfo().getRefundId();
-        String goodsOrderNo = notifyResult.getReqInfo().getOutTradeNo();
-
-        GoodsOrderDetail detail = goodsOrderDetailRepository.findByRefundOrderNo(refundId).get();
-
+        Optional<GoodsOrderDetail> optional = goodsOrderDetailRepository.findByRefundOrderNo(outRefundNo);
+        if (!optional.isPresent()) throw new OrderException(OrderExceptionEnum.REFUND_NOT_FOUND);
+        GoodsOrderDetail detail = optional.get();
         //判断是否是重复通知
         if (null != detail.getWeixinRefundId())
             throw new OrderException(OrderExceptionEnum.REPEAT_PAY_ORDER);
-
         //判断退款费用是否一致
         if (detail.getRefundMoney().multiply(BigDecimal.valueOf(100)).intValue()
                 != notifyResult.getReqInfo().getRefundFee()) {
-            log.warn("订单金额不一致refundOrderNo：" + detail.getRefundOrderNo());
+            log.warn("订单金额不一致refundOrderNo：{}", detail);
             throw new OrderException(OrderExceptionEnum.ORDER_PAY_NOT_FIT);
         }
-
-        PayOrder payOrder = payOrderRepository.findByPayOrderNo(goodsOrderNo);
-        GoodsOrder order = goodsOrderRepository.findByGoodsOrderNo(goodsOrderNo).get();
-        order.setRefundTime(System.currentTimeMillis());
-        order.setOrderStatus(OrderStatusEnum.refund);
-
+        Optional<GoodsOrder> orderOptional = goodsOrderRepository.findByGoodsOrderNo(detail.getGoodsOrderNo());
+        if (!orderOptional.isPresent()) throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
+        GoodsOrder order = orderOptional.get();
+        Optional<PayOrder> byId = payOrderRepository.findById(order.getPayid());
+        if (!byId.isPresent()) throw new OrderException(OrderExceptionEnum.NOT_PAID);
+        PayOrder payOrder = byId.get();
+        order.setRefundTime(System.currentTimeMillis()).setOrderStatus(OrderStatusEnum.refund).setCanRemit(false).setWithdrawal(BigDecimal.ZERO);
         detail.setWeixinRefundId(refundId);
         BigDecimal fee = payOrder.getAfterFee();
         payOrder.setAfterFee(fee.subtract(detail.getRefundMoney()));
-
         goodsOrderDetailRepository.save(detail);
         payOrderRepository.save(payOrder);
     }
