@@ -165,7 +165,7 @@ public class UserBasicService {
                 store = new Store();
             }
             return new UserOpenDto(uid, userInfo.getCreateTime(), userInfo.getNickName(), userInfo.getPortrait(), userInfo.getSex(), userInfo.getBirthday(), userInfo.getProvince(), userInfo.getCity(), userInfo.getPersonalSign(), userInfo.getOpenWxId(), userInfo.getOpenQQ(), userToken.getRole(), userToken.getVip(), userToken.getUserState(), userToken.getLastLoginTime(), userToken.getLastAccessTime(), store.getId());
-        }else{
+        } else {
             return new UserOpenDto(uid, userInfo.getCreateTime(), userInfo.getNickName(), userInfo.getPortrait(), userInfo.getSex(), userInfo.getBirthday(), userInfo.getProvince(), userInfo.getCity(), userInfo.getPersonalSign(), userInfo.getOpenWxId(), userInfo.getOpenQQ(), userToken.getRole(), userToken.getVip(), userToken.getUserState(), userToken.getLastLoginTime(), userToken.getLastAccessTime(), null);
         }
     }
@@ -340,7 +340,7 @@ public class UserBasicService {
         return new StateModel("success", userTokenUp.getAccessToken());
     }
 
-    public boolean checkPwd(int uid ,String pwd){
+    public boolean checkPwd(int uid, String pwd) {
         UserToken userToken = userTokenRepository.findByUid(uid);
         if (TokenUtil.isBan(userToken)) {
             //用户被封禁
@@ -408,9 +408,14 @@ public class UserBasicService {
      */
     public void alterPortrait(int uid, String portrait) {
         UserInfo userInfo = userInfoRepository.findByUid(uid);
-        QiniuUtil.delFilesBatch(userInfo.getPortrait());
-        userInfo.setPortrait(portrait);
-        userInfoRepository.save(userInfo);
+        if (null != userInfo) {
+            if (null != userInfo.getPortrait())
+                QiniuUtil.delFilesBatch(userInfo.getPortrait());
+            userInfo.setPortrait(portrait);
+            userInfoRepository.save(userInfo);
+        } else {
+            throw new RuntimeException("用户信息未找到");
+        }
     }
 
     /**
