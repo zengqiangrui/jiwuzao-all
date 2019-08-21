@@ -141,8 +141,7 @@ public class UserBasicService {
             return null;
         }
         userToken = TokenUtil.judgeEndTime(userToken);
-        UserSimpleOpenDto userSimpleOpenDto = new UserSimpleOpenDto(uid, userToken.getVip(), userInfo.getNickName(), userInfo.getPortrait());
-        return userSimpleOpenDto;
+        return new UserSimpleOpenDto(uid, userToken.getVip(), userInfo.getNickName(), userInfo.getPortrait());
     }
 
     /**
@@ -202,8 +201,7 @@ public class UserBasicService {
             uids.add(userInfo.getUid());
         }
         List<UserSimpleOpenDto> userSimpleOpenDtos = getUserSimpleOpenDtos(uids);
-        PageDto<UserSimpleOpenDto> page3 = new PageDto<>(page2.getTotalElements(), userSimpleOpenDtos);
-        return page3;
+        return new PageDto<>(page2.getTotalElements(), userSimpleOpenDtos);
     }
 
     /**
@@ -224,8 +222,7 @@ public class UserBasicService {
             StoreOpenDto storeOpenDto = new StoreOpenDto(store.getId(), store.getUid(), store.getStoreName(), store.getStoreIcon(), store.getServicePhone(), store.getStoreIntro(), store.getBusinessLicense());
             list.add(storeOpenDto);
         }
-        PageDto<StoreOpenDto> page3 = new PageDto<>(page2.getTotalElements(), list);
-        return page3;
+        return new PageDto<>(page2.getTotalElements(), list);
     }
 
     /**
@@ -239,8 +236,7 @@ public class UserBasicService {
             return null;
         }
         Store store = optional.get();
-        StoreOpenDto storeOpenDto = new StoreOpenDto(store.getId(), store.getUid(), store.getStoreName(), store.getStoreIcon(), store.getServicePhone(), store.getStoreIntro(), store.getBusinessLicense());
-        return storeOpenDto;
+        return new StoreOpenDto(store.getId(), store.getUid(), store.getStoreName(), store.getStoreIcon(), store.getServicePhone(), store.getStoreIntro(), store.getBusinessLicense());
     }
 
 
@@ -265,12 +261,11 @@ public class UserBasicService {
      * @return
      */
     public boolean validNickName(String nickName) {
+        if(StringUtil.isBlank(nickName))
+            return false;
         User user = userRepository.findByNickName(nickName);
         UserInfo userInfo = userInfoRepository.findByNickName(nickName);
-        if (user != null || userInfo != null) {
-            return true;
-        }
-        return false;
+        return user != null || userInfo != null;
     }
 
     /**
@@ -404,6 +399,7 @@ public class UserBasicService {
     }
 
     /**
+     * /root/jiwuzao/release/merchant/jiwuzao-merchant
      * 修改头像
      */
     public void alterPortrait(int uid, String portrait) {

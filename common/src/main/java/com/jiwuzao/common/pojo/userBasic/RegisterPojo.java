@@ -21,7 +21,7 @@ import lombok.experimental.Accessors;
 public class RegisterPojo {
     @Phone
     private String phone;
-    @NickName
+    @NickName(require = false)
     private String nickName;
     @Password
     private String pwd;
