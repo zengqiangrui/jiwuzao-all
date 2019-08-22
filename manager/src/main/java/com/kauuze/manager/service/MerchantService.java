@@ -6,10 +6,7 @@ import com.jiwuzao.common.domain.enumType.UserStateEnum;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.UserToken;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.VerifyActor;
-import com.kauuze.manager.domain.common.EsUtil;
 import com.kauuze.manager.domain.common.MongoUtil;
-import com.kauuze.manager.domain.es.entity.GoodsEs;
-import com.kauuze.manager.domain.es.repository.GoodsRepositoryEs;
 import com.kauuze.manager.domain.mongo.repository.StoreRepository;
 import com.kauuze.manager.domain.mongo.repository.UserTokenRepository;
 import com.kauuze.manager.domain.mongo.repository.VerifyActorRepository;
@@ -38,8 +35,6 @@ public class MerchantService {
     private VerifyActorRepository verifyActorRepository;
     @Autowired
     private StoreRepository storeRepository;
-    @Autowired
-    private GoodsRepositoryEs goodsRepositoryEs;
     @Autowired
     private UserTokenRepository userTokenRepository;
 
@@ -103,44 +98,44 @@ public class MerchantService {
         return null;
     }
 
-    /**
-     * 封禁商家:下架所有商品，不允许上架。
-     */
-    public void banMerchant(int uid,String violationCause){
-        Store store = storeRepository.findByUid(uid);
-        if(store != null){
-            Store store2 = new Store();
-            store2.setId(store.getId());
-            store2.setViolation(true);
-            store2.setViolationCause(violationCause);
-            MongoUtil.updateNotNon("id",store2,Store.class);
-        }
-        List<GoodsEs> list = goodsRepositoryEs.findByUid(uid);
-        for (GoodsEs goodsEs : list) {
-            Map<String,String> map = new HashMap<>();
-            map.put("gid", goodsEs.getGid());
-            map.put("putaway","false");
-            map.put("soldOutTime",String.valueOf(System.currentTimeMillis()));
-            EsUtil.modify(map);
-        }
-        UserToken userToken = new UserToken();
-        userToken.setUid(uid);
-        userToken.setUserState(UserStateEnum.ban);
-        userToken.setUserStateEndTime(System.currentTimeMillis() + DateTimeUtil.getOneYearMill()*70);
-        MongoUtil.updateNotNon("uid",userToken,UserToken.class);
-    }
+//    /**
+//     * 封禁商家:下架所有商品，不允许上架。
+//     */
+//    public void banMerchant(int uid,String violationCause){
+//        Store store = storeRepository.findByUid(uid);
+//        if(store != null){
+//            Store store2 = new Store();
+//            store2.setId(store.getId());
+//            store2.setViolation(true);
+//            store2.setViolationCause(violationCause);
+//            MongoUtil.updateNotNon("id",store2,Store.class);
+//        }
+//        List<GoodsEs> list = goodsRepositoryEs.findByUid(uid);
+//        for (GoodsEs goodsEs : list) {
+//            Map<String,String> map = new HashMap<>();
+//            map.put("gid", goodsEs.getGid());
+//            map.put("putaway","false");
+//            map.put("soldOutTime",String.valueOf(System.currentTimeMillis()));
+//            EsUtil.modify(map);
+//        }
+//        UserToken userToken = new UserToken();
+//        userToken.setUid(uid);
+//        userToken.setUserState(UserStateEnum.ban);
+//        userToken.setUserStateEndTime(System.currentTimeMillis() + DateTimeUtil.getOneYearMill()*70);
+//        MongoUtil.updateNotNon("uid",userToken,UserToken.class);
+//    }
 
-    /**
-     * 实名认证非法:修改认证资料为非法xx
-     * @param uid
-     * @return
-     */
-    public void illegalAuditVerify(int uid,String violationCause){
-        banMerchant(uid,violationCause);
-        VerifyActor verifyActor = new VerifyActor();
-        verifyActor.setUid(uid);
-        verifyActor.setUscc("违规" + uid);
-        verifyActor.setIdcard("违规" + uid);
-        MongoUtil.updateNotNon("uid",verifyActor,VerifyActor.class);
-    }
+//    /**
+//     * 实名认证非法:修改认证资料为非法xx
+//     * @param uid
+//     * @return
+//     */
+//    public void illegalAuditVerify(int uid,String violationCause){
+//        banMerchant(uid,violationCause);
+//        VerifyActor verifyActor = new VerifyActor();
+//        verifyActor.setUid(uid);
+//        verifyActor.setUscc("违规" + uid);
+//        verifyActor.setIdcard("违规" + uid);
+//        MongoUtil.updateNotNon("uid",verifyActor,VerifyActor.class);
+//    }
 }

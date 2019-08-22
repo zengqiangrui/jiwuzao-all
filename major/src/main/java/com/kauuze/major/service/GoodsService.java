@@ -22,7 +22,6 @@ import com.jiwuzao.common.pojo.goods.GoodsPagePojo;
 import com.jiwuzao.common.vo.goods.*;
 import com.jiwuzao.common.vo.user.AppriseVO;
 import com.jiwuzao.common.vo.user.UserCommentVO;
-import com.kauuze.major.domain.common.EsUtil;
 import com.kauuze.major.domain.common.MongoUtil;
 import com.kauuze.major.domain.mongo.repository.*;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
@@ -735,7 +734,7 @@ public class GoodsService {
         List<Comment> list = goodsCommentRepository.findByUid(uid);
         List<UserCommentVO> res = new ArrayList<>();
         list.forEach((e)->{
-            UserInfo info = userInfoRepository.findByUid(uid);
+//            UserInfo info = userInfoRepository.findByUid(uid);
             String gid = e.getGid();
             Goods goods = goodsRepository.findByGid(gid);
             UserCommentVO vo = new UserCommentVO(e.getGid(), goods.getTitle(), e.getTime(),

@@ -4,8 +4,6 @@ package com.kauuze.manager.config.contain;
 import com.jiwuzao.common.pojo.common.GidPojo;
 import com.kauuze.manager.config.permission.GreenWay;
 import com.kauuze.manager.config.permission.Root;
-import com.kauuze.manager.domain.common.EsUtil;
-import com.kauuze.manager.domain.es.repository.GoodsRepositoryEs;
 import com.kauuze.manager.domain.mongo.repository.UserTokenRepository;
 import com.kauuze.manager.domain.mysql.repository.UserRepository;
 import com.kauuze.manager.include.DateTimeUtil;
@@ -36,8 +34,6 @@ public class CommonController {
     private UserTokenRepository userTokenRepository;
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private GoodsRepositoryEs goodsRepositoryEs;
     /**
      * 查看服务器响应情况
      * @return
@@ -48,7 +44,7 @@ public class CommonController {
         Long start = System.currentTimeMillis();
         userRepository.findById(1);
         userTokenRepository.findByUid(1);
-        goodsRepositoryEs.findById("1");
+//        goodsRepositoryEs.findById("1");
         Long runtime = System.currentTimeMillis() - start;
         Map map = new HashMap<>();
         map.put("server",getLinuxLocalIp());
@@ -91,20 +87,20 @@ public class CommonController {
         return ip;
     }
 
-    @RequestMapping("/modifyEs")
-    @Root
-    public JsonResult modifyEs(@RequestBody Map<String,String> map){
-        if(StringUtil.isBlank(map.get("gid"))){
-            return JsonResult.failure();
-        }
-        EsUtil.modify(map);
-        return JsonResult.success();
-    }
-
-    @RequestMapping("/delEs")
-    @Root
-    public JsonResult delEs(@Valid @RequestBody GidPojo gidPojo){
-        goodsRepositoryEs.deleteById(gidPojo.getGid());
-        return JsonResult.success();
-    }
+//    @RequestMapping("/modifyEs")
+//    @Root
+//    public JsonResult modifyEs(@RequestBody Map<String,String> map){
+//        if(StringUtil.isBlank(map.get("gid"))){
+//            return JsonResult.failure();
+//        }
+//        EsUtil.modify(map);
+//        return JsonResult.success();
+//    }
+//
+//    @RequestMapping("/delEs")
+//    @Root
+//    public JsonResult delEs(@Valid @RequestBody GidPojo gidPojo){
+//        goodsRepositoryEs.deleteById(gidPojo.getGid());
+//        return JsonResult.success();
+//    }
 }

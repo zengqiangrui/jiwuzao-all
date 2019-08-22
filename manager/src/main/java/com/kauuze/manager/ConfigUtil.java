@@ -13,7 +13,7 @@ public class ConfigUtil {
     /**
      * 注解需要常量，这里手动更改
      */
-    public static final String customEnvironment = "dev";
+    public static final String customEnvironment = "prod";
     /**
      * 运行配置环境
      */
@@ -26,21 +26,5 @@ public class ConfigUtil {
         return customEnvironment.equals(customEnvironmentSet);
     }
 
-    /**
-     * 获取es节点
-     */
-    public static String elasticsearchNode;
-    @Value("${spring.data.elasticsearch.cluster-nodes}")
-    public void setElasticsearchNode(String elasticsearchNode2){
-        elasticsearchNode = elasticsearchNode2.split(":")[0] + ":9200";
-    }
 
-    /**
-     * 支付回调域名
-     */
-    public static String payCallBackDomain;
-    @Value("${custom.payCallBackDomain}")
-    public void setPayCallBackDomain(String payCallBackDomain){
-        ConfigUtil.payCallBackDomain = payCallBackDomain;
-    }
 }

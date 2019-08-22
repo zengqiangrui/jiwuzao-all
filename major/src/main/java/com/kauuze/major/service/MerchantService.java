@@ -1,13 +1,9 @@
 package com.kauuze.major.service;
 
-import com.jiwuzao.common.domain.common.OrderUtil;
 import com.jiwuzao.common.domain.enumType.*;
-import com.jiwuzao.common.domain.mongo.entity.Goods;
-import com.jiwuzao.common.domain.mongo.entity.SystemGoods;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.UserInfo;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.VerifyActor;
-import com.jiwuzao.common.domain.mysql.entity.PayOrder;
 import com.jiwuzao.common.domain.mysql.entity.User;
 import com.jiwuzao.common.domain.mysql.entity.WithdrawOrder;
 import com.jiwuzao.common.exception.StoreException;
@@ -15,14 +11,11 @@ import com.jiwuzao.common.exception.excEnum.StoreExceptionEnum;
 import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.vo.store.StoreSimpleVO;
 import com.jiwuzao.common.vo.store.StoreVO;
-import com.kauuze.major.ConfigUtil;
-import com.kauuze.major.domain.common.EsUtil;
 import com.kauuze.major.domain.mongo.repository.*;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
 import com.kauuze.major.domain.mysql.repository.UserRepository;
 import com.kauuze.major.domain.mysql.repository.WithdrawOrderRepository;
 import com.kauuze.major.include.StringUtil;
-import com.kauuze.major.include.yun.WxPayUtil;
 import com.kauuze.major.service.dto.merchant.MerchantUdpDto;
 import com.qiniu.util.Json;
 import lombok.extern.slf4j.Slf4j;
@@ -149,47 +142,47 @@ public class MerchantService {
         return Json.encode(storeRepository.save(myStore));
     }
 
-    /**
-     * 缴纳保证金二维码
-     *
-     * @param uid
-     * @param userIp
-     * @return
-     */
-    public String getDepositQrCode(int uid, String userIp) {
-        SystemGoods systemGoods = systemGoodsRepository.findByName(SystemGoodsNameEnum.deposit);
-        String sid = storeRepository.findByUid(uid).get().getId();
-        PayOrder payOrder = new PayOrder(null, uid, sid, System.currentTimeMillis(), null, true, false, true, null, systemGoods.getId(), systemGoods.getPrice(), systemGoods.getPrice(), systemGoods.getName().name, null, null, false, null, null);
-        payOrderRepository.save(payOrder);
-        payOrderRepository.save(payOrderRepository.findByIdForUpdate(payOrder.getId()).setPayOrderNo(OrderUtil.getOrderNo(payOrder.getId(), "p")));
-        return WxPayUtil.generateWxPayQrCode(systemGoods.getId(), systemGoods.getName().name, payOrder.getPayOrderNo(), payOrder.getFinalPay(), ConfigUtil.payCallBackDomain + PayCallBackUrl.systemGoodsWxNoticeWxQrCode, userIp);
-    }
+//    /**
+//     * 缴纳保证金二维码
+//     *
+//     * @param uid
+//     * @param userIp
+//     * @return
+//     */
+//    public String getDepositQrCode(int uid, String userIp) {
+//        SystemGoods systemGoods = systemGoodsRepository.findByName(SystemGoodsNameEnum.deposit);
+//        String sid = storeRepository.findByUid(uid).get().getId();
+//        PayOrder payOrder = new PayOrder(null, uid, sid, System.currentTimeMillis(), null, true, false, true, null, systemGoods.getId(), systemGoods.getPrice(), systemGoods.getPrice(), systemGoods.getName().name, null, null, false, null, null);
+//        payOrderRepository.save(payOrder);
+//        payOrderRepository.save(payOrderRepository.findByIdForUpdate(payOrder.getId()).setPayOrderNo(OrderUtil.getOrderNo(payOrder.getId(), "p")));
+//        return WxPayUtil.generateWxPayQrCode(systemGoods.getId(), systemGoods.getName().name, payOrder.getPayOrderNo(), payOrder.getFinalPay(), ConfigUtil.payCallBackDomain + PayCallBackUrl.systemGoodsWxNoticeWxQrCode, userIp);
+//    }
 
     /**
      * 取出保证金:下架所有商品，15-30天提现
      *
      * @return
      */
-    public String takeOutDeposit(int uid) {
-        Optional<Store> opt = storeRepository.findByUid(uid);
-        if (opt.isPresent() && opt.get().getViolation()) {
-            return "你因违规，保证金被冻结";
-        }
-        List<Goods> list = goodsRepository.findByUid(uid);
-        for (Goods goods : list) {
-            Map<String, String> map = new HashMap<>();
-            map.put("gid", goods.getGid());
-            map.put("putaway", "false");
-            map.put("soldOutTime", String.valueOf(System.currentTimeMillis()));
-            EsUtil.modify(map);
-        }
-        User user = userRepository.findByIdForUpdate(uid);
-        VerifyActor verifyActor = verifyActorRepository.findByUid(uid);
-        WithdrawOrder withdrawOrder = new WithdrawOrder(null, uid, opt.get().getId(),System.currentTimeMillis(), true, WithdrawStatusEnum.wait, null, user.getDeposit(), verifyActor.getBankNo(), verifyActor.getBankTrueName(), verifyActor.getOpeningBank(), "取出保证金", null, null, null);
-        withdrawOrderRepository.save(withdrawOrder);
-        withdrawOrderRepository.save(withdrawOrderRepository.findByIdForUpdate(withdrawOrder.getId()).setWithdrawOrderNo(OrderUtil.getOrderNo(withdrawOrder.getId(), "w")));
-        return null;
-    }
+//    public String takeOutDeposit(int uid) {
+//        Optional<Store> opt = storeRepository.findByUid(uid);
+//        if (opt.isPresent() && opt.get().getViolation()) {
+//            return "你因违规，保证金被冻结";
+//        }
+//        List<Goods> list = goodsRepository.findByUid(uid);
+//        for (Goods goods : list) {
+//            Map<String, String> map = new HashMap<>();
+//            map.put("gid", goods.getGid());
+//            map.put("putaway", "false");
+//            map.put("soldOutTime", String.valueOf(System.currentTimeMillis()));
+//            EsUtil.modify(map);
+//        }
+//        User user = userRepository.findByIdForUpdate(uid);
+//        VerifyActor verifyActor = verifyActorRepository.findByUid(uid);
+//        WithdrawOrder withdrawOrder = new WithdrawOrder(null, uid, opt.get().getId(),System.currentTimeMillis(), true, WithdrawStatusEnum.wait, null, user.getDeposit(), verifyActor.getBankNo(), verifyActor.getBankTrueName(), verifyActor.getOpeningBank(), "取出保证金", null, null, null);
+//        withdrawOrderRepository.save(withdrawOrder);
+//        withdrawOrderRepository.save(withdrawOrderRepository.findByIdForUpdate(withdrawOrder.getId()).setWithdrawOrderNo(OrderUtil.getOrderNo(withdrawOrder.getId(), "w")));
+//        return null;
+//    }
 
 
     /**

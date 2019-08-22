@@ -8,15 +8,13 @@ import com.jiwuzao.common.pojo.common.*;
 import com.jiwuzao.common.pojo.userBasic.*;
 import com.jiwuzao.common.vo.user.UserCommentVO;
 import com.kauuze.major.config.permission.Authorization;
+import com.kauuze.major.config.permission.GreenWay;
 import com.kauuze.major.include.StateModel;
 import com.kauuze.major.service.GoodsService;
 import com.kauuze.major.service.UserBasicService;
 import com.kauuze.major.service.dto.userBasic.UserPrivateDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/userBasic")
+@CrossOrigin
 public class UserBasicController {
     @Autowired
     private UserBasicService userBasicService;

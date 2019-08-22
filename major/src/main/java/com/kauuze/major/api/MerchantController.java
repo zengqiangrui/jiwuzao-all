@@ -91,28 +91,28 @@ public class MerchantController {
             return JsonResult.failure("未找到店铺,请开通");
         }
     }
+//
+//    @RequestMapping("/getDepositQrCode")
+//    @Merchant
+//    public JsonResult getDepositQrCode(@RequestAttribute int uid, @Valid @RequestBody IpAddressPojo ipAddressPojo) {
+//        String qrCodeUrl = merchantService.getDepositQrCode(uid, ipAddressPojo.getIpAddress());
+//        if (qrCodeUrl != null) {
+//            return JsonResult.success(qrCodeUrl);
+//        } else {
+//            return JsonResult.failure();
+//        }
+//    }
 
-    @RequestMapping("/getDepositQrCode")
-    @Merchant
-    public JsonResult getDepositQrCode(@RequestAttribute int uid, @Valid @RequestBody IpAddressPojo ipAddressPojo) {
-        String qrCodeUrl = merchantService.getDepositQrCode(uid, ipAddressPojo.getIpAddress());
-        if (qrCodeUrl != null) {
-            return JsonResult.success(qrCodeUrl);
-        } else {
-            return JsonResult.failure();
-        }
-    }
-
-    @RequestMapping("/takeOutDeposit")
-    @Merchant
-    public JsonResult takeOutDeposit(@RequestAttribute int uid) {
-        String result = merchantService.takeOutDeposit(uid);
-        if (result != null) {
-            return JsonResult.success();
-        } else {
-            return JsonResult.failure(result);
-        }
-    }
+//    @RequestMapping("/takeOutDeposit")
+//    @Merchant
+//    public JsonResult takeOutDeposit(@RequestAttribute int uid) {
+//        String result = merchantService.takeOutDeposit(uid);
+//        if (result != null) {
+//            return JsonResult.success();
+//        } else {
+//            return JsonResult.failure(result);
+//        }
+//    }
 
 
     @RequestMapping("/getStorePage")
