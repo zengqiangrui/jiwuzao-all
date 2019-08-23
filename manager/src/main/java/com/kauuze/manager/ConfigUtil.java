@@ -13,7 +13,7 @@ public class ConfigUtil {
     /**
      * 注解需要常量，这里手动更改
      */
-    public static final String customEnvironment = "prod";
+    public static final String customEnvironment = "dev";
     /**
      * 运行配置环境
      */
