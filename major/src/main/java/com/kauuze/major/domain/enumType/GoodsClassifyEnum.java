@@ -1,69 +1,76 @@
 package com.kauuze.major.domain.enumType;
 
-/**
- * @author kauuze
- * @email 3412879785@qq.com
- * @time 2019-05-29 15:53
- */
+import lombok.Getter;
+
+@Getter
 public enum GoodsClassifyEnum {
+    recommend(0,"推荐"),
     /**
      * 灵物
      */
-    special,
+    special(1,"灵物"),
     /**
      * 食品
      */
-    food,
+    food(2,"食品"),
     /**
      * 服装
      */
-    clothing,
+    clothing(3,"服装"),
     /**
      * 饰品
      */
-    jewelry,
+    jewelry(4,"饰品"),
     /**
      * 箱包
      */
-    bags,
+    bags(5,"箱包"),
     /**
      * 器具
      */
-    appliance,
+    appliance(6,"器具"),
 
     /**
      * 极礼
      */
-    gift,
+    gift(7,"极礼"),
 
     /**
      * 美业
      */
-    beauty,
+    beauty(8,"美业"),
 
     /**
      * 家居
      */
-    house,
+    house(9,"家居"),
     /**
      * 母婴
      */
-    mom,
+    mom(10,"母婴"),
     /**
      * 玩具
      */
-    toy,
+    toy(11,"玩具"),
     /**
      * 器具
      */
-    tool,
+    tool(12,"工具"),
     /**
      * 电子
      */
-    electron,
+    electron(13,"电子"),
     /**
      * 其他
      */
-    other;
+    other(14,"其他");
 
+    private Integer code;
+
+    private String msg;
+
+    GoodsClassifyEnum(Integer code, String msg) {
+        this.code = code;
+        this.msg = msg;
+    }
 }

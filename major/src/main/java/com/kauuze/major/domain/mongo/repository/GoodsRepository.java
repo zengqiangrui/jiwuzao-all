@@ -25,9 +25,11 @@ public interface GoodsRepository extends MongoRepository<Goods, String> {
 
     Page<Goods> findAllByUidAndPutaway(int uid,Boolean putAway,Pageable pageable);
 
-    List<Goods> findByClassify(Pageable pageable, GoodsClassifyEnum classify);
+    List<Goods> findByClassifyAndPutaway(Pageable pageable, GoodsClassifyEnum classify,Boolean putaway);
 
     Page<Goods> findAllBySid(String sid, Pageable pageable);
 
     Page<Goods> findAllBySidAndPutaway(String storeId, Boolean putAway, Pageable pageable);
+
+    List<Goods> findAllBySidAndPutaway(String sid, Boolean putaway);
 }

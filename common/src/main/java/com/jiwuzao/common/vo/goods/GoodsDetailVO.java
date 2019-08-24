@@ -15,6 +15,10 @@ import java.util.List;
 public class GoodsDetailVO {
 
     private int uid;
+
+    private String storeId;
+
+    private String storeName;
     /**
      * 短视频或图片轮播最多5，分析连接
      */

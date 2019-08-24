@@ -383,10 +383,12 @@ public class GoodsService {
         Goods goods = goodsRepository.findByGid(gid);
         User user = userRepository.findById(goods.getUid()).get();
         UserInfo info = userInfoRepository.findByUid(goods.getUid());
+        Store store = storeRepository.findByUid(goods.getUid()).get();
+
         if (uid != -1 && appriseRepository.findByGidAndUid(gid, uid) != null) {
             apprised = true;
         }
-        if (detail == null || goods == null || user == null || info == null)
+        if (user == null || info == null)
             return null;
 
         //获取关注列表
@@ -399,13 +401,13 @@ public class GoodsService {
         });
 
         GoodsDetailVO vo = new GoodsDetailVO();
-        vo.setTitle(goods.getTitle()).setDefaultPrice(goods.getDefaultPrice())
+        vo.setTitle(goods.getTitle()).setDefaultPrice(goods.getDefaultPrice()).setStoreId(goods.getSid())
                 .setDetailLabel(detail.getDetailLabel()).setDetailPhotos(detail.getDetailPhotos())
                 .setPostage(goods.getPostage()).setSlideshow(detail.getSlideshow())
                 .setNickName(user.getNickName()).setPortrait(info.getPortrait())
                 .setGoodsType(detail.getGoodsType()).setGoodsTypeClass(detail.getGoodsTypeClass())
                 .setCover(goods.getCover()).setAppriseCnt(detail.getAppriseCnt())
-                .setUid(goods.getUid())
+                .setUid(goods.getUid()).setStoreName(store.getStoreName())
                 .setApprised(apprised).setAppriseList(list);
         return vo;
     }
@@ -423,35 +425,35 @@ public class GoodsService {
         List<Goods> goodsPage = null;
         switch (goodsPagePojo.getCurrentTab()) {
             case 0:
-                //推荐，暂写food
-                goodsPage = goodsRepository.findByClassify(pageRequest, GoodsClassifyEnum.food);
+                //推荐，
+                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.food, true);
                 break;
             case 1:
-                goodsPage = goodsRepository.findByClassify(pageRequest, GoodsClassifyEnum.special);
+                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.special, true);
                 break;
             case 2:
-                goodsPage = goodsRepository.findByClassify(pageRequest, GoodsClassifyEnum.food);
+                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.food, true);
                 break;
             case 3:
-                goodsPage = goodsRepository.findByClassify(pageRequest, GoodsClassifyEnum.clothing);
+                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.clothing, true);
                 break;
             case 4:
-                goodsPage = goodsRepository.findByClassify(pageRequest, GoodsClassifyEnum.jewelry);
+                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.jewelry, true);
                 break;
             case 5:
-                goodsPage = goodsRepository.findByClassify(pageRequest, GoodsClassifyEnum.bags);
+                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.bags, true);
                 break;
             case 6:
-                goodsPage = goodsRepository.findByClassify(pageRequest, GoodsClassifyEnum.appliance);
+                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.appliance, true);
                 break;
             case 7:
-                goodsPage = goodsRepository.findByClassify(pageRequest, GoodsClassifyEnum.gift);
+                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.gift, true);
                 break;
             case 8:
-                goodsPage = goodsRepository.findByClassify(pageRequest, GoodsClassifyEnum.beauty);
+                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.beauty, true);
                 break;
             case 9:
-                goodsPage = goodsRepository.findByClassify(pageRequest, GoodsClassifyEnum.other);
+                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.other, true);
                 break;
         }
         return goodsPage;
@@ -493,7 +495,7 @@ public class GoodsService {
      * @param pageable
      * @return
      */
-    public PageDto<GoodsSimpleVO> getGoodsByStore(String storeId,Boolean putAway, Pageable pageable) {
+    public PageDto<GoodsSimpleVO> getGoodsByStore(String storeId, Boolean putAway, Pageable pageable) {
         Page<Goods> page = goodsRepository.findAllBySidAndPutaway(storeId, putAway, pageable);
         PageDto<GoodsSimpleVO> pageDto = new PageDto<>();
         pageDto.setTotal(page.getTotalElements());
@@ -531,6 +533,7 @@ public class GoodsService {
 
     /**
      * 删除评论
+     *
      * @param uid
      * @param comid
      * @return
@@ -687,6 +690,7 @@ public class GoodsService {
 
     /**
      * 根据审核状态查询
+     *
      * @param uid
      * @param auditType
      * @param pageAble
@@ -699,17 +703,19 @@ public class GoodsService {
 
     /**
      * 查询店铺商品是否上架分页信息
+     *
      * @param uid
      * @param putaway
      * @param pageAble
      * @return
      */
     public PageDto<GoodsSimpleDto> getGoodsListByPutAway(int uid, Boolean putaway, Pageable pageAble) {
-        return getGoodsSimplePage(goodsRepository.findAllByUidAndPutaway(uid,putaway,pageAble));
+        return getGoodsSimplePage(goodsRepository.findAllByUidAndPutaway(uid, putaway, pageAble));
     }
 
     /**
      * 获取用户点赞列表
+     *
      * @param uid
      * @return
      */
@@ -717,7 +723,7 @@ public class GoodsService {
         List<Apprise> list = appriseRepository.findByUid(uid);
         List<AppriseVO> volist = new ArrayList<>();
 
-        list.forEach(item->{
+        list.forEach(item -> {
             Goods goods = goodsRepository.findByGid(item.getGid());
             volist.add(new AppriseVO(item.getGid(), goods.getCover(), goods.getTitle(), goods.getDefaultPrice()));
         });
@@ -726,6 +732,7 @@ public class GoodsService {
 
     /**
      * 通过uid获取用户评论列表
+     *
      * @param uid
      * @return
      */
@@ -733,7 +740,7 @@ public class GoodsService {
     public List<UserCommentVO> getUserComment(Integer uid) {
         List<Comment> list = goodsCommentRepository.findByUid(uid);
         List<UserCommentVO> res = new ArrayList<>();
-        list.forEach((e)->{
+        list.forEach((e) -> {
 //            UserInfo info = userInfoRepository.findByUid(uid);
             String gid = e.getGid();
             Goods goods = goodsRepository.findByGid(gid);

@@ -52,6 +52,9 @@ public class ExpressService {
     private ExpressResultRepository resultRepository;
     @Autowired
     private AddressRepository addressRepository;
+    @Autowired
+    private OrderService orderService;
+
 
     /**
      * Json方式 查询订单物流轨迹
@@ -303,8 +306,10 @@ public class ExpressService {
                     BeanUtils.copyProperties(dataPojo, expressResult, "id");
                 }
                 ExpressResult save = resultRepository.save(expressResult);//更新物流订单信息
-                if (userReceiveGoods(save))//todo 判断用户是否收货
+                if (userReceiveGoods(save)) {
                     log.info("用户成功收货:{}", save);
+//                    orderService.takeOver(dataPojo.getLogisticCode(),OrderStatusEnum.waitAppraise);
+                }
             }
             return notifySendDto.setSuccess(true);
         } else {

@@ -4,7 +4,6 @@ import com.github.binarywang.wxpay.bean.result.WxPayRefundResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
-import com.jiwuzao.common.domain.enumType.ReceiptEnum;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
 import com.jiwuzao.common.domain.mysql.entity.Receipt;
 import com.jiwuzao.common.dto.order.GoodsOrderDto;
@@ -16,7 +15,9 @@ import com.jiwuzao.common.pojo.order.AskServicePojo;
 import com.jiwuzao.common.pojo.order.ConfirmOrderPojo;
 import com.jiwuzao.common.pojo.order.GetOrderPojo;
 import com.jiwuzao.common.pojo.order.OrderPagePojo;
+import com.jiwuzao.common.vo.order.GoodsOrderVO;
 import com.jiwuzao.common.vo.order.ReceiptVO;
+import com.jiwuzao.common.vo.store.StoreVO;
 import com.kauuze.major.api.pojo.ConfirmRefundPojo;
 import com.kauuze.major.config.permission.Authorization;
 import com.kauuze.major.config.permission.Merchant;
@@ -113,11 +114,12 @@ public class OrderController {
     @Authorization
     public JsonResult getOrderDetail(@RequestAttribute int uid, @Valid @RequestBody GetOrderPojo getOrderPojo) {
         GoodsOrderDto result = orderService.getOrderDetail(getOrderPojo.getGoodsOrderNo());
-        if (result == null) {
-            return JsonResult.failure();
-        } else {
-            return JsonResult.success(result);
-        }
+        if (null == result) return JsonResult.failure();
+        GoodsOrderVO goodsOrderVO = new GoodsOrderVO();
+        BeanUtils.copyProperties(result, goodsOrderVO);
+        StoreVO storeVO = merchantService.getStoreVO(goodsOrderVO.getSid());
+        goodsOrderVO.setStoreIcon(storeVO.getStoreIcon()).setStoreName(storeVO.getStoreName());
+        return JsonResult.success(goodsOrderVO);
     }
 
     /**

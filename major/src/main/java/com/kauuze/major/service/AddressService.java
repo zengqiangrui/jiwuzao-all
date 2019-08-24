@@ -110,7 +110,6 @@ public class AddressService {
         for (Address address : list) {
             System.out.println(address);
         }
-
         return list;
     }
 

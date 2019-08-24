@@ -578,4 +578,21 @@ public class OrderService {
     public Receipt getOrderReceipt(String goodsOrderNo) {
         return receiptService.getOne(goodsOrderNo);
     }
+
+    /**
+     * 订单已签收，待评价
+     * @param logisticCode
+     * @param waitAppraise
+     */
+    public void takeOver(String logisticCode, OrderStatusEnum waitAppraise) {
+        Optional<GoodsOrderDetail> detailOptional = goodsOrderDetailRepository.findByExpressNo(logisticCode);
+        if (!detailOptional.isPresent()) {
+            throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
+        } else {
+            GoodsOrderDetail goodsOrderDetail = detailOptional.get();
+            Optional<GoodsOrder> orderOptional = goodsOrderRepository.findByGoodsOrderNo(goodsOrderDetail.getGoodsOrderNo());
+            if (!orderOptional.isPresent()) throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
+            goodsOrderRepository.save(orderOptional.get().setOrderStatus(waitAppraise));
+        }
+    }
 }

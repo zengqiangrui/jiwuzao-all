@@ -56,12 +56,13 @@ public class Goods {
     /**
      * 销量:可排序
      */
-    private Integer salesVolume;
+    private Integer salesVolume = 0;
     /**
      * 默认价格：可排序
      */
     private BigDecimal defaultPrice;
 
+    //是否可退还
     private GoodsReturnEnum goodsReturn;
 
     private DeliveryTimeEnum deliveryTime;
