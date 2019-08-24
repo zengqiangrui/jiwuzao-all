@@ -2,6 +2,7 @@ package com.jiwuzao.common.include;
 
 import org.junit.Test;
 
+import javax.naming.InsufficientResourcesException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -63,9 +64,28 @@ public class StringUtil {
     }
 
 
-
     public static String getUrn(String uri) {
         return uri.substring(uri.lastIndexOf("/") + 1);
     }
 
+
+    public static boolean checkVersion(String version, Integer versionCode) {
+        if (!Pattern.isVersion(version)) {
+            return false;
+        }
+        String[] split = version.split("\\.");
+        StringBuilder res = new StringBuilder();
+        for (String s : split) {
+            res.append(s);
+        }
+        try {
+            if (Integer.parseInt(res.toString()) != versionCode) {
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
 }

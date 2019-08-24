@@ -15,6 +15,7 @@ import com.kauuze.major.domain.mysql.repository.SmsRepository;
 import com.kauuze.major.domain.mysql.repository.UserRepository;
 import com.jiwuzao.common.include.DateTimeUtil;
 import com.jiwuzao.common.include.StringUtil;
+import com.kauuze.major.service.SystemService;
 import com.kauuze.major.service.UserBasicService;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -30,14 +31,24 @@ import java.time.LocalDateTime;
 @Component
 @Order(1)
 public class ApplicationRunnerAfter implements ApplicationRunner {
+    private AppVersion updateVersion() {
+        AppVersion appVersion = new AppVersion();
+        appVersion.setVersion("1.0.1").setVersionCode(101).setCreateTime(System.currentTimeMillis()).setStop(false)
+                .setUpdateContent("更新一个版本").setDownloadUrl("http://download.jiwuzao.com/jiwuzao.apk");
+        return appVersion;
+    }
+
     @Override
     public void run(ApplicationArguments applicationArguments) throws Exception {
         if (!ConfigUtil.validCustomEnvironment()) {
             throw new RuntimeException("validCustomEnvironment error!");
         }
-        if (!StringUtil.isEq(ConfigUtil.customEnvironment, "dev")) {
-            return;
+        if (StringUtil.isEq(ConfigUtil.customEnvironment, "prod")) {
+            SystemService bean = SpringContext.getBean(SystemService.class);
+            AppVersion appVersion = bean.createUpdateVersion("1.0.0", 100, "http://download.jiwuzao.com/jiwuzao.apk", "更新");
+            if(appVersion == null) throw new RuntimeException("请检查版本信息和更新环境");
         }
+
         AppVersionRepository appVersionRepository = SpringContext.getBean(AppVersionRepository.class);
         SystemNoticeRepository systemNoticeRepository = SpringContext.getBean(SystemNoticeRepository.class);
         SystemGoodsRepository systemGoodsRepository = SpringContext.getBean(SystemGoodsRepository.class);
@@ -53,10 +64,13 @@ public class ApplicationRunnerAfter implements ApplicationRunner {
             AppVersion appVersion = new AppVersion();
             appVersion.setCreateTime(System.currentTimeMillis());
             appVersion.setVersion("1.0.0");
+            appVersion.setVersionCode(100);
             appVersion.setUpdateContent("系统初始化版本号");
             appVersion.setStop(false);
             appVersionRepository.insert(appVersion);
         }
+
+
         if (systemNoticeRepository.findAll().size() == 0) {
             SystemNotice systemNotice = new SystemNotice();
             systemNoticeRepository.insert(systemNotice);
@@ -97,4 +111,5 @@ public class ApplicationRunnerAfter implements ApplicationRunner {
             smsRepository.save(sms3);
         }
     }
+
 }

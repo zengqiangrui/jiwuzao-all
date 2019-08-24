@@ -291,6 +291,10 @@ public class Pattern {
         return patternReg(qq,"^[1-9][0-9]{4,14}$");
     }
 
+    public static boolean isVersion(String version){
+        return patternReg(version,"^([1-9]\\d|[1-9])(\\.([1-9]\\d|\\d)){2}$");
+    }
+
     /**
      * 微信号
      * @return

@@ -31,7 +31,10 @@ public class AppVersion {
      * 版本号
      */
     @Indexed(unique = true)
-    private String version;
+    private String version;//版本值例如1.0.2
+
+    @Indexed(unique = true)
+    private Integer versionCode;//版本编号，用于比较对应为102
     /**
      * 更新内容
      */
