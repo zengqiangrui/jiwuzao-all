@@ -60,7 +60,7 @@ public class MerchantService {
      * 申请商家认证
      */
     public String verifyActor(int uid, String trueName, String idcard, String frontIdCardPhoto
-            , String handIdCardPhoto, String backIdCardPhoto, Long publicBankNo, String publicBankTrueName, OpeningBankEnum openingBank, String companyName, String uscc, String businessLicense, String otherSupportPhotos) {
+            , String handIdCardPhoto, String backIdCardPhoto, Long publicBankNo, String publicBankTrueName, String openingBank, String companyName, String uscc, String businessLicense,String accountOpenLicence, String otherSupportPhotos) {
         VerifyActor verifyActor = verifyActorRepository.findByUid(uid);
         if (verifyActor != null) {
             if (verifyActor.getAuditType() == AuditTypeEnum.refuse) {
@@ -75,7 +75,7 @@ public class MerchantService {
         if (verifyActorRepository.findByUsccAndAuditType(uscc, AuditTypeEnum.agree) != null) {
             return "改企业已被实名注册过";
         }
-        verifyActor = new VerifyActor(null, uid, System.currentTimeMillis(), trueName, idcard, frontIdCardPhoto, backIdCardPhoto, handIdCardPhoto, publicBankNo, publicBankTrueName, openingBank, companyName, uscc, businessLicense, otherSupportPhotos, AuditTypeEnum.wait, null, null);
+        verifyActor = new VerifyActor(null, uid, System.currentTimeMillis(), trueName, idcard, frontIdCardPhoto, backIdCardPhoto, handIdCardPhoto, publicBankNo, publicBankTrueName, openingBank,accountOpenLicence, companyName, uscc, businessLicense, otherSupportPhotos, AuditTypeEnum.wait, null, null);
         verifyActorRepository.insert(verifyActor);
         return null;
     }

@@ -65,8 +65,7 @@ public class WithdrawOrder {
     /**
      * 银行卡开户行
      */
-    @Enumerated(EnumType.STRING)
-    private OpeningBankEnum openingBank;
+    private String openingBank;
     /**
      * 提现备注
      */

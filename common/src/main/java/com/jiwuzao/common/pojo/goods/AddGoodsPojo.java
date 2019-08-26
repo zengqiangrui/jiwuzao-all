@@ -42,7 +42,7 @@ public class AddGoodsPojo {
     private String slideshow;
     @Decimal(zero = true)
     private BigDecimal postage = BigDecimal.ZERO;
-    @StringMax
+    @StringMax(require = false)
     private String detailLabel;
     @StringMax
     private String goodsType;

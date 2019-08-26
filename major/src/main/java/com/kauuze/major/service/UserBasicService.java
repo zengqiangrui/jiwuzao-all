@@ -261,7 +261,7 @@ public class UserBasicService {
      * @return
      */
     public boolean validNickName(String nickName) {
-        if(StringUtil.isBlank(nickName))
+        if (StringUtil.isBlank(nickName))
             return false;
         User user = userRepository.findByNickName(nickName);
         UserInfo userInfo = userInfoRepository.findByNickName(nickName);
@@ -285,6 +285,7 @@ public class UserBasicService {
         if (validPhone(phone)) {
             return new StateModel("registered");
         }
+        if (StringUtil.isBlank(nickName)) nickName = StringUtil.getRandomNickName(4);
         if (validNickName(nickName)) {
             return new StateModel("nickNameExist");
         }

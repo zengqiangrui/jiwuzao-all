@@ -30,17 +30,19 @@ public class VerifyActorPojo {
     @Url
     private String backIdCardPhoto;//身份证背面
     @BankNo
-    private Long bankNo;//银行号码
-    @TrueName
-    private String bankTrueName;
-    @NotNull
-    private OpeningBankEnum openingBank;
+    private Long bankNo;//银行开户行
+    @StringMax(max = 32)
+    private String bankTrueName;//开户名称
+    @StringMax
+    private String openingBank;
     @StringMax(max = 30)
-    private String companyName;
+    private String companyName;//公司名
     @StringMax(max = 18)
     private String uscc;
     @Url
     private String businessLicense;
+    @Url
+    private String accountOpenLicence;
     @Urls
     private String otherSupportPhotos;
 }

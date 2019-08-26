@@ -246,24 +246,18 @@ public class Pattern {
     }
 
     public static boolean isUrl(String url){
-        if(patternReg(url,"^((ht|f)tps?):\\/\\/[\\w\\-]+(\\.[\\w\\-]+)+([\\w\\-.,@?^=%&:\\/~+#]*[\\w\\-@?^=%&\\/~+#])?$")){
-            return true;
-        }else{
-            return false;
-        }
+        return patternReg(url, "^((ht|f)tps?):\\/\\/[\\w\\-]+(\\.[\\w\\-]+)+([\\w\\-.,@?^=%&:\\/~+#]*[\\w\\-@?^=%&\\/~+#])?$");
     }
 
     public static boolean isUrls(String urls){
         List<String> list = StringUtil.splitComma(urls);
         for (String s : list) {
+            if(StringUtil.isBlank(s)) continue;
             if(!isUrl(s)){
                 return false;
             }
         }
-        if(list.size() > 9){
-            return false;
-        }
-        return true;
+        return list.size() <= 9;
     }
 
     /**

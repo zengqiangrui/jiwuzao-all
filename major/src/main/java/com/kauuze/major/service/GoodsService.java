@@ -58,8 +58,6 @@ public class GoodsService {
     @Autowired
     private StoreRepository storeRepository;
     @Autowired
-    private SystemGoodsRepository systemGoodsRepository;
-    @Autowired
     private CategoryRepository categoryRepository;
     @Autowired
     private GoodsCommentRepository goodsCommentRepository;

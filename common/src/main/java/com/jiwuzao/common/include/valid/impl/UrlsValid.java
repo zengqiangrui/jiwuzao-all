@@ -27,11 +27,7 @@ public class UrlsValid implements ConstraintValidator<Urls,Object> {
             if(Pattern.require(o,require)){
                 return true;
             }
-            if(Pattern.isUrls(String.valueOf(o))){
-                return true;
-            }else{
-                return false;
-            }
+            return Pattern.isUrls(String.valueOf(o));
         } catch (Exception e) {
             return false;
         }

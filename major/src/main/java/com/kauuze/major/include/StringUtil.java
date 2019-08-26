@@ -2,9 +2,11 @@ package com.kauuze.major.include;
 
 import org.junit.Test;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 /**
  * @author kauuze
@@ -64,6 +66,27 @@ public class StringUtil {
 
     public static String getUrn(String uri) {
         return uri.substring(uri.lastIndexOf("/") + 1, uri.length());
+    }
+
+    public static String getRandomNickName(int len) {
+        StringBuilder ret = new StringBuilder();
+        for (int i = 0; i < len; i++) {
+            String str = null;
+            int hightPos, lowPos; // 定义高低位
+            Random random = new Random();
+            hightPos = (176 + Math.abs(random.nextInt(39))); // 获取高位值
+            lowPos = (161 + Math.abs(random.nextInt(93))); // 获取低位值
+            byte[] b = new byte[2];
+            b[0] = (new Integer(hightPos).byteValue());
+            b[1] = (new Integer(lowPos).byteValue());
+            try {
+                str = new String(b, "GBK"); // 转成中文
+            } catch (UnsupportedEncodingException ex) {
+                ex.printStackTrace();
+            }
+            ret.append(str);
+        }
+        return ret.toString();
     }
 
     @Test

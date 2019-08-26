@@ -49,7 +49,7 @@ public class MerchantController {
     @Authorization
     public JsonResult verifyActor(@RequestAttribute int uid, @Valid @RequestBody VerifyActorPojo verifyActorPojo) {
         System.out.println("申请匠人id" + uid);
-        String result = merchantService.verifyActor(uid, verifyActorPojo.getBankTrueName(), verifyActorPojo.getIdcard(), verifyActorPojo.getFrontIdCardPhoto(), verifyActorPojo.getHandIdCardPhoto(), verifyActorPojo.getBackIdCardPhoto(), verifyActorPojo.getBankNo(), verifyActorPojo.getBankTrueName(), verifyActorPojo.getOpeningBank(), verifyActorPojo.getCompanyName(), verifyActorPojo.getUscc(), verifyActorPojo.getBusinessLicense(), verifyActorPojo.getOtherSupportPhotos());
+        String result = merchantService.verifyActor(uid, verifyActorPojo.getBankTrueName(), verifyActorPojo.getIdcard(), verifyActorPojo.getFrontIdCardPhoto(), verifyActorPojo.getHandIdCardPhoto(), verifyActorPojo.getBackIdCardPhoto(), verifyActorPojo.getBankNo(), verifyActorPojo.getBankTrueName(), verifyActorPojo.getOpeningBank(), verifyActorPojo.getCompanyName(), verifyActorPojo.getUscc(), verifyActorPojo.getBusinessLicense(), verifyActorPojo.getAccountOpenLicence(),verifyActorPojo.getOtherSupportPhotos());
         if (StringUtil.isBlank(result)) {
             return JsonResult.success();
         } else {

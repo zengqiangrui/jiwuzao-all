@@ -62,7 +62,11 @@ public class VerifyActor {
     /**
      * 银行卡开户行
      */
-    private OpeningBankEnum openingBank;
+    private String openingBank;
+    /**
+     * 开户许可证
+     */
+    private String accountOpenLicence;
     /**
      * 企业名称
      */
