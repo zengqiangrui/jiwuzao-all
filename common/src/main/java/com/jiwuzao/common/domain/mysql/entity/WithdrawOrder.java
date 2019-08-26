@@ -57,7 +57,7 @@ public class WithdrawOrder {
     /**
      * 银行卡号
      */
-    private Long bankNo;
+    private String bankNo;
     /**
      * 银行卡姓名
      */

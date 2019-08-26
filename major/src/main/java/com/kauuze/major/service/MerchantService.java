@@ -60,7 +60,7 @@ public class MerchantService {
      * 申请商家认证
      */
     public String verifyActor(int uid, String trueName, String idcard, String frontIdCardPhoto
-            , String handIdCardPhoto, String backIdCardPhoto, Long publicBankNo, String publicBankTrueName, String openingBank, String companyName, String uscc, String businessLicense,String accountOpenLicence, String otherSupportPhotos) {
+            , String handIdCardPhoto, String backIdCardPhoto, String publicBankNo, String publicBankTrueName, String openingBank, String companyName, String uscc, String businessLicense,String accountOpenLicence, String otherSupportPhotos) {
         VerifyActor verifyActor = verifyActorRepository.findByUid(uid);
         if (verifyActor != null) {
             if (verifyActor.getAuditType() == AuditTypeEnum.refuse) {

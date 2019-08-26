@@ -29,15 +29,15 @@ public class VerifyActorPojo {
     private String handIdCardPhoto;//手持身份证
     @Url
     private String backIdCardPhoto;//身份证背面
-    @BankNo
-    private Long bankNo;//银行开户行
     @StringMax(max = 32)
+    private String bankNo;//银行开户行
+    @StringMax
     private String bankTrueName;//开户名称
     @StringMax
     private String openingBank;
-    @StringMax(max = 30)
+    @StringMax
     private String companyName;//公司名
-    @StringMax(max = 18)
+    @StringMax
     private String uscc;
     @Url
     private String businessLicense;

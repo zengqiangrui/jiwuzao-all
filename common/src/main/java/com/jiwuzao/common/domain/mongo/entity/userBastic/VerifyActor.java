@@ -54,7 +54,7 @@ public class VerifyActor {
     /**
      * 对公银行卡号
      */
-    private Long bankNo;
+    private String bankNo;
     /**
      *对公银行卡姓名
      */
