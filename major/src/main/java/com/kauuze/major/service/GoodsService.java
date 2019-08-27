@@ -26,6 +26,7 @@ import com.kauuze.major.domain.common.MongoUtil;
 import com.kauuze.major.domain.mongo.repository.*;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import com.kauuze.major.domain.mysql.repository.UserRepository;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -386,7 +387,7 @@ public class GoodsService {
         if (uid != -1 && appriseRepository.findByGidAndUid(gid, uid) != null) {
             apprised = true;
         }
-        if (user == null || info == null)
+        if (info == null)
             return null;
 
         //获取关注列表
@@ -405,11 +406,15 @@ public class GoodsService {
                 .setNickName(user.getNickName()).setPortrait(info.getPortrait()).setDeliveryTime(goods.getDeliveryTime().getMsg())
                 .setGoodsType(detail.getGoodsType()).setGoodsTypeClass(detail.getGoodsTypeClass())
                 .setCover(goods.getCover()).setAppriseCnt(detail.getAppriseCnt())
-                .setUid(goods.getUid()).setStoreName(store.getStoreName())
+                .setUid(goods.getUid()).setStoreName(store.getStoreName()).setPersonalSign(info.getPersonalSign())
                 .setApprised(apprised).setAppriseList(list);
         return vo;
     }
 
+    @Test
+    public void show() {
+        System.out.println("6628B37BB954959A751E37CA29ED8B9D".length());
+    }
 
     /**
      * 获取商品列表

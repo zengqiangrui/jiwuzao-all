@@ -70,6 +70,11 @@ public class GoodsDetailVO {
     private String portrait;
 
     /**
+     * 匠人个性签名
+     */
+    private String personalSign;
+
+    /**
      * 商品规格分类
      */
     private String goodsType;
