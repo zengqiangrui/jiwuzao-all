@@ -3,6 +3,7 @@ package com.kauuze.major.service;
 import com.jiwuzao.common.domain.mongo.entity.AppVersion;
 import com.jiwuzao.common.domain.mongo.entity.SystemNotice;
 import com.jiwuzao.common.include.StringUtil;
+import com.jiwuzao.common.vo.common.AppUpdateVO;
 import com.kauuze.major.domain.mongo.repository.AppVersionRepository;
 import com.kauuze.major.domain.mongo.repository.SystemNoticeRepository;
 import com.jiwuzao.common.include.PageUtil;
@@ -11,9 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author kauuze
@@ -38,6 +38,15 @@ public class SystemService {
         list.add(appVersionRepository.findByVersion(currentVersion));
         list.add(appVersionRepository.findAll(PageUtil.getMaxOne("createTime")).getContent().get(0));
         return list;
+    }
+
+    public AppUpdateVO getUpdate() {
+        List<AppVersion> all = appVersionRepository.findAll();
+        Optional<AppVersion> first = all.stream().filter(appVersion -> !appVersion.getStop()).max(Comparator.comparingInt(AppVersion::getVersionCode));
+        if(!first.isPresent()) throw new RuntimeException("版本异常");
+        AppVersion appVersion = first.get();
+        return new AppUpdateVO().setLastUpdateTime(appVersion.getCreateTime()).setUpdateMsg(appVersion.getUpdateContent())
+                .setAppVersionName(appVersion.getVersion()).setAppVersionCode(appVersion.getVersionCode());
     }
 
     public AppVersion createUpdateVersion(String version, Integer versionCode, String downloadUrl, String updateMsg) {

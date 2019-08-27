@@ -1,5 +1,7 @@
 package com.jiwuzao.common.vo.goods;
 
+import com.jiwuzao.common.domain.enumType.DeliveryTimeEnum;
+import com.jiwuzao.common.domain.enumType.GoodsReturnEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -37,6 +39,10 @@ public class GoodsDetailVO {
      * 标题
      */
     private String title;
+
+    private String goodsReturn;
+
+    private String deliveryTime;
 
     /**
      * 商品封面

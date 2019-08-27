@@ -37,7 +37,7 @@ public class ApplicationRunnerAfter implements ApplicationRunner {
         if (!ConfigUtil.validCustomEnvironment()) {
             throw new RuntimeException("validCustomEnvironment error!");
         }
-
+//手动修改更新版本
 //        if (StringUtil.isEq(ConfigUtil.customEnvironment, "prod")) {
 //            SystemService bean = SpringContext.getBean(SystemService.class);
 //            AppVersion appVersion = bean.createUpdateVersion("1.0.0", 100, "http://download.jiwuzao.com/jiwuzao.apk", "更新");

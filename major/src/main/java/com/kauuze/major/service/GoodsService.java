@@ -401,8 +401,8 @@ public class GoodsService {
         GoodsDetailVO vo = new GoodsDetailVO();
         vo.setTitle(goods.getTitle()).setDefaultPrice(goods.getDefaultPrice()).setStoreId(goods.getSid())
                 .setDetailLabel(detail.getDetailLabel()).setDetailPhotos(detail.getDetailPhotos())
-                .setPostage(goods.getPostage()).setSlideshow(detail.getSlideshow())
-                .setNickName(user.getNickName()).setPortrait(info.getPortrait())
+                .setPostage(goods.getPostage()).setSlideshow(detail.getSlideshow()).setGoodsReturn(goods.getGoodsReturn().getMsg())
+                .setNickName(user.getNickName()).setPortrait(info.getPortrait()).setDeliveryTime(goods.getDeliveryTime().getMsg())
                 .setGoodsType(detail.getGoodsType()).setGoodsTypeClass(detail.getGoodsTypeClass())
                 .setCover(goods.getCover()).setAppriseCnt(detail.getAppriseCnt())
                 .setUid(goods.getUid()).setStoreName(store.getStoreName())

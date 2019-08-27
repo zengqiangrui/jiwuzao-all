@@ -1,7 +1,9 @@
 import com.jiwuzao.common.domain.enumType.ReceiptEnum;
+import com.jiwuzao.common.vo.common.AppUpdateVO;
 import com.kauuze.major.MajorApplication;
 import com.kauuze.major.domain.mysql.repository.ReceiptRepository;
 import com.kauuze.major.service.ShopCartService;
+import com.kauuze.major.service.SystemService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +22,8 @@ public class ShopCartTest{
     ShopCartService shopCartService;
     @Autowired
     private ReceiptRepository receiptRepository;
+    @Autowired
+    private SystemService systemService;
 
     @Test
     public void testReceipt(){
@@ -38,5 +42,11 @@ public class ShopCartTest{
 //        cidList.add("5d2ec5e26a4d804649c28348");
 //        cidList.add("5d2ec62a6a4d8046ce4697b2");
 //        shopCartService.delItems(cidList);
+    }
+
+    @Test
+    public void getVersion(){
+        AppUpdateVO update = systemService.getUpdate();
+        System.out.println(update);
     }
 }
