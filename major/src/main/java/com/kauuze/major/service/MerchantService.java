@@ -215,7 +215,7 @@ public class MerchantService {
         List<StoreSimpleVO> list = new ArrayList<>();
         for (Store store : storesPage.getContent()) {
             StoreSimpleVO storeSimpleVO = new StoreSimpleVO()
-                    .setStoreIcon(store.getStoreIcon()).setStoreId(store.getId())
+                    .setStoreIcon(store.getStoreIcon()).setStoreId(store.getId()).setArtisanName(getVerifyActor(store.getUid()).getTrueName())
                     .setStoreName(store.getStoreName()).setStyle(store.getStoreStyle())
                     .setDescription(userBasicService.getUserOpenDto(store.getUid()).getPersonalSign());
             list.add(storeSimpleVO);

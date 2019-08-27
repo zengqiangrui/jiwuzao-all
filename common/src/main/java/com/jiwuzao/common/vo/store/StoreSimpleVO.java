@@ -18,6 +18,8 @@ public class StoreSimpleVO {
 
     private String storeName;
 
+    private String artisanName;
+
     private String storeIcon;
 
     private String description;
