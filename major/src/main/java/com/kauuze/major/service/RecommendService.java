@@ -41,7 +41,7 @@ public class RecommendService {
             GoodsSimpleVO goodsSimpleVO = new GoodsSimpleVO();
             goodsSimpleVO.setGoodsId(item.getGid()).setGoodsName(item.getTitle())
                     .setGoodsImg(item.getCover()).setGoodsPrice(item.getDefaultPrice());
-            if (!goodsSimpleVOS.contains(goodsSimpleVO) && goodsSimpleVOS.size() < 7) {
+            if (!goodsSimpleVOS.contains(goodsSimpleVO) && goodsSimpleVOS.size() < 6) {
                 goodsSimpleVOS.add(goodsSimpleVO);
             }
         }

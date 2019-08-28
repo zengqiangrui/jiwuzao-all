@@ -640,7 +640,7 @@ public class GoodsService {
         List<ViewHistoryVO> volist = new ArrayList<>();
         for (ViewHistory e : list) {
             Goods goods = goodsRepository.findByGid(e.getGid());
-            if (goods == null) {
+            if (goods == null || !goods.getPutaway()) {//过滤商品未上架
                 continue;
             }
             ViewHistoryVO vo = new ViewHistoryVO(e.getId(), e.getGid(), e.getTime(), goods.getTitle(), goods.getCover(), goods.getDefaultPrice());
