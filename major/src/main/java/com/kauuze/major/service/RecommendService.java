@@ -1,19 +1,23 @@
 package com.kauuze.major.service;
 
 import com.jiwuzao.common.domain.enumType.GoodsClassifyEnum;
+import com.jiwuzao.common.domain.mongo.entity.Category;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.jiwuzao.common.domain.mongo.entity.RecommendGoods;
 import com.jiwuzao.common.vo.goods.GoodsSimpleVO;
+import com.kauuze.major.domain.mongo.repository.CategoryRepository;
 import com.kauuze.major.domain.mongo.repository.GoodsDetailRepository;
 import com.kauuze.major.domain.mongo.repository.GoodsRepository;
 import com.kauuze.major.domain.mongo.repository.RecommendGoodsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class RecommendService {
@@ -24,7 +28,8 @@ public class RecommendService {
     private GoodsDetailRepository goodsDetailRepository;
     @Autowired
     private RecommendGoodsRepository recommendGoodsRepository;
-
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     public List<GoodsSimpleVO> getGoodsSimilar(String goodsId) {
         Optional<Goods> byId = goodsRepository.findById(goodsId);
@@ -66,10 +71,24 @@ public class RecommendService {
 
     /**
      * 根据主分类获取一个推荐
+     *
      * @param goodsClassify
      * @return
      */
-    public RecommendGoods getOne(GoodsClassifyEnum goodsClassify){
-        return recommendGoodsRepository.findByGoodsClassifyAndStatus(goodsClassify,true).orElse(null);
+    public RecommendGoods getOne(GoodsClassifyEnum goodsClassify) {
+        return recommendGoodsRepository.findByGoodsClassifyAndStatus(goodsClassify, true).orElse(null);
+    }
+
+    public GoodsSimpleVO getSimpleByCategory(GoodsClassifyEnum goodsClassify) {
+        Goods goods = goodsRepository.findByClassifyAndPutaway(PageRequest.of(0, 10), goodsClassify, true).get(0);
+        return new GoodsSimpleVO().setGoodsPrice(goods.getDefaultPrice())
+                .setGoodsName(goods.getTitle()).setGoodsImg(goods.getCover()).setGoodsId(goods.getGid());
+    }
+
+    public List<GoodsSimpleVO> getHeadGoodsList() {
+        //todo 商品列表头部推荐算法,暂时取极物造店铺中前五个
+        List<Goods> list = goodsRepository.findAllBySidAndPutaway("5d639c11d6018000015e1865", true);
+        return list.stream().map(goods -> new GoodsSimpleVO().setGoodsId(goods.getGid()).setGoodsImg(goods.getCover()).setGoodsName(goods.getTitle()).setGoodsPrice(goods.getDefaultPrice()))
+                .limit(5L).collect(Collectors.toList());
     }
 }

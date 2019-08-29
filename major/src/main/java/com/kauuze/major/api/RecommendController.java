@@ -23,11 +23,23 @@ public class RecommendController {
     @Autowired
     private RecommendService recommendService;
 
+    /**
+     * 每个类目推荐一件商品
+     *
+     * @param pojo
+     * @return
+     */
     @RequestMapping("/goodsByCategory")
-    public JsonResult goodsByCategory(@RequestBody @Valid CategoryPojo pojo) {
-        return null;
+    public JsonResult goodsByCategory(@RequestBody @Valid GoodsClassifyPojo pojo) {
+        GoodsSimpleVO goodsSimpleVO = recommendService.getSimpleByCategory(pojo.getGoodsClassify());
+        return JsonResult.success(goodsSimpleVO);
     }
 
+    @RequestMapping("/getHeadGoodsList")
+    public JsonResult getHeadGoodsList(){
+        List<GoodsSimpleVO> list = recommendService.getHeadGoodsList();
+        return JsonResult.success(list);
+    }
 
     @RequestMapping("/goodsSimilar")
     public JsonResult getGoodsSimilar(@RequestBody @Valid GoodsItemPojo pojo) {

@@ -72,6 +72,7 @@ public class ExpressController {
              * 订阅物流轨迹的推送
              */
             ExpressRequestReturnDto returnDto = expressService.orderTracesSubByJson(express.getExpCode(), express.getExpNo(), express.getOrderNo(), express.getAddressId());
+            log.info("物流订阅信息:{}",returnDto);
             if (returnDto.getSuccess()) {
                 //订阅成功
                 expressService.addExpressOrder(express.getExpCode(), express.getExpNo(), express.getOrderNo(), true);
