@@ -138,6 +138,7 @@ public class OrderService {
         //遍历购买列表， 为每件物品生成goodsOrder,将所有费用相加放入payOrder
         for (AddItemPojo e : itemList) {
             Goods goods = goodsRepository.findByGid(e.getGid());
+            if (goods == null || !goods.getPutaway()) throw new OrderException(OrderExceptionEnum.GOODS_TAKE_OFF);
             GoodsSpec goodsSpec = goodsSpecRepository.findById(e.getSpecId()).get();
 
             //生成GoodsOrderDetail
@@ -581,6 +582,7 @@ public class OrderService {
 
     /**
      * 订单已签收，待评价
+     *
      * @param logisticCode
      * @param waitAppraise
      */

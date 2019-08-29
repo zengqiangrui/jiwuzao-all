@@ -4,6 +4,7 @@ import com.jiwuzao.common.domain.enumType.GoodsClassifyEnum;
 import com.jiwuzao.common.domain.mongo.entity.Category;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.jiwuzao.common.domain.mongo.entity.RecommendGoods;
+import com.jiwuzao.common.exception.OrderException;
 import com.jiwuzao.common.vo.goods.GoodsSimpleVO;
 import com.kauuze.major.domain.mongo.repository.CategoryRepository;
 import com.kauuze.major.domain.mongo.repository.GoodsDetailRepository;
@@ -88,7 +89,7 @@ public class RecommendService {
     public List<GoodsSimpleVO> getHeadGoodsList() {
         //todo 商品列表头部推荐算法,暂时取极物造店铺中前五个
         List<Goods> list = goodsRepository.findAllBySidAndPutaway("5d639c11d6018000015e1865", true);
-        return list.stream().map(goods -> new GoodsSimpleVO().setGoodsId(goods.getGid()).setGoodsImg(goods.getCover()).setGoodsName(goods.getTitle()).setGoodsPrice(goods.getDefaultPrice()))
-                .limit(5L).collect(Collectors.toList());
+        return list.stream().sorted(Comparator.comparingLong(Goods::getCreateTime).reversed()).map(goods -> new GoodsSimpleVO().setGoodsId(goods.getGid()).setGoodsImg(goodsDetailRepository.findByGid(goods.getGid()).get().getSlideshow().split(",")[0]).setGoodsName(goods.getTitle()).setGoodsPrice(goods.getDefaultPrice()))
+        .limit(5L).collect(Collectors.toList());
     }
 }

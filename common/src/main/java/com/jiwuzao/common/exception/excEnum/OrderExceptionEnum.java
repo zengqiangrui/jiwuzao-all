@@ -20,7 +20,8 @@ public enum OrderExceptionEnum {
     DELIVER_FAIL(12, "发货失败"),
     HAS_RECEIPT(13, "已经开具发票"),
     ORDER_STATUS_NO_FIT(14, "订单状态不匹配"),
-    REFUND_NOT_FOUND(15, "退款订单未找到");
+    REFUND_NOT_FOUND(15, "退款订单未找到"),
+    GOODS_TAKE_OFF(16, "所购商品已下架");
 
     private Integer code;
 
