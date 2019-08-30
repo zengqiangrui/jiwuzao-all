@@ -15,7 +15,7 @@ public class GoodsPagePojo {
     /**
      * 每页容量
      */
-    private Integer pageSize = 40;
+    private Integer pageSize = 10;
 
     /**
      * 当前页

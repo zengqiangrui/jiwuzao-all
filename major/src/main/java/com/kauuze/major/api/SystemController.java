@@ -26,6 +26,11 @@ public class SystemController {
         return JsonResult.success(systemService.getUpdate(appVersionPojo.getCurrentVersion()));
     }
 
+    @RequestMapping("/getUpdate")
+    public JsonResult getUpdate(){
+        return JsonResult.success(systemService.getUpdate());
+    }
+
     @RequestMapping("/systemNotice")
     public JsonResult systemNotice(){
         return JsonResult.success(systemService.systemNotice());

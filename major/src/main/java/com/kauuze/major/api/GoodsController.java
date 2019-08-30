@@ -149,7 +149,7 @@ public class GoodsController {
         } else {
             page = goodsService.getGoodsSimple(uid, pageAble);
         }
-        if (page.getContent().size() != 0)
+        if (!page.getContent().isEmpty())
             return JsonResult.success(page);
         return JsonResult.failure("没找到商品信息");
     }
@@ -259,7 +259,7 @@ public class GoodsController {
      * @return
      */
     @RequestMapping("/getGoodsByClassfy")
-    public JsonResult getGoodsByClassfy(@RequestBody GoodsPagePojo goodsPagePojo) {
+    public JsonResult getGoodsByClassify(@RequestBody GoodsPagePojo goodsPagePojo) {
         System.out.println(goodsPagePojo);
         List<Goods> goodsList = goodsService.getGoodsList(goodsPagePojo);
         if (!goodsList.isEmpty()) {

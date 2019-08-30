@@ -19,10 +19,7 @@ public class StringUtil {
             return true;
         }
         str = str.trim();
-        if ("".equals(str) || "null".equals(str)) {
-            return true;
-        }
-        return false;
+        return "".equals(str) || "null".equals(str) || "undefined".equals(str);
     }
 
     public static boolean isEq(String value, String value2) {

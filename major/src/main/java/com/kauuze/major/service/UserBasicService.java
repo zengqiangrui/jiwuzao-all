@@ -273,7 +273,7 @@ public class UserBasicService {
      * success--accessToken
      *
      * @param phone
-     * @param pwd
+     * @param pwd 密码
      * @param nickName
      * @param msCode
      * @return

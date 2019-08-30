@@ -37,12 +37,6 @@ public class ApplicationRunnerAfter implements ApplicationRunner {
         if (!ConfigUtil.validCustomEnvironment()) {
             throw new RuntimeException("validCustomEnvironment error!");
         }
-//手动修改更新版本
-//        if (StringUtil.isEq(ConfigUtil.customEnvironment, "prod")) {
-//            SystemService bean = SpringContext.getBean(SystemService.class);
-//            AppVersion appVersion = bean.createUpdateVersion("1.0.0", 100, "http://download.jiwuzao.com/jiwuzao.apk", "更新");
-//            if(appVersion == null) throw new RuntimeException("请检查版本信息和更新环境");
-//        }
 
         AppVersionRepository appVersionRepository = SpringContext.getBean(AppVersionRepository.class);
         SystemNoticeRepository systemNoticeRepository = SpringContext.getBean(SystemNoticeRepository.class);
@@ -56,15 +50,27 @@ public class ApplicationRunnerAfter implements ApplicationRunner {
             systemGoodsRepository.insert(systemGoods);
         }
 
+        //手动修改更新版本
+//        if (StringUtil.isEq(ConfigUtil.customEnvironment, "prod")) {
+//            SystemService bean = SpringContext.getBean(SystemService.class);
+//            AppVersion appVersion = bean.createUpdateVersion("1.0.0", 100, "http://download.jiwuzao.com/jiwuzao.apk", "更新");
+//            if(appVersion == null) throw new RuntimeException("请检查版本信息和更新环境");
+//        }
+
         if (appVersionRepository.findAll().size() == 0) {
             AppVersion appVersion = new AppVersion();
             appVersion.setCreateTime(System.currentTimeMillis());
             appVersion.setVersion("1.0.0");
             appVersion.setVersionCode(100);
             appVersion.setUpdateContent("系统初始化版本号");
+            appVersion.setDownloadUrl("http://download.jiwuzao.com/jiwuzao.apk");
             appVersion.setStop(false);
             appVersionRepository.insert(appVersion);
         }
+//        SystemService bean = SpringContext.getBean(SystemService.class);
+//        AppVersion appVersion = bean.createUpdateVersion("1.0.1", 101, "http://download.jiwuzao.com/jiwuzao.apk", "页面调整");
+//        if (appVersion == null) throw new RuntimeException("请检查版本信息和更新环境");
+
 
         if (systemNoticeRepository.findAll().size() == 0) {
             SystemNotice systemNotice = new SystemNotice();

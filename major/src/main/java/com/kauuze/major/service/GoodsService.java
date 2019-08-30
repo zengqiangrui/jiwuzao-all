@@ -17,6 +17,7 @@ import com.jiwuzao.common.dto.goods.GoodsOpenDto;
 import com.jiwuzao.common.dto.goods.GoodsSimpleDto;
 import com.jiwuzao.common.include.DateTimeUtil;
 import com.jiwuzao.common.include.PageDto;
+import com.jiwuzao.common.include.PageUtil;
 import com.jiwuzao.common.pojo.common.GoodsSpecPojo;
 import com.jiwuzao.common.pojo.goods.GoodsPagePojo;
 import com.jiwuzao.common.vo.goods.*;
@@ -411,24 +412,18 @@ public class GoodsService {
         return vo;
     }
 
-    @Test
-    public void show() {
-        System.out.println("6628B37BB954959A751E37CA29ED8B9D".length());
-    }
-
     /**
      * 获取商品列表
      *
      * @return
      */
     public List<Goods> getGoodsList(GoodsPagePojo goodsPagePojo) {
-//        Pageable pageable = PageUtil.getNewsInsert(page,size);
         PageRequest pageRequest = PageRequest.of(goodsPagePojo.getCurrentPage(), goodsPagePojo.getPageSize(),
                 Sort.Direction.DESC, goodsPagePojo.getSortBy());
         List<Goods> goodsPage = null;
         switch (goodsPagePojo.getCurrentTab()) {
             case 0:
-                //推荐，
+                //推荐
                 goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.food, true);
                 break;
             case 1:
