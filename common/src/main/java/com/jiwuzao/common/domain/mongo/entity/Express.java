@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.GeneratedValue;
@@ -24,6 +25,7 @@ public class Express {
     private String name;
 
     //快递公司编码
+    @Indexed
     private String code;
 
     //快递公司类型，分为常用，国内，国外，转运

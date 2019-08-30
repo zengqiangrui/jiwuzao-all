@@ -20,6 +20,15 @@ public class ShopCartItem {
     private Boolean checkStatus = false;
 
     /**
+     * 发货承诺
+     */
+    private String goodsDeliverPromise;
+    /**
+     * 退换承诺
+     */
+    private String goodsReturnPromise;
+
+    /**
      * 商品显示标题
      */
     private String goodsName;
@@ -38,6 +47,11 @@ public class ShopCartItem {
      * 商品价格
      */
     private String goodsPrice;
+
+    /**
+     * 商品运费
+     */
+    private String goodsPostage;
 
     /**
      * 商品数量

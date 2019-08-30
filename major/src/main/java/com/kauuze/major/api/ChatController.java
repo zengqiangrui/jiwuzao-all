@@ -131,11 +131,12 @@ public class ChatController {
         return JsonResult.success(chatMessageByGroup);
     }
 
+
     /**
      * 连接建立成功调用的方法
      */
     @OnOpen
-    public void onOpen(Session session, @PathParam("uid") String uid, @PathParam("groupId") String groupId) {
+    public void onOpen(Session session, @PathParam("uid") String uid, @PathParam("groupId") String groupId) throws IOException {
         this.session = session;
         this.uid = uid;
         this.groupId = groupId;

@@ -37,8 +37,8 @@ public class ShopCartService {
         String sid = goodsRepository.findByGid(gid).getSid();
         if (sid == null)
             return null;
-        if (shopCartRepository.findByUidAndSpecId(uid, specId) != null){
-            return "商品已在购物车中";  
+        if (shopCartRepository.findByUidAndSpecId(uid, specId) != null) {
+            return "商品已在购物车中";
         }
         ShopCart shopCart = new ShopCart(null, uid, sid, gid, specId, ShopCartEnum.settled, System.currentTimeMillis(), num);
         shopCartRepository.save(shopCart);
@@ -50,39 +50,33 @@ public class ShopCartService {
         List<ShopCart> items = shopCartRepository.findByUid(uid);
         //用map将同一个店铺的商品放在一个数组中
         Map<String, List<ShopCartItem>> map = new HashMap<>();
-        items.forEach(e ->{
+        items.forEach(e -> {
             String gid = e.getGid();
             String sid = e.getSid();
             Integer goodsNum = e.getNum();
             ShopCartItem item = makeItems(e.getId(), gid, e.getSpecId(), goodsNum);
-            List<ShopCartItem> list = map.get(sid);
-            if (list == null) {
-                list = new ArrayList<ShopCartItem>();
-                map.put(sid, list);
-            }
+            List<ShopCartItem> list = map.computeIfAbsent(sid, k -> new ArrayList<>());
             list.add(item);
         });
 
         //每个店铺组成一个ShopCartDto
         List<ShopCartVO> result = new ArrayList<>();
-        map.forEach((k,v)->{
+        map.forEach((k, v) -> {
             String sname = storeRepository.findById(k).get().getStoreName();
-            result.add(new ShopCartVO(k, false,sname, v));
+            result.add(new ShopCartVO(k, false, sname, v));
         });
         return result;
     }
 
-    public ShopCartItem makeItems(String cid, String gid, String specId, int goodsNum){
+    public ShopCartItem makeItems(String cid, String gid, String specId, int goodsNum) {
         Goods goods = goodsRepository.findByGid(gid);
-//        GoodsDetail detail = goodsDetailRepository.findByGid(gid).get();
         GoodsSpec goodsSpec = goodsSpecRepository.findById(specId).get();
-
-        return  new ShopCartItem(cid, gid, goods.getSid(),goodsSpec.getId(), false,goods.getTitle(), goods.getCover(), goodsSpec.getSpecClass(),
-                goodsSpec.getSpecPrice().toString(), goodsNum, goodsSpec.getSpecInventory());
+        return new ShopCartItem(cid, gid, goods.getSid(), goodsSpec.getId(), false, goods.getDeliveryTime().getMsg(), goods.getGoodsReturn().getMsg(), goods.getTitle(), goods.getCover(), goodsSpec.getSpecClass(),
+                goodsSpec.getSpecPrice().toString(), goods.getPostage().toString(), goodsNum, goodsSpec.getSpecInventory());
     }
 
     public String delItems(List<String> cidList) {
-        cidList.forEach(e->{
+        cidList.forEach(e -> {
             shopCartRepository.deleteById(e);
         });
         return "操作成功";
