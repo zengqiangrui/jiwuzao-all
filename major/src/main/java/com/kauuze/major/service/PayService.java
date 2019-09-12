@@ -60,10 +60,6 @@ public class PayService {
         list.forEach(e -> {
             e.setOrderStatus(OrderStatusEnum.waitDeliver);
             goodsOrderRepository.save(e);
-            String[] param = new String[2];
-            param[0] = e.getGoodsTitle();
-            param[1] = e.getSpecClass();
-            tencentUtil.sendDeliverNotice(merchantService.getMerchantStore(e.getUid2()).getServicePhone(),param);
         });
 
     }

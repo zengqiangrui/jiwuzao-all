@@ -9,10 +9,9 @@ import com.jiwuzao.common.pojo.shopcart.AddItemPojo;
 import com.jiwuzao.common.vo.store.AllEarningVO;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
-import com.kauuze.major.service.ExpressService;
-import com.kauuze.major.service.OrderService;
-import com.kauuze.major.service.PayService;
-import com.kauuze.major.service.WithdrawService;
+import com.kauuze.major.include.yun.TencentUtil;
+import com.kauuze.major.service.*;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Optional;
+@Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class OrderServiceTest {
@@ -38,6 +38,10 @@ public class OrderServiceTest {
     private ExpressService expressService;
     @Autowired
     private WithdrawService withdrawService;
+    @Autowired
+    private MerchantService merchantService;
+    @Autowired
+    private TencentUtil tencentUtil;
 
     @Test
     public void genOrder(){
@@ -79,6 +83,18 @@ public class OrderServiceTest {
             e.setOrderStatus(OrderStatusEnum.waitDeliver);
             goodsOrderRepository.save(e);
         });
+    }
+
+    @Test
+    public void testSendNotice(){
+        String[] param = new String[2];
+        Optional<GoodsOrder> byGoodsOrderNo = goodsOrderRepository.findByGoodsOrderNo("2019082705043683427");
+        GoodsOrder goodsOrder = byGoodsOrderNo.get();
+
+        param[0] = goodsOrder.getGoodsTitle();
+        param[1] = goodsOrder.getSpecClass();
+        tencentUtil.sendDeliverNotice(merchantService.getMerchantStore(goodsOrder.getUid2()).getServicePhone(),param);
+        log.info("发送短信：{}",goodsOrder);
     }
 
 
