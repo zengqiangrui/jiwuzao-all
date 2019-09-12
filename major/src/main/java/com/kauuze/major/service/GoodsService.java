@@ -577,8 +577,6 @@ public class GoodsService {
     public Long addApprise(int uid, String gid) {
         //判断对象是否存在
         GoodsDetail detail = goodsDetailRepository.findByGid(gid).get();
-        if (detail == null)
-            return null;
         //判断是否已经点过赞
         Apprise apprise = appriseRepository.findByGidAndUid(gid, uid);
         if (apprise != null) {

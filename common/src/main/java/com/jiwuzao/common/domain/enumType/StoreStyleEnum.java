@@ -1,5 +1,8 @@
 package com.jiwuzao.common.domain.enumType;
 
+import lombok.Getter;
+
+@Getter
 public enum StoreStyleEnum {
     chinese("中国风"),
     japanese("日式"),

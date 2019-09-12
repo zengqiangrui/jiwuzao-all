@@ -55,6 +55,8 @@ public class ConfigBean implements WebMvcConfigurer {
         return wxPayService;
     }
 
+    
+
     @Bean
     public MongoClientOptions mongoOptions() {
         return MongoClientOptions

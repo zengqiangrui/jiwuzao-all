@@ -11,6 +11,7 @@ import com.jiwuzao.common.exception.excEnum.OrderExceptionEnum;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderDetailRepository;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
+import com.kauuze.major.include.yun.TencentUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,8 @@ public class PayService {
     private GoodsOrderRepository goodsOrderRepository;
     @Autowired
     private GoodsOrderDetailRepository goodsOrderDetailRepository;
+    @Autowired
+    private TencentUtil tencentUtil;
 
     @Transactional(rollbackOn = Exception.class)
     public void handleNotify(WxPayOrderNotifyResult notifyResult) throws OrderException {
@@ -54,6 +57,7 @@ public class PayService {
             e.setOrderStatus(OrderStatusEnum.waitDeliver);
             goodsOrderRepository.save(e);
         });
+
     }
 
     /**

@@ -10,5 +10,6 @@ import org.springframework.stereotype.Component;
 public class TencentSmsPropertis {
     private Integer appId;
     private String appKey;
-    private Integer templateId;
+    private Integer smsTemplateId;
+    private Integer deliverTemplateId;
 }

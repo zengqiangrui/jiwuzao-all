@@ -130,7 +130,7 @@ public class OrderController {
     public JsonResult getOrderReceipt(@RequestAttribute int uid, @Valid @RequestBody GetOrderPojo getOrderPojo) {
         Receipt receipt = orderService.getOrderReceipt(getOrderPojo.getGoodsOrderNo());
         if (receipt == null) {
-            return JsonResult.failure();
+            return JsonResult.success();
         } else {
             ReceiptVO receiptVO = new ReceiptVO();
             BeanUtils.copyProperties(receipt, receiptVO, "type");

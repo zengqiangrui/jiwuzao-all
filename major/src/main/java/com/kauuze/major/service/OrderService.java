@@ -34,6 +34,7 @@ import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
 import com.kauuze.major.include.Rand;
 import com.kauuze.major.include.StringUtil;
+import com.kauuze.major.include.yun.TencentUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +71,8 @@ public class OrderService {
     private StoreRepository storeRepository;
     @Autowired
     private ReceiptService receiptService;
-
+    @Autowired
+    private TencentUtil tencentUtil;
     /**
      * 用户通过购物车或者单个商品结算，传入商品数组生成订单
      *
