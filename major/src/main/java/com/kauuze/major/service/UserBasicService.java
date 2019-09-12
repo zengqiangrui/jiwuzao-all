@@ -69,12 +69,12 @@ public class UserBasicService {
     public Integer sendSms(String phone) {
         int msCode = Rand.getNumber(6);
         String[] params = {String.valueOf(msCode), "3"};
-        if(!SmsUtil.sendTp1(phone, msCode)){//发送失败
-            return null;
-        }
-//        if (!tencentUtil.sendSms(phone, params)) {
+//        if(!SmsUtil.sendTp1(phone, msCode)){//发送失败
 //            return null;
 //        }
+        if (!tencentUtil.sendSms(phone, params)) {
+            return null;
+        }
         Sms sms = smsRepository.findByPhone(phone);
         if (sms == null) {
             smsRepository.save(new Sms(null, phone, msCode, DateTimeUtil.covertMill(LocalDateTime.now().plusMinutes(5)), 0));

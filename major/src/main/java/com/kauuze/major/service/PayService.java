@@ -3,11 +3,13 @@ package com.kauuze.major.service;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
 import com.github.binarywang.wxpay.bean.notify.WxPayRefundNotifyResult;
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
+import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrderDetail;
 import com.jiwuzao.common.domain.mysql.entity.PayOrder;
 import com.jiwuzao.common.exception.OrderException;
 import com.jiwuzao.common.exception.excEnum.OrderExceptionEnum;
+import com.kauuze.major.domain.mongo.repository.StoreRepository;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderDetailRepository;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
@@ -30,6 +32,8 @@ public class PayService {
     private GoodsOrderRepository goodsOrderRepository;
     @Autowired
     private GoodsOrderDetailRepository goodsOrderDetailRepository;
+    @Autowired
+    private MerchantService merchantService;
     @Autowired
     private TencentUtil tencentUtil;
 
@@ -56,6 +60,10 @@ public class PayService {
         list.forEach(e -> {
             e.setOrderStatus(OrderStatusEnum.waitDeliver);
             goodsOrderRepository.save(e);
+            String[] param = new String[2];
+            param[0] = e.getGoodsTitle();
+            param[1] = e.getSpecClass();
+            tencentUtil.sendDeliverNotice(merchantService.getMerchantStore(e.getUid2()).getServicePhone(),param);
         });
 
     }
