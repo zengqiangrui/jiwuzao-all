@@ -73,6 +73,7 @@ public class OrderService {
     private ReceiptService receiptService;
     @Autowired
     private TencentUtil tencentUtil;
+
     /**
      * 用户通过购物车或者单个商品结算，传入商品数组生成订单
      *
@@ -567,6 +568,13 @@ public class OrderService {
 
     public GoodsOrder getByGoodsOrderNo(String goodsOrderNo) {
         Optional<GoodsOrder> optional = goodsOrderRepository.findByGoodsOrderNo(goodsOrderNo);
+        if (!optional.isPresent())
+            throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
+        return optional.get();
+    }
+
+    public GoodsOrderDetail getDetailByGoodsOrderNo(String goodsOrderNo) {
+        Optional<GoodsOrderDetail> optional = goodsOrderDetailRepository.findByGoodsOrderNo(goodsOrderNo);
         if (!optional.isPresent())
             throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
         return optional.get();

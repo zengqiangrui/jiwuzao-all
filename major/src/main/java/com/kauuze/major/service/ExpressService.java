@@ -24,6 +24,7 @@ import com.kauuze.major.domain.mysql.repository.GoodsOrderDetailRepository;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import com.qiniu.util.Json;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,8 +63,16 @@ public class ExpressService {
      * @throws Exception
      */
     public ExpressResult getOrderTracesByJson(String expCode, String expNo, String orderCode) throws Exception {
+        if(StringUtils.isAnyBlank(expCode,expNo,orderCode)) {
+            throw new RuntimeException("快递输入参数为空");
+        }
         KdniaoUtil kdniaoUtil = new KdniaoUtil();
-        String requestData = "{'OrderCode':'" + orderCode + "','ShipperCode':'" + expCode + "','LogisticCode':'" + expNo + "'}";
+        ExpressRequestDataDto requestDataDto = new ExpressRequestDataDto().setLogisticCode(expNo).setShipperCode(expCode).setOrderCode(orderCode);
+        String requestData = JsonUtil.toJsonString(requestDataDto);
+        if(expCode.equals("SF")){
+            GoodsOrderDetail orderDetail = orderService.getDetailByGoodsOrderNo(orderCode);
+            requestData = JsonUtil.toJsonString(requestDataDto.setCustomerName(StringUtil.getPhoneLast4(orderDetail.getReceiverPhone())));
+        }
         Map<String, String> params = new HashMap<>();
         params.put("RequestData", kdniaoUtil.urlEncoder(requestData, "UTF-8"));
         params.put("EBusinessID", properties.getEBusinessID());
@@ -72,13 +81,13 @@ public class ExpressService {
         params.put("DataSign", kdniaoUtil.urlEncoder(dataSign, "UTF-8"));
         params.put("DataType", "2");
         String result = kdniaoUtil.sendPost(properties.getTraceUrl(), params);
-        log.info("kdniaoTraceResult", result);
+        log.info("kdniaoTraceResult:{}", result);
         //获取并转换对象
         ExpressResultDto expressResultDto = JsonUtil.parseJsonString(result, ExpressResultDto.class);
         Optional<ExpressResult> byOrderCode = resultRepository.findByOrderCode(orderCode);
         ExpressResult expressResult = byOrderCode.orElse(new ExpressResult());
         BeanUtils.copyProperties(expressResultDto, expressResult);
-        log.info("快递物流信息expressResult", expressResult);
+        log.info("快递物流信息expressResult:{}", expressResult);
         //保存或更新快递信息
         return resultRepository.save(expressResult);
     }
@@ -255,8 +264,17 @@ public class ExpressService {
             throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
         } else {
             GoodsOrderDetail goodsOrderDetail = optional.get();
-            return getExpressOneByLogistic(goodsOrderDetail.getExpressNo());
+            ExpressShowDto expressShowDto = new ExpressShowDto().setOrderNo(goodsOrderNo).setExpNo(goodsOrderDetail.getExpressNo());
+//            return getExpressOneByLogistic(goodsOrderDetail.getExpressNo());
+            try {
+                ExpressResult orderTracesByJson = getOrderTracesByJson(goodsOrderDetail.getExpCode(), goodsOrderDetail.getExpressNo(), goodsOrderNo);
+                expressShowDto.setTraces(orderTracesByJson.getTraces());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return expressShowDto;
         }
+
     }
 
     /**

@@ -18,6 +18,10 @@ public class ExpressRequestDataDto {
     private String shipperCode;//快递公司编码
     @JsonProperty("LogisticCode")
     private String logisticCode;//快递单号
+    @JsonProperty("OrderCode")
+    private String orderCode;
+    @JsonProperty("CustomerName")
+    private String customerName;//若shipperCode为JD，该字段为青龙配送编码（商家编码），SF为寄件人或者收件人手机号后四位@see 快递鸟文档
     @JsonProperty("PayType")
     private String payType = "1";//支付类型
     @JsonProperty("ExpType")

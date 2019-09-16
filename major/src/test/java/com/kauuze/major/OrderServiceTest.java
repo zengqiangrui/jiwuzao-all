@@ -107,4 +107,12 @@ public class OrderServiceTest {
         AllEarningVO allEarningVO = withdrawService.merchantGetAllEarning("5d241a0a3e6e8aadf857f2f9");
         System.out.println(allEarningVO);
     }
+
+    @Test
+    public void showMyExpress() throws Exception {
+        ExpressResult sf = expressService.getOrderTracesByJson("SF", "265950109782", "2019091410055429234");
+//        ExpressResult sf = expressService.getOrderTracesByJson("YD", "4300633884396", "");
+
+        System.out.println(sf);
+    }
 }

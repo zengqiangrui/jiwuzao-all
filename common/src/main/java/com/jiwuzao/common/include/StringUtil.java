@@ -31,6 +31,13 @@ public class StringUtil {
         return value.equals(value2);
     }
 
+    public static String getPhoneLast4(String phone) {
+        if (!Pattern.isPhone(phone)) {
+            throw new RuntimeException("手机号格式错误");
+        }
+        return phone.substring(7, 11);
+    }
+
     public static List<String> splitComma(String s) {
         if (s == null) {
             return new ArrayList<>();
