@@ -41,14 +41,14 @@ public class PayController {
          */
         WxPayUnifiedOrderRequest req = new WxPayUnifiedOrderRequest();
         req.setSpbillCreateIp("118.24.254.146");
-        req.setNotifyUrl("http://api.jiwuzao.com/pay/notify/order");//todo 解析api.jiwuzao.com，同时本项目部署在此之上
+        req.setNotifyUrl("http://api.jiwuzao.com/pay/notify/order");
         req.setTradeType(WxPayConstants.TradeType.APP);//支付类型,jsapi需要传openid
         req.setBody("testbody");//商品介绍
         req.setOutTradeNo(Rand.getUUID());//传给微信的订单号
         req.setTotalFee(1);//金额,分
         log.info("请求参数",req);
         if(this.wxPayService.createOrder(req) instanceof WxPayAppOrderResult){
-            //todo
+
         }
         return this.wxPayService.createOrder(req);
     }
@@ -67,7 +67,6 @@ public class PayController {
         final WxPayOrderNotifyResult notifyResult = wxPayService.parseOrderNotifyResult(xmlData);
         log.info("支付回调信息",notifyResult);
         payService.handleNotify(notifyResult);
-        // TODO 根据自己业务场景需要构造返回对象
         return WxPayNotifyResponse.success("成功");
     }
 
@@ -85,7 +84,6 @@ public class PayController {
         final WxPayRefundNotifyResult notifyResult = wxPayService.parseRefundNotifyResult(xmlData);
         log.info("退款回调信息",notifyResult);
         payService.handleRefundNotify(notifyResult);
-        // TODO 根据自己业务场景需要构造返回对象
         return WxPayNotifyResponse.success("成功");
     }
 }

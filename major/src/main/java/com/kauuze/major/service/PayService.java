@@ -60,6 +60,7 @@ public class PayService {
         list.forEach(e -> {
             e.setOrderStatus(OrderStatusEnum.waitDeliver);
             goodsOrderRepository.save(e);
+            merchantService.sendDeliverMessage(e);
         });
 
     }

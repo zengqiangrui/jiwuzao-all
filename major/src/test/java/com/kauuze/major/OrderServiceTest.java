@@ -87,14 +87,8 @@ public class OrderServiceTest {
 
     @Test
     public void testSendNotice(){
-        String[] param = new String[2];
-        Optional<GoodsOrder> byGoodsOrderNo = goodsOrderRepository.findByGoodsOrderNo("2019082705043683427");
-        GoodsOrder goodsOrder = byGoodsOrderNo.get();
-
-        param[0] = goodsOrder.getGoodsTitle();
-        param[1] = goodsOrder.getSpecClass();
-        tencentUtil.sendDeliverNotice(merchantService.getMerchantStore(goodsOrder.getUid2()).getServicePhone(),param);
-        log.info("发送短信：{}",goodsOrder);
+        GoodsOrder goodsOrder = goodsOrderRepository.findByGoodsOrderNo("2019091206552677566").get();
+        merchantService.sendDeliverMessage(goodsOrder);
     }
 
 

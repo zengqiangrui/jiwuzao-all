@@ -4,6 +4,7 @@ import com.jiwuzao.common.domain.enumType.*;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.UserInfo;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.VerifyActor;
+import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
 import com.jiwuzao.common.domain.mysql.entity.User;
 import com.jiwuzao.common.domain.mysql.entity.WithdrawOrder;
 import com.jiwuzao.common.exception.StoreException;
@@ -12,10 +13,12 @@ import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.vo.store.StoreSimpleVO;
 import com.jiwuzao.common.vo.store.StoreVO;
 import com.kauuze.major.domain.mongo.repository.*;
+import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
 import com.kauuze.major.domain.mysql.repository.UserRepository;
 import com.kauuze.major.domain.mysql.repository.WithdrawOrderRepository;
 import com.kauuze.major.include.StringUtil;
+import com.kauuze.major.include.yun.TencentUtil;
 import com.kauuze.major.service.dto.merchant.MerchantUdpDto;
 import com.qiniu.util.Json;
 import lombok.extern.slf4j.Slf4j;
@@ -46,11 +49,7 @@ public class MerchantService {
     @Autowired
     private WithdrawOrderRepository withdrawOrderRepository;
     @Autowired
-    private GoodsRepository goodsRepository;
-    @Autowired
-    private SystemGoodsRepository systemGoodsRepository;
-    @Autowired
-    private PayOrderRepository payOrderRepository;
+    private TencentUtil tencentUtil;
     @Autowired
     private UserBasicService userBasicService;
     @Autowired
@@ -60,7 +59,7 @@ public class MerchantService {
      * 申请商家认证
      */
     public String verifyActor(int uid, String trueName, String idcard, String frontIdCardPhoto
-            , String handIdCardPhoto, String backIdCardPhoto, String publicBankNo, String publicBankTrueName, String openingBank, String companyName, String uscc, String businessLicense,String accountOpenLicence, String otherSupportPhotos) {
+            , String handIdCardPhoto, String backIdCardPhoto, String publicBankNo, String publicBankTrueName, String openingBank, String companyName, String uscc, String businessLicense, String accountOpenLicence, String otherSupportPhotos) {
         VerifyActor verifyActor = verifyActorRepository.findByUid(uid);
         if (verifyActor != null) {
             if (verifyActor.getAuditType() == AuditTypeEnum.refuse) {
@@ -75,7 +74,7 @@ public class MerchantService {
         if (verifyActorRepository.findByUsccAndAuditType(uscc, AuditTypeEnum.agree) != null) {
             return "改企业已被实名注册过";
         }
-        verifyActor = new VerifyActor(null, uid, System.currentTimeMillis(), trueName, idcard, frontIdCardPhoto, backIdCardPhoto, handIdCardPhoto, publicBankNo, publicBankTrueName, openingBank,accountOpenLicence, companyName, uscc, businessLicense, otherSupportPhotos, AuditTypeEnum.wait, null, null);
+        verifyActor = new VerifyActor(null, uid, System.currentTimeMillis(), trueName, idcard, frontIdCardPhoto, backIdCardPhoto, handIdCardPhoto, publicBankNo, publicBankTrueName, openingBank, accountOpenLicence, companyName, uscc, businessLicense, otherSupportPhotos, AuditTypeEnum.wait, null, null);
         verifyActorRepository.insert(verifyActor);
         return null;
     }
@@ -193,9 +192,32 @@ public class MerchantService {
      */
     public Store getMerchantStore(int uid) {
         Optional<Store> byUid = storeRepository.findByUid(uid);
-        if (byUid.isPresent()){
+        if (byUid.isPresent()) {
             return byUid.get();
-        }else {
+        } else {
+            throw new StoreException(StoreExceptionEnum.STORE_NOT_FOUND);
+        }
+    }
+
+    /**
+     * 根据订单发送一条短信给商家
+     *
+     * @param goodsOrder
+     * @return
+     */
+    public void sendDeliverMessage(GoodsOrder goodsOrder) {
+        String[] param = new String[2];
+        param[0] = goodsOrder.getGoodsTitle();
+        param[1] = goodsOrder.getSpecClass();
+        tencentUtil.sendDeliverNotice(getMerchantStoreById(goodsOrder.getSid()).getServicePhone(), param);
+        log.info("发送短信：{}", goodsOrder);
+    }
+
+    private Store getMerchantStoreById(String sid) {
+        Optional<Store> optional = storeRepository.findById(sid);
+        if (optional.isPresent()) {
+            return optional.get();
+        } else {
             throw new StoreException(StoreExceptionEnum.STORE_NOT_FOUND);
         }
     }

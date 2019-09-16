@@ -41,7 +41,6 @@ public class ConfigBean implements WebMvcConfigurer {
         return MongoClientOptions
                 .builder()
                 .maxConnectionIdleTime(60000)
-                //todo mogoDb连接配置与优化
                 .build();
     }
 }
