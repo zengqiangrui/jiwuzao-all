@@ -46,10 +46,7 @@ public class PayController {
         req.setBody("testbody");//商品介绍
         req.setOutTradeNo(Rand.getUUID());//传给微信的订单号
         req.setTotalFee(1);//金额,分
-        log.info("请求参数",req);
-        if(this.wxPayService.createOrder(req) instanceof WxPayAppOrderResult){
-
-        }
+        log.info("请求参数:{}",req);
         return this.wxPayService.createOrder(req);
     }
 
@@ -60,14 +57,20 @@ public class PayController {
      * @throws WxPayException
      */
     @PostMapping("/notify/order")
-    public String parseOrderNotifyResult(@RequestBody String xmlData) throws WxPayException {
+    public String parseOrderNotifyResult(@RequestBody String xmlData){
         /**
          * 解析回调的信息，完成进一步
          */
-        final WxPayOrderNotifyResult notifyResult = wxPayService.parseOrderNotifyResult(xmlData);
-        log.info("支付回调信息",notifyResult);
-        payService.handleNotify(notifyResult);
-        return WxPayNotifyResponse.success("成功");
+        final WxPayOrderNotifyResult notifyResult;
+        try {
+            notifyResult = wxPayService.parseOrderNotifyResult(xmlData);
+            log.info("支付回调信息:{}",notifyResult);
+            payService.handleNotify(notifyResult);
+            return WxPayNotifyResponse.success("成功");
+        } catch (WxPayException e) {
+            e.printStackTrace();
+            return WxPayNotifyResponse.fail("处理支付信息异常");
+        }
     }
 
     /**

@@ -9,7 +9,10 @@ import com.kauuze.major.config.permission.Merchant;
 import com.kauuze.major.include.JsonResult;
 import com.kauuze.major.service.AddressService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
