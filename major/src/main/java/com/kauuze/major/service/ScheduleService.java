@@ -33,7 +33,7 @@ public class ScheduleService {
     private PayOrderRepository payOrderRepository;
 
 
-    @Scheduled(cron = "0 0 1 * * ? *")//每天凌晨1点扫描订单信息
+    @Scheduled(cron = "0 0 1 * * ?")//每天凌晨1点扫描订单信息
     public void refreshOrderWithDrawAble() {
         log.info("凌晨1点扫描订单，计算提现金额");
         goodsOrderRepository.saveAll(goodsOrderRepository.findAll().stream()
@@ -50,7 +50,7 @@ public class ScheduleService {
     /**
      * 每日0点扫描店铺信息，更新提现上限
      */
-    @Scheduled(cron = "0 0 0 * * ? *")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void refreshStore() {
         storeRepository.saveAll(storeRepository.findAll().stream()
                 .filter(store -> !store.getViolation())
@@ -62,7 +62,7 @@ public class ScheduleService {
     /**
      * 每日0点30分扫描已发货订单，订单发货15天后无异常视为订单完成
      */
-    @Scheduled(cron = "0 30 0 * * ? *")
+    @Scheduled(cron = "0 30 0 * * ?")
     public void checkFinish() {
         List<GoodsOrder> collect = goodsOrderRepository.findAll().stream().filter(goodsOrder -> goodsOrder.getOrderStatus() != OrderStatusEnum.waitReceive)
                 .filter(goodsOrder -> goodsOrder.getOrderExStatus() != OrderExStatusEnum.normal)
