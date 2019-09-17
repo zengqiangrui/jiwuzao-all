@@ -264,14 +264,19 @@ public class ExpressService {
             throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
         } else {
             GoodsOrderDetail goodsOrderDetail = optional.get();
-            ExpressShowDto expressShowDto = new ExpressShowDto().setOrderNo(goodsOrderNo).setExpNo(goodsOrderDetail.getExpressNo());
+            Optional<Express> byCode = expressRepository.findByCode(goodsOrderDetail.getExpCode());
+            if(!byCode.isPresent()) throw new RuntimeException("不支持快递类型");
+            Express express = byCode.get();
+            ExpressShowDto expressShowDto = new ExpressShowDto().setOrderNo(goodsOrderNo).setExpCompany(express.getName()).setExpNo(goodsOrderDetail.getExpressNo());
 //            return getExpressOneByLogistic(goodsOrderDetail.getExpressNo());
             try {
                 ExpressResult orderTracesByJson = getOrderTracesByJson(goodsOrderDetail.getExpCode(), goodsOrderDetail.getExpressNo(), goodsOrderNo);
+                Collections.reverse(orderTracesByJson.getTraces());
                 expressShowDto.setTraces(orderTracesByJson.getTraces());
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            log.info("showDTO:{}",expressShowDto);
             return expressShowDto;
         }
 

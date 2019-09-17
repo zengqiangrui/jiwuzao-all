@@ -15,6 +15,8 @@ public class ExpressShowDto {
 
     private String orderNo;//订单号
 
+    private String expCompany;//快递公司
+
     private String expNo;//运单号
 
     private Long createTime;//创建时间
