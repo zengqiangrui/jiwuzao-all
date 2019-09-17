@@ -372,7 +372,6 @@ public class ExpressService {
         }
     }
 
-
     /**
      * 根据公司类型获取所有支持快递公司信息
      *

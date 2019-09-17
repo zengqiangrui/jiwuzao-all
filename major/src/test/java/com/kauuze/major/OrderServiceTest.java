@@ -42,6 +42,8 @@ public class OrderServiceTest {
     private MerchantService merchantService;
     @Autowired
     private TencentUtil tencentUtil;
+    @Autowired
+    private ScheduleService scheduleService;
 
     @Test
     public void genOrder(){
@@ -114,5 +116,10 @@ public class OrderServiceTest {
 //        ExpressResult sf = expressService.getOrderTracesByJson("YD", "4300633884396", "");
 
         System.out.println(sf);
+    }
+
+    @Test
+    public void showSchedule(){
+        scheduleService.checkFinish();
     }
 }

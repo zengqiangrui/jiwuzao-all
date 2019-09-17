@@ -58,30 +58,6 @@ public class WithdrawService {
     @Autowired
     private VerifyActorRepository verifyActorRepository;
 
-    @Scheduled(cron = "0 0 1 * * ?")//每天凌晨1点扫描订单信息
-    public void refreshOrderWithDrawAble() {
-        goodsOrderRepository.saveAll(goodsOrderRepository.findAll().stream()
-                .filter(goodsOrder -> goodsOrder.getOrderStatus() == OrderStatusEnum.finish)
-                .filter(goodsOrder -> goodsOrder.getOrderExStatus() != OrderExStatusEnum.exception)//过滤异常订单
-                .filter(goodsOrder -> {
-                    Optional<PayOrder> opt = payOrderRepository.findById(goodsOrder.getPayid());//过滤订单未支付,或者支付时间不足15天的订单
-                    return opt.isPresent() && opt.get().getPay() && (System.currentTimeMillis() - opt.get().getPayTime() > 15 * 24 * 60 * 60 * 1000);
-                })
-                .map(goodsOrder -> goodsOrder.setCanRemit(true).setWithdrawal(goodsOrder.getFinalPay().subtract(goodsOrder.getPostage()).multiply(new BigDecimal(0.8))))
-                .collect(Collectors.toList()));
-
-    }
-
-    /**
-     * 每日0点扫描店铺信息，更新提现上限
-     */
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void refreshStore() {
-        storeRepository.saveAll(storeRepository.findAll().stream()
-                .filter(store -> !store.getViolation())
-                .map(store -> store.setWithdrawNum(0))
-                .collect(Collectors.toList()));
-    }
 
     /**
      * 获取店铺可提现金额
