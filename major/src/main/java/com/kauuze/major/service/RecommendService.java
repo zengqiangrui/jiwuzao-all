@@ -4,20 +4,19 @@ import com.jiwuzao.common.domain.enumType.GoodsClassifyEnum;
 import com.jiwuzao.common.domain.mongo.entity.Category;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.jiwuzao.common.domain.mongo.entity.RecommendGoods;
+import com.jiwuzao.common.domain.mongo.entity.RecommendStore;
+import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
 import com.jiwuzao.common.exception.OrderException;
+import com.jiwuzao.common.exception.StoreException;
+import com.jiwuzao.common.exception.excEnum.StoreExceptionEnum;
 import com.jiwuzao.common.vo.goods.GoodsSimpleVO;
-import com.kauuze.major.domain.mongo.repository.CategoryRepository;
-import com.kauuze.major.domain.mongo.repository.GoodsDetailRepository;
-import com.kauuze.major.domain.mongo.repository.GoodsRepository;
-import com.kauuze.major.domain.mongo.repository.RecommendGoodsRepository;
+import com.kauuze.major.domain.mongo.repository.*;
+import org.omg.SendingContext.RunTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,7 +29,12 @@ public class RecommendService {
     @Autowired
     private RecommendGoodsRepository recommendGoodsRepository;
     @Autowired
+    private RecommendStoreRepository recommendStoreRepository;
+    @Autowired
     private CategoryRepository categoryRepository;
+    @Autowired
+    private StoreRepository storeRepository;
+
 
     public List<GoodsSimpleVO> getGoodsSimilar(String goodsId) {
         Optional<Goods> byId = goodsRepository.findById(goodsId);
@@ -90,6 +94,24 @@ public class RecommendService {
         //todo 商品列表头部推荐算法,暂时取极物造店铺中前五个
         List<Goods> list = goodsRepository.findAllBySidAndPutaway("5d639c11d6018000015e1865", true);
         return list.stream().sorted(Comparator.comparingLong(Goods::getCreateTime).reversed()).map(goods -> new GoodsSimpleVO().setGoodsId(goods.getGid()).setGoodsImg(goodsDetailRepository.findByGid(goods.getGid()).get().getSlideshow().split(",")[0]).setGoodsName(goods.getTitle()).setGoodsPrice(goods.getDefaultPrice()))
-        .limit(5L).collect(Collectors.toList());
+                .limit(5L).collect(Collectors.toList());
     }
+
+    public RecommendStore addRecommendStore(String storeId, String... images) {
+        Optional<Store> optional = storeRepository.findById(storeId);
+        if (!optional.isPresent()) throw new StoreException(StoreExceptionEnum.STORE_NOT_FOUND);
+        Store store = optional.get();
+        List<String> list = new ArrayList<>();
+        Collections.addAll(list, images);
+        RecommendStore recommendStore = new RecommendStore().setStoreId(storeId).setStoreName(store.getStoreName())
+                .setCreateTime(System.currentTimeMillis()).setImages(list);
+        return recommendStoreRepository.save(recommendStore);
+    }
+
+    public RecommendStore getLatestRecommendStore() {
+        return recommendStoreRepository.findAll().stream().max(Comparator.comparingLong(RecommendStore::getCreateTime)).orElse(
+                new RecommendStore().setStoreId("").setImages(new ArrayList<>())
+        );
+    }
+
 }
