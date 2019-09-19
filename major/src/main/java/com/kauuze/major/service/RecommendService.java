@@ -97,6 +97,12 @@ public class RecommendService {
                 .limit(5L).collect(Collectors.toList());
     }
 
+    /**
+     * 增加一个极匠推荐店铺。
+     * @param storeId 店铺id
+     * @param images 图片数组
+     * @return RecommendStore
+     */
     public RecommendStore addRecommendStore(String storeId, String... images) {
         Optional<Store> optional = storeRepository.findById(storeId);
         if (!optional.isPresent()) throw new StoreException(StoreExceptionEnum.STORE_NOT_FOUND);
@@ -108,9 +114,15 @@ public class RecommendService {
         return recommendStoreRepository.save(recommendStore);
     }
 
+    /**
+     * 获取一个推荐店铺
+     * @return 推荐
+     */
     public RecommendStore getLatestRecommendStore() {
+        ArrayList<String> images = new ArrayList<>();
+        images.add("http://cdn.jiwuzao.com/image/jijiang/MasterMap.png");//todo 默认极物造页面
         return recommendStoreRepository.findAll().stream().max(Comparator.comparingLong(RecommendStore::getCreateTime)).orElse(
-                new RecommendStore().setStoreId("").setImages(new ArrayList<>())
+                new RecommendStore().setStoreId("5d639c11d6018000015e1865").setImages(images)
         );
     }
 

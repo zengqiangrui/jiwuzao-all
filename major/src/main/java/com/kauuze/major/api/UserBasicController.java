@@ -1,5 +1,7 @@
 package com.kauuze.major.api;
 
+import cn.binarywang.wx.miniapp.api.WxMaService;
+import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import com.jiwuzao.common.include.DateTimeUtil;
 import com.jiwuzao.common.include.JsonResult;
 import com.jiwuzao.common.include.SHA256;
@@ -13,6 +15,7 @@ import com.kauuze.major.include.StateModel;
 import com.kauuze.major.service.GoodsService;
 import com.kauuze.major.service.UserBasicService;
 import com.kauuze.major.service.dto.userBasic.UserPrivateDto;
+import me.chanjar.weixin.common.error.WxErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +37,18 @@ public class UserBasicController {
     @Autowired
     private GoodsService goodsService;
 
+    @Autowired
+    private WxMaService wxMaService;
+
+    @RequestMapping("/weixinMaLogin")
+    public JsonResult weixinMalogin(@Valid @RequestBody MaLoginPojo pojo){
+        try {
+            WxMaJscode2SessionResult sessionInfo = wxMaService.getUserService().getSessionInfo(pojo.getCode());
+            return JsonResult.success(sessionInfo);
+        } catch (WxErrorException e) {
+            return JsonResult.failure();
+        }
+    }
 
     @RequestMapping("/sendSms")
     public JsonResult sendSms(@Valid @RequestBody SendSmsPojo sendSmsPojo){

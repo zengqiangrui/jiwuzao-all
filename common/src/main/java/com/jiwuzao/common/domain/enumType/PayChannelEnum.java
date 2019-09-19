@@ -10,6 +10,8 @@ public enum PayChannelEnum {
      * 微信支付
      */
     wxPay,
+
+    wxMiniPay,
     /**
      * 支付宝支付
      */

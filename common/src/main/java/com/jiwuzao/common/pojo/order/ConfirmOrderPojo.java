@@ -17,6 +17,8 @@ import java.util.List;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class ConfirmOrderPojo {
+    private String openId;
+
     /**
      * 收货省市区
      */

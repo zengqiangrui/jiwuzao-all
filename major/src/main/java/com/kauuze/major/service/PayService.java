@@ -37,6 +37,11 @@ public class PayService {
     @Autowired
     private TencentUtil tencentUtil;
 
+    /**
+     * 付款成功回调
+     * @param notifyResult
+     * @throws OrderException
+     */
     @Transactional(rollbackOn = Exception.class)
     public void handleNotify(WxPayOrderNotifyResult notifyResult) throws OrderException {
         log.info(notifyResult.toString());

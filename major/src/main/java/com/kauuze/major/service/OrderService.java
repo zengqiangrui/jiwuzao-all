@@ -1,8 +1,10 @@
 package com.kauuze.major.service;
 
 import com.github.binarywang.wxpay.bean.order.WxPayAppOrderResult;
+import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayRefundRequest;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
+import com.github.binarywang.wxpay.bean.result.WxPayCommonResult;
 import com.github.binarywang.wxpay.bean.result.WxPayRefundResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
@@ -26,6 +28,7 @@ import com.jiwuzao.common.exception.excEnum.OrderExceptionEnum;
 import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.pojo.order.ReceiptPojo;
 import com.jiwuzao.common.pojo.shopcart.AddItemPojo;
+import com.kauuze.major.config.contain.properties.WxMaProperties;
 import com.kauuze.major.domain.mongo.repository.GoodsRepository;
 import com.kauuze.major.domain.mongo.repository.GoodsSpecRepository;
 import com.kauuze.major.domain.mongo.repository.StoreRepository;
@@ -36,6 +39,7 @@ import com.kauuze.major.include.Rand;
 import com.kauuze.major.include.StringUtil;
 import com.kauuze.major.include.yun.TencentUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -55,7 +59,6 @@ import java.util.stream.Collectors;
 @Transactional(rollbackOn = Exception.class)
 @Slf4j
 public class OrderService {
-    private static final Boolean DEBUG = false;
 
     @Autowired
     private GoodsOrderRepository goodsOrderRepository;
@@ -73,6 +76,8 @@ public class OrderService {
     private ReceiptService receiptService;
     @Autowired
     private TencentUtil tencentUtil;
+    @Autowired
+    private WxMaProperties wxMaProperties;
 
     /**
      * 用户通过购物车或者单个商品结算，传入商品数组生成订单
@@ -128,7 +133,7 @@ public class OrderService {
      * @return
      */
     public Object confirmOrder(int uid, List<AddItemPojo> itemList, String city, String address,
-                               String phone, String name, String ip, ReceiptPojo receipt) throws WxPayException {
+                               String phone, String name, String ip, ReceiptPojo receipt, String openId) throws WxPayException {
         BigDecimal price = new BigDecimal(BigInteger.ZERO);
         //生成支付订单
         PayOrder payOrder = new PayOrder().setPay(false)
@@ -171,7 +176,7 @@ public class OrderService {
         }
         payOrder.setFinalPay(price);
         payOrderRepository.save(payOrder);
-        return genPayOrder(payOrder.getId(), city, address, phone, name, ip);
+        return genPayOrder(payOrder.getId(), city, address, phone, name, ip, openId);
     }
 
     /**
@@ -187,7 +192,7 @@ public class OrderService {
      * @throws WxPayException
      */
     private Object genPayOrder(Integer payid, String city, String address,
-                               String phone, String name, String ip) throws WxPayException {
+                               String phone, String name, String ip, String openId) throws WxPayException {
         List<GoodsOrder> list = goodsOrderRepository.findByPayid(payid);
         String body = "极物造-商品支付";
         for (GoodsOrder e : list) {
@@ -196,26 +201,23 @@ public class OrderService {
                     .setReceiverTrueName(name);
             goodsOrderDetailRepository.save(detail);
         }
-        ;
         PayOrder payOrder = payOrderRepository.findById(payid).get();
         if (payOrder.getPrepayId() != null) {
             //为过期订单设置overTime按老的订单建立新的订单,并与goodsorder关联。
             payOrder = renewOrder(payOrder);
         }
         //调统一下单接口
-        Object res = null;
-        if (!DEBUG) {
-            res = createOrder(ip, body, payOrder.getPayOrderNo(), payOrder.getFinalPay());
-            if (res instanceof WxPayAppOrderResult) {
-                WxPayAppOrderResult wxres = (WxPayAppOrderResult) res;
-                payOrder.setPrepayId(wxres.getPrepayId());
-                payOrderRepository.save(payOrder);
-            }
-        } else {
-            payOrder.setPrepayId("Prepay123");
+        if (StringUtils.isBlank(openId)) {
+            WxPayAppOrderResult wxres = createOrder(ip, body, payOrder.getPayOrderNo(), payOrder.getFinalPay());
+            payOrder.setPrepayId(wxres.getPrepayId());
             payOrderRepository.save(payOrder);
+            return wxres;
+        } else {
+            WxPayMpOrderResult mpRes = createWeixinMAOrder(ip, openId, body, payOrder.getPayOrderNo(), payOrder.getFinalPay());
+            payOrder.setPayChannel(PayChannelEnum.wxMiniPay);
+            payOrderRepository.save(payOrder);
+            return mpRes;
         }
-        return res;
     }
 
     /**
@@ -412,6 +414,24 @@ public class OrderService {
         req.setOutTradeNo(payOrderNo);//传给微信的订单号
         req.setTotalFee(price.multiply(BigDecimal.valueOf(100)).intValue());//金额,分
         log.info("请求参数", req);
+        return this.wxPayService.createOrder(req);
+    }
+
+    public <T> T createWeixinMAOrder(String ip, String openId, String body, String payOrderNo, BigDecimal price) throws WxPayException {
+        //必填项appid，mchid,随机字符串nonce_str,签名sign,已经根据配置给出
+        /**
+         * 以下为必填，其中ip从前端传入
+         */
+        WxPayUnifiedOrderRequest req = new WxPayUnifiedOrderRequest();
+        req.setSpbillCreateIp(ip);
+        req.setAppid(wxMaProperties.getAppId());
+        req.setNotifyUrl("http://api.jiwuzao.com/pay/notify/order");
+        req.setTradeType("JSAPI");//支付类型,jsapi需要传openid
+        req.setOpenid(openId);
+        req.setBody(body);//商品介绍
+        req.setOutTradeNo(payOrderNo);//传给微信的订单号
+        req.setTotalFee(price.multiply(BigDecimal.valueOf(100)).intValue());//金额,分
+        log.info("请求参数:{}", req);
         return this.wxPayService.createOrder(req);
     }
 

@@ -35,4 +35,5 @@ public class WxPayConfiguration {
     return wxPayService;
   }
 
+
 }

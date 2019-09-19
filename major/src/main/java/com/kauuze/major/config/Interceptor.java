@@ -7,6 +7,7 @@ import com.jiwuzao.common.include.StateModel;
 import com.jiwuzao.common.include.StringUtil;
 import com.kauuze.major.config.permission.*;
 import com.kauuze.major.include.TokenUtil;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -124,7 +125,7 @@ public class Interceptor implements HandlerInterceptor {
     private void response401(HttpServletResponse response, StateModel stateModel){
         try {
             response.setHeader("Content-type", "application/json;charset=utf-8");
-            response.setStatus(401);
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.getWriter().write(stateModel.toJsonString());
         } catch (IOException e) {
             throw new RuntimeException("Interceptor response401 error");

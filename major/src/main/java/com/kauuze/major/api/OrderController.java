@@ -75,9 +75,9 @@ public class OrderController {
     @RequestMapping("/confirmOrder")
     @Authorization
     public JsonResult confirmOrder(@RequestAttribute("uid") int uid, @RequestAttribute("ip") String ip,
-                                   @Valid @RequestBody ConfirmOrderPojo pojo, HttpServletResponse response) throws WxPayException, IOException {
+                                   @Valid @RequestBody ConfirmOrderPojo pojo) throws WxPayException, IOException {
         Object result = orderService.confirmOrder(uid, pojo.getItemList(), pojo.getCity(),
-                pojo.getAddress(), pojo.getPhone(), pojo.getTrueName(), ip, pojo.getReceipt());
+                pojo.getAddress(), pojo.getPhone(), pojo.getTrueName(), ip, pojo.getReceipt(),pojo.getOpenId());
         if (result == null) {
             return JsonResult.failure();
         } else {
