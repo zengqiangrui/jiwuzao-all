@@ -215,7 +215,7 @@ public class ChatService {
         //查询任务执行的结果
         for (Future<?> future : futures) {
             if (!future.isCancelled() && future.isDone())
-                log.info("Future未处理有", future.get());
+                log.info("Future未处理有:{}", future.get());
         }
     }
 
@@ -235,4 +235,8 @@ public class ChatService {
     }
 
 
+    public ChatGroupDto getOfficialChat(int uid) {
+
+        return null;
+    }
 }

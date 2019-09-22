@@ -20,7 +20,7 @@ public interface PayOrderRepository extends JpaRepository<PayOrder,Integer>  {
     List<PayOrder> findByUid(int uid);
 
     PayOrder findById(int id);
-    @Lock(value = LockModeType.PESSIMISTIC_WRITE)
-    @Query(value = "select e from PayOrder e where e.id = ?1")
-    PayOrder findByIdForUpdate(int id);
+//    @Lock(value = LockModeType.PESSIMISTIC_WRITE)
+//    @Query(value = "select e from PayOrder e where e.id = ?1")
+//    PayOrder findByIdForUpdate(int id);
 }

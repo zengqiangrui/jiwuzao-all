@@ -5,11 +5,13 @@ import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.UserInfo;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.VerifyActor;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
+import com.jiwuzao.common.domain.mysql.entity.PayOrder;
 import com.jiwuzao.common.domain.mysql.entity.User;
 import com.jiwuzao.common.domain.mysql.entity.WithdrawOrder;
 import com.jiwuzao.common.exception.StoreException;
 import com.jiwuzao.common.exception.excEnum.StoreExceptionEnum;
 import com.jiwuzao.common.include.PageDto;
+import com.jiwuzao.common.vo.store.AllEarningVO;
 import com.jiwuzao.common.vo.store.StoreSimpleVO;
 import com.jiwuzao.common.vo.store.StoreVO;
 import com.kauuze.major.domain.mongo.repository.*;
@@ -30,6 +32,8 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author kauuze
@@ -54,6 +58,10 @@ public class MerchantService {
     private UserBasicService userBasicService;
     @Autowired
     private UserInfoRepository userInfoRepository;
+    @Autowired
+    private GoodsOrderRepository goodsOrderRepository;
+    @Autowired
+    private PayOrderRepository payOrderRepository;
 
     /**
      * 申请商家认证
@@ -101,8 +109,7 @@ public class MerchantService {
         for (WithdrawOrder withdrawOrder : withdrawOrders) {
             onWithdrawOrder.add(withdrawOrder.getRemitMoney());
         }
-        MerchantUdpDto merchantUdpDto = new MerchantUdpDto(user.getDeposit(), user.getWithdrawal(), onWithdrawOrder, user.getTodayWithdrawal());
-        return merchantUdpDto;
+        return new MerchantUdpDto(user.getDeposit(), user.getWithdrawal(), onWithdrawOrder, user.getTodayWithdrawal());
     }
 
     /**
@@ -259,5 +266,25 @@ public class MerchantService {
             throw new RuntimeException("店铺没找到");
         }
         return storeVO;
+    }
+
+    public AllEarningVO getStoreTurnover(String storeId) {
+        List<GoodsOrder> list = goodsOrderRepository.findAllBySid(storeId);
+        AllEarningVO vo = new AllEarningVO();
+        vo.setStoreId(storeId);
+        BigDecimal bigDecimal =
+                list.stream().filter(goodsOrder -> goodsOrder.getOrderExStatus() != OrderExStatusEnum.exception)
+                        .filter(goodsOrder -> {
+                            Optional<PayOrder> optional = payOrderRepository.findById(goodsOrder.getPayid());
+                            if (!optional.isPresent()) {
+                                return false;
+                            } else {
+                                PayOrder payOrder = optional.get();
+                                return payOrder.getPay();
+                            }
+                        }).map(GoodsOrder::getFinalPay).reduce(BigDecimal.ZERO, BigDecimal::add);
+        log.info("总营业额{}", bigDecimal);
+        vo.setTurnover(bigDecimal);
+        return vo;
     }
 }

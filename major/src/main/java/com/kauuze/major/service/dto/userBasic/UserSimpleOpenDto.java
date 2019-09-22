@@ -32,4 +32,6 @@ public class UserSimpleOpenDto {
      * 头像
      */
     private String portrait;
+
+    private String personalSign;
 }

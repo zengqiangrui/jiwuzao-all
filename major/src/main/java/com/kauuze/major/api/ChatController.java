@@ -96,6 +96,14 @@ public class ChatController {
         return JsonResult.success(collect);
     }
 
+    @RequestMapping("/getOfficial")
+    @Authorization
+    public JsonResult getOfficialChat(@RequestAttribute int uid){
+        ChatGroupDto chatGroupDto = chatService.getOfficialChat(uid);
+        //todo 获取官方号
+        return null;
+    }
+
     /**
      * 获取用户未处理消息总数
      *

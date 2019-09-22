@@ -73,4 +73,19 @@ public class ScheduleService {
         log.info("凌晨0点30，扫描订单完成情况，发货15天后如果无异常就算订单完成:{}",collect);
         goodsOrderRepository.saveAll(collect);
     }
+
+    /**
+     * 每日0点30分扫描已发货订单，订单发货15天后无异常视为订单完成
+     */
+    @Scheduled(cron = "0 30 0 * * ?")
+    public void checkUnpay() {
+        List<GoodsOrder> collect = goodsOrderRepository.findAll().stream().filter(goodsOrder -> goodsOrder.getOrderStatus() != OrderStatusEnum.waitReceive)
+                .filter(goodsOrder -> goodsOrder.getOrderExStatus() != OrderExStatusEnum.normal)
+                .filter(goodsOrder -> !payOrderRepository.findById(goodsOrder.getPayid()).isPresent())
+                .filter(goodsOrder -> System.currentTimeMillis() - goodsOrder.getDeliverTime() < 1000 * 60 * 60 * 24 * 15)
+                .map(goodsOrder -> goodsOrder.setOrderStatus(OrderStatusEnum.finish))
+                .collect(Collectors.toList());
+        log.info("凌晨0点30，扫描订单完成情况，发货15天后如果无异常就算订单完成:{}",collect);
+        goodsOrderRepository.saveAll(collect);
+    }
 }

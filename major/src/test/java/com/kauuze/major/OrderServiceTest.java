@@ -122,4 +122,10 @@ public class OrderServiceTest {
     public void showSchedule(){
         scheduleService.checkFinish();
     }
+
+    @Test
+    public void showEarning(){
+        AllEarningVO storeTurnover = merchantService.getStoreTurnover("5d6372987888ef4614cb1b26");
+        System.out.println(storeTurnover);
+    }
 }

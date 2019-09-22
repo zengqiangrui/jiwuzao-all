@@ -9,6 +9,7 @@ import com.jiwuzao.common.pojo.merchant.VerifyActorPojo;
 import com.jiwuzao.common.pojo.store.StoreIdPojo;
 import com.jiwuzao.common.pojo.store.StorePagePojo;
 import com.jiwuzao.common.pojo.systemOrder.WithdrawPojo;
+import com.jiwuzao.common.vo.store.AllEarningVO;
 import com.jiwuzao.common.vo.store.StoreSimpleVO;
 import com.jiwuzao.common.vo.store.StoreVO;
 import com.kauuze.major.config.permission.Authorization;
@@ -127,5 +128,11 @@ public class MerchantController {
         return JsonResult.success(storeVO);
     }
 
-
+    @RequestMapping("/getStoreTurnover")
+    @Merchant
+    public JsonResult getStoreTurnover(@Valid @RequestBody StoreIdPojo pojo){
+        AllEarningVO vo = merchantService.getStoreTurnover(pojo.getStoreId());
+        return JsonResult.success(vo);
+    }
 }
+

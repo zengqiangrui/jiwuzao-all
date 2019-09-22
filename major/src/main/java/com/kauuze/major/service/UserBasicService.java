@@ -123,10 +123,21 @@ public class UserBasicService {
         TokenUtil.refreshRddy(uid);
         UserToken userToken = userTokenRepository.findByUid(uid);
         UserInfo userInfo = userInfoRepository.findByUid(uid);
-        userToken = TokenUtil.judgeEndTime(userToken);
+        TokenUtil.judgeEndTime(userToken);
         FansAndFocusDTO dto = focusService.getFocusAndFansNum(uid);
-        UserPrivateDto userPrivateDto = new UserPrivateDto(uid, user.getPhone(), userToken.getRole(), userToken.getBackRole(), userToken.getVip(), userToken.getVipEndTime(), userToken.getAccessToken(), userToken.getUserState(), userToken.getUserStateEndTime(), System.currentTimeMillis(), userInfo.getNickName(), userInfo.getPortrait(), userInfo.getSex(), userInfo.getBirthday(), userInfo.getProvince(), userInfo.getCity(), userInfo.getPersonalSign(), userInfo.getOpenWxId(), userInfo.getOpenQQ(), dto.getFansNum(), dto.getFocusNum());
-        return userPrivateDto;
+        return new UserPrivateDto(uid, user.getPhone(), userToken.getRole(), userToken.getBackRole(), userToken.getVip(), userToken.getVipEndTime(), userToken.getAccessToken(), userToken.getUserState(), userToken.getUserStateEndTime(), System.currentTimeMillis(), userInfo.getNickName(), userInfo.getPortrait(), userInfo.getSex(), userInfo.getBirthday(), userInfo.getProvince(), userInfo.getCity(), userInfo.getPersonalSign(), userInfo.getOpenWxId(), userInfo.getOpenQQ(), dto.getFansNum(), dto.getFocusNum());
+    }
+
+    /**
+     * 选择一个客服用户对象
+     * @param uid
+     * @return
+     */
+    public UserOpenDto getOneCms(int uid){
+        List<UserToken> list = userTokenRepository.findAllByBackRole(BackRoleEnum.cms);
+//        list.stream().filter(userToken -> userToken.getUid()!=uid)
+        //todo 选举客服用户对象
+        return null;
     }
 
     /**
@@ -142,7 +153,7 @@ public class UserBasicService {
             return null;
         }
         userToken = TokenUtil.judgeEndTime(userToken);
-        return new UserSimpleOpenDto(uid, userToken.getVip(), userInfo.getNickName(), userInfo.getPortrait());
+        return new UserSimpleOpenDto(uid, userToken.getVip(), userInfo.getNickName(), userInfo.getPortrait(),userInfo.getPersonalSign());
     }
 
     /**

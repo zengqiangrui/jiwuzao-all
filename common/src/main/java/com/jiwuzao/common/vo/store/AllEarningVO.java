@@ -15,5 +15,8 @@ public class AllEarningVO {
 
     private String storeId;
 
-    private BigDecimal allEarning;
+    private BigDecimal turnover;//总营业额
+
+    private BigDecimal allEarning;//总收益（提现后收益）
+
 }
