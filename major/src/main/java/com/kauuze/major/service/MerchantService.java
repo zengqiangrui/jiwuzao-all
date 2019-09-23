@@ -212,12 +212,12 @@ public class MerchantService {
      * @param goodsOrder
      * @return
      */
-    public void sendDeliverMessage(GoodsOrder goodsOrder) {
+    public boolean sendDeliverMessage(GoodsOrder goodsOrder) {
         String[] param = new String[2];
         param[0] = goodsOrder.getGoodsTitle();
         param[1] = goodsOrder.getSpecClass();
-        tencentUtil.sendDeliverNotice(getMerchantStoreById(goodsOrder.getSid()).getServicePhone(), param);
         log.info("发送短信：{}", goodsOrder);
+        return tencentUtil.sendDeliverNotice(getMerchantStoreById(goodsOrder.getSid()).getServicePhone(), param);
     }
 
     private Store getMerchantStoreById(String sid) {

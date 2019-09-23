@@ -96,6 +96,9 @@ public class GoodsOrder {
     //是否开发票
     private Boolean isReceipt = false;
 
+    //今日是否催单
+    private Boolean isHastened = false;
+
     /**
      * 订单状态
      */

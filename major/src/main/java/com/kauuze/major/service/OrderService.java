@@ -61,6 +61,8 @@ import java.util.stream.Collectors;
 public class OrderService {
 
     @Autowired
+    private MerchantService merchantService;
+    @Autowired
     private GoodsOrderRepository goodsOrderRepository;
     @Autowired
     private GoodsOrderDetailRepository goodsOrderDetailRepository;
@@ -260,7 +262,7 @@ public class OrderService {
         goodsOrder.forEach(e -> {
             Store store = storeRepository.findById(e.getSid()).get();
             GoodsOrderSimpleDto goodsOrderSimpleDto = new GoodsOrderSimpleDto(
-                    e.getSid(), store.getStoreName(), e.getGoodsOrderNo(), e.getGoodsTitle(), e.getCover(),
+                    e.getSid(), store.getStoreName(), e.getGoodsOrderNo(), e.getIsHastened() == null ? false : e.getIsHastened(), e.getGoodsTitle(), e.getCover(),
                     e.getSpecClass(), e.getBuyCount(), e.getPostage(), e.getFinalPay(),
                     e.getOrderStatus()
             );
@@ -471,13 +473,30 @@ public class OrderService {
     /**
      * 催单
      *
-     * @param uid
      * @param goodsOrderNo
      * @return
      */
-    public String hastenOrder(int uid, String goodsOrderNo) {
-        // TODO: 19-8-7 通过聊天系统发送催单请求
-        return "发送催单请求";
+    public boolean hastenOrder(String goodsOrderNo) {
+        Optional<GoodsOrder> optional = goodsOrderRepository.findByGoodsOrderNo(goodsOrderNo);
+        if (optional.isPresent()) {
+            GoodsOrder goodsOrder = optional.get();
+            if (goodsOrder.getOrderExStatus() == OrderExStatusEnum.exception)
+                throw new OrderException(OrderExceptionEnum.EXCEPTION_ORDER);
+            if (goodsOrder.getOrderStatus() != OrderStatusEnum.waitDeliver)
+                throw new OrderException(OrderExceptionEnum.ORDER_STATUS_NO_FIT);
+            if (goodsOrder.getIsHastened() != null && goodsOrder.getIsHastened()) {//如果今日已经催单，则不可再催单
+                return false;
+            }
+            log.info("催单{}", goodsOrder);
+            boolean b = merchantService.sendDeliverMessage(goodsOrder);//给商家发送信息
+            if (b) {
+                GoodsOrder save = goodsOrderRepository.save(goodsOrder.setIsHastened(true));
+                return null != save;
+            }
+            return false;
+        } else {
+            throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
+        }
     }
 
     /**
@@ -490,10 +509,6 @@ public class OrderService {
     public String cancelOrder(int uid, String goodsOrderNo) {
         GoodsOrder order = goodsOrderRepository.findByGoodsOrderNo(goodsOrderNo).get();
         GoodsOrderDetail detail = goodsOrderDetailRepository.findById(order.getGoodsOrderDetailId()).get();
-
-        if (detail == null || order == null) {
-            return null;
-        }
 
         order.setOrderStatus(OrderStatusEnum.cancel);
         detail.setCancelTime(System.currentTimeMillis());
@@ -514,9 +529,6 @@ public class OrderService {
     public String askService(int uid, String goodsOrderNo, String content) {
         GoodsOrder goodsOrder = getByGoodsOrderNo(goodsOrderNo);
         GoodsOrderDetail detail = goodsOrderDetailRepository.findById(goodsOrder.getGoodsOrderDetailId()).get();
-        if (goodsOrder == null || detail == null) {
-            return "订单状态不一致";
-        }
 
         if (goodsOrder.getOrderExStatus() == OrderExStatusEnum.exception)
             return "请勿重复申请";

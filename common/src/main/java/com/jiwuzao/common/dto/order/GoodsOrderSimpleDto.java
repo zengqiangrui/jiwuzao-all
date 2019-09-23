@@ -26,6 +26,8 @@ public class GoodsOrderSimpleDto {
      * 商品订单号
      */
     private String goodsOrderNo;
+
+    private boolean isHastened;//是否催单
     /**
      * 商品标题
      */

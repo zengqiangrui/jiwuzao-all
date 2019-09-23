@@ -145,12 +145,12 @@ public class OrderController {
      */
     @RequestMapping("/hastenOrder")
     @Authorization
-    public JsonResult hastenOrder(@RequestAttribute int uid, @Valid @RequestBody GetOrderPojo getOrderPojo) {
-        String result = orderService.hastenOrder(uid, getOrderPojo.getGoodsOrderNo());
-        if (result == null) {
+    public JsonResult hastenOrder(@Valid @RequestBody GetOrderPojo getOrderPojo) {
+        boolean result = orderService.hastenOrder(getOrderPojo.getGoodsOrderNo());
+        if (!result) {
             return JsonResult.failure();
         } else {
-            return JsonResult.success(result);
+            return JsonResult.success();
         }
     }
 
