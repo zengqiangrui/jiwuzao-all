@@ -1,37 +1,23 @@
 package com.kauuze.major;
 
 
-import com.jiwuzao.common.domain.enumType.DeliveryTimeEnum;
-import com.jiwuzao.common.domain.enumType.ExpressEnum;
-import com.jiwuzao.common.domain.enumType.GoodsReturnEnum;
-import com.jiwuzao.common.domain.mongo.entity.Express;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
-import com.jiwuzao.common.include.JsonResult;
-import com.jiwuzao.common.include.Rand;
 import com.jiwuzao.common.pojo.goods.GoodsPagePojo;
 import com.kauuze.major.domain.mongo.repository.*;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
-import com.kauuze.major.include.StringUtil;
 import com.kauuze.major.include.yun.TencentUtil;
 import com.kauuze.major.service.ChatService;
 import com.kauuze.major.service.ExpressService;
 import com.kauuze.major.service.GoodsService;
-import org.apache.commons.lang3.StringUtils;
+import com.kauuze.major.service.ScheduleService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import javax.annotation.Resource;
 import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -56,6 +42,8 @@ public class GoodsServiceTest {
     private ChatService chatService;
     @Autowired
     private ChatMessageRepository chatMessageRepository;
+    @Resource
+    private ScheduleService scheduleService;
 
     @Test
     public void showGoods() {
@@ -102,5 +90,10 @@ public class GoodsServiceTest {
 //        List<Goods> collect = all.stream().map(res -> res.setDeliveryTime(DeliveryTimeEnum.values()[Rand.getRand(6)]).setGoodsReturn(GoodsReturnEnum.values()[Rand.getRand(2)])).collect(Collectors.toList());
 //        List<Goods> goods = goodsRepository.saveAll(collect);
 //        goods.forEach(System.out::println);
+    }
+
+    @Test
+    public void cancelOrder(){
+        scheduleService.waitAppraiseOrder();
     }
 }

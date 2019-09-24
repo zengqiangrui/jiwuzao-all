@@ -230,7 +230,7 @@ public class GoodsController {
     public JsonResult getGoodsComment(@Valid @RequestBody GidPojo gidPojo) {
         List<GoodsCommentVO> volist = goodsService.getGoodsComment(gidPojo.getGid());
         if (volist == null) {
-            return JsonResult.failure("服务器内部错误");
+            return JsonResult.failure();
         } else {
             return JsonResult.success(volist);
         }
@@ -320,7 +320,7 @@ public class GoodsController {
     @RequestMapping("/addComment")
     @Authorization
     public JsonResult addComment(@RequestAttribute int uid, @Valid @RequestBody CommentPojo pojo) {
-        String s = goodsService.addComment(uid, pojo.getGoodsOrderNo(), pojo.getComment());
+        String s = goodsService.addComment(uid, pojo.getGoodsOrderNo(), pojo.getComment(),pojo.getStar());
         if (s == null) {
             return JsonResult.failure();
         } else {

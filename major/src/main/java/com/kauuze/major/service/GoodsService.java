@@ -1,9 +1,6 @@
 package com.kauuze.major.service;
 
-import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
-import com.jiwuzao.common.domain.enumType.DeliveryTimeEnum;
-import com.jiwuzao.common.domain.enumType.GoodsClassifyEnum;
-import com.jiwuzao.common.domain.enumType.GoodsReturnEnum;
+import com.jiwuzao.common.domain.enumType.*;
 import com.jiwuzao.common.domain.mongo.entity.*;
 import com.jiwuzao.common.domain.mongo.entity.Category;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
@@ -516,16 +513,23 @@ public class GoodsService {
      * @param comment
      * @return
      */
-    public String addComment(int uid, String goodsOrderNo, String comment) {
-        GoodsOrder order = goodsOrderRepository.findByGoodsOrderNo(goodsOrderNo).get();
-        if (order == null) {
-            return "没有找到该订单";
+    public String addComment(int uid, String goodsOrderNo, String comment, Integer star) {
+        Optional<GoodsOrder> optional = goodsOrderRepository.findByGoodsOrderNo(goodsOrderNo);
+        GoodsOrder order;
+        if (optional.isPresent()) {
+            order = optional.get();
+        } else {
+            return null;
         }
+        if(order.getOrderExStatus() == OrderExStatusEnum.exception) return null;
         Comment old = goodsCommentRepository.findByGoodsOrderNoAndUid(goodsOrderNo, uid);
         if (old != null)
             return null;
-        Comment comment1 = new Comment(null, goodsOrderNo, order.getGid(), uid, comment, System.currentTimeMillis(), false);
-        goodsCommentRepository.save(comment1);
+        Comment comment1 = new Comment(null, goodsOrderNo, order.getGid(), uid, comment, star, System.currentTimeMillis(), false);
+        Comment save = goodsCommentRepository.save(comment1);
+        if (save != null) {
+            goodsOrderRepository.save(order.setOrderStatus(OrderStatusEnum.finish));
+        }
         return "添加成功";
     }
 
@@ -561,7 +565,7 @@ public class GoodsService {
             Integer uid = e.getUid();
             UserInfo info = userInfoRepository.findByUid(uid);
             GoodsCommentVO vo = new GoodsCommentVO(e.getUid(), info.getNickName(), e.getTime(),
-                    info.getPortrait(), e.getContent());
+                    info.getPortrait(), e.getContent(),e.getStar());
             res.add(vo);
         });
         return res;

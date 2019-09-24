@@ -18,6 +18,7 @@ public class GoodsCommentVO {
      * 用户名
      */
     private String userName;
+
     /**
      * 评论时间
      */
@@ -30,4 +31,9 @@ public class GoodsCommentVO {
      * 评论内容
      */
     private String content;
+
+    /**
+     * 评论星
+     */
+    private Integer star;
 }

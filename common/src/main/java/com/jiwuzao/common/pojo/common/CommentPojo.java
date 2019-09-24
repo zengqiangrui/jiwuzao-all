@@ -16,4 +16,6 @@ public class CommentPojo {
     private String goodsOrderNo;
     @StringMax
     private String comment;
+
+    private Integer star;
 }

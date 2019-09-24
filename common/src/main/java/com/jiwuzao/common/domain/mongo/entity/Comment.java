@@ -43,6 +43,11 @@ public class Comment {
     private String content;
 
     /**
+     * 打星，默认五颗
+     */
+    private Integer star = 5;
+
+    /**
      * 评论时间
      */
     private Long time;
