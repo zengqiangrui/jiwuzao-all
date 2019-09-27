@@ -85,23 +85,30 @@ public class ChatController {
     @Authorization
     public JsonResult getAllGroup(@RequestAttribute int uid) {
         List<ChatGroupDto> userAllGroup = chatService.getUserAllGroup(uid);
-        List<ChatGroupItemVO> collect = userAllGroup.stream().map(chatGroupDto -> new ChatGroupItemVO()
-                .setUid(chatGroupDto.getUidA() == uid ? chatGroupDto.getUidB() : chatGroupDto.getUidA())
-                .setNickName(chatGroupDto.getUidA() == uid ? chatGroupDto.getUserNameB() : chatGroupDto.getUserNameA())
-                .setAvatar(chatGroupDto.getUidA() == uid ? chatGroupDto.getAvatarB() : chatGroupDto.getAvatarA())
-                .setOnlineStatus(chatGroupDto.getUidA() == uid ? chatGroupDto.getOnlineStatusB() : chatGroupDto.getOnlineStatusA())
-                .setGroupId(chatGroupDto.getGroupId()).setUndoNum(chatGroupDto.getUndoNum()).setSex(chatGroupDto.getSex()))
+        List<ChatGroupItemVO> collect = userAllGroup.stream().map(chatGroupDto -> createChatItem(uid, chatGroupDto))
                 .sorted(Comparator.comparing(ChatGroupItemVO::getUndoNum).reversed())//根据未处理的数量进行降序排列
                 .collect(Collectors.toList());
         return JsonResult.success(collect);
     }
 
+    private ChatGroupItemVO createChatItem(int uid, ChatGroupDto chatGroupDto) {
+        return new ChatGroupItemVO()
+                .setUid(chatGroupDto.getUidA() == uid ? chatGroupDto.getUidB() : chatGroupDto.getUidA())
+                .setNickName(chatGroupDto.getUidA() == uid ? chatGroupDto.getUserNameB() : chatGroupDto.getUserNameA())
+                .setAvatar(chatGroupDto.getUidA() == uid ? chatGroupDto.getAvatarB() : chatGroupDto.getAvatarA())
+                .setOnlineStatus(chatGroupDto.getUidA() == uid ? chatGroupDto.getOnlineStatusB() : chatGroupDto.getOnlineStatusA())
+                .setGroupId(chatGroupDto.getGroupId()).setUndoNum(chatGroupDto.getUndoNum()).setSex(chatGroupDto.getSex());
+    }
+
     @RequestMapping("/getOfficial")
     @Authorization
-    public JsonResult getOfficialChat(@RequestAttribute int uid){
+    public JsonResult getOfficialChat(@RequestAttribute int uid) {
         ChatGroupDto chatGroupDto = chatService.getOfficialChat(uid);
-        //todo 获取官方号
-        return null;
+        if (null != chatGroupDto) {
+            return JsonResult.success(createChatItem(uid, chatGroupDto));
+        } else {
+            return JsonResult.failure();
+        }
     }
 
     /**
@@ -138,7 +145,6 @@ public class ChatController {
         ));
         return JsonResult.success(chatMessageByGroup);
     }
-
 
     /**
      * 连接建立成功调用的方法

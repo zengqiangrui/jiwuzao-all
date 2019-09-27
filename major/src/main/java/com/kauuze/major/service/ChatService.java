@@ -1,17 +1,22 @@
 package com.kauuze.major.service;
 
+import com.jiwuzao.common.domain.enumType.BackRoleEnum;
 import com.jiwuzao.common.domain.enumType.MessageTypeEnum;
 import com.jiwuzao.common.domain.enumType.OnlineStatusEnum;
+import com.jiwuzao.common.domain.enumType.UserStateEnum;
 import com.jiwuzao.common.domain.mongo.entity.ChatGroup;
 import com.jiwuzao.common.domain.mongo.entity.ChatMessage;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.UserInfo;
+import com.jiwuzao.common.domain.mongo.entity.userBastic.UserToken;
 import com.jiwuzao.common.dto.chat.ChatGroupDto;
 import com.jiwuzao.common.dto.chat.ChatMessageDto;
 import com.jiwuzao.common.include.JsonUtil;
+import com.jiwuzao.common.include.Rand;
 import com.jiwuzao.common.include.StringUtil;
 import com.kauuze.major.domain.mongo.repository.ChatMessageRepository;
 import com.kauuze.major.domain.mongo.repository.ChatGroupRepository;
 import com.kauuze.major.domain.mongo.repository.UserInfoRepository;
+import com.kauuze.major.domain.mongo.repository.UserTokenRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +44,8 @@ public class ChatService {
     private UserInfoRepository userInfoRepository;
     @Autowired
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+    @Autowired
+    private UserTokenRepository userTokenRepository;
 
     /**
      * 建立聊天联系
@@ -81,7 +88,7 @@ public class ChatService {
         for (ChatGroup chatGroup : chatGroups) {
             UserInfo userA = userInfoRepository.findByUid(chatGroup.getUidA());
             UserInfo userB = userInfoRepository.findByUid(chatGroup.getUidB());
-            if(null==userA||null==userB)
+            if (null == userA || null == userB)
                 throw new RuntimeException("未找到分组");
             ChatGroupDto chatGroupDto = new ChatGroupDto()
                     .setUidA(chatGroup.getUidA())
@@ -204,7 +211,7 @@ public class ChatService {
         List<ChatMessageDto> list = new ArrayList<>();
         for (ChatMessage chatMessage : allByGroupId) {
             ChatMessageDto chatMessageDto = new ChatMessageDto();
-            BeanUtils.copyProperties(chatMessage, chatMessageDto,"id");
+            BeanUtils.copyProperties(chatMessage, chatMessageDto, "id");
             list.add(chatMessageDto);
         }
         return list;
@@ -234,9 +241,26 @@ public class ChatService {
                 .setGroupId(chatGroup.getId());
     }
 
-
+    /**
+     * 获取一个内容管理员的聊天对象
+     * @param uid
+     * @return
+     */
     public ChatGroupDto getOfficialChat(int uid) {
-
-        return null;
+        List<ChatGroup> chatGroups = chatGroupRepository.findByUidAOrUidB(uid, uid);
+        Optional<ChatGroup> optional = chatGroups.stream().filter(chatGroup -> {
+            int tempUid = uid == chatGroup.getUidB() ? chatGroup.getUidA() : chatGroup.getUidB();//获取对方用户id
+            UserToken byUid = userTokenRepository.findByUid(tempUid);
+            if (byUid.getUserState() != UserStateEnum.normal) return false;
+            return byUid.getBackRole() == BackRoleEnum.cms;
+        }).findAny();//匹配获取任何一个内容管理员
+        if (optional.isPresent()) {
+            return transToDto(optional.get());
+        } else {
+            List<UserToken> list = userTokenRepository.findAllByBackRole(BackRoleEnum.cms);
+            int rand = Rand.getRand(list.size());
+            UserToken userToken = list.get(rand);
+            return initChatGroup(uid, userToken.getUid());
+        }
     }
 }

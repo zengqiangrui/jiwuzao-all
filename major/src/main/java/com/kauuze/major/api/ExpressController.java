@@ -152,7 +152,7 @@ public class ExpressController {
     @RequestMapping("/getTraceByExpNo")
     @Authorization
     public JsonResult getTraceByExpNo(@Valid @RequestBody ExpressNoPojo expressNo) {
-        ExpressShowDto showDto = expressService.getExpressOneByOrder(expressNo.getExpressNo());
+        ExpressShowDto showDto = expressService.getExpressOneByLogistic(expressNo.getExpressNo());
         return JsonResult.success(showDto);
     }
 
