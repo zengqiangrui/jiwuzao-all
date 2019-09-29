@@ -242,7 +242,8 @@ public class GoodsService {
         if (goods.getUid() != uid) {
             return "你无权限";
         }
-        MongoUtil.updateNotNon("id", new Goods().setGid(gid).setPostage(postage), Goods.class);
+        goodsRepository.save(goods.setPostage(postage));
+//        MongoUtil.updateNotNon("id", new Goods().setGid(gid).setPostage(postage), Goods.class);
         return null;
     }
 

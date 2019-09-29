@@ -71,7 +71,7 @@ public class UploadController {
         try {
             file.transferTo(dest);
             layUploadDto.setCode(0).setMsg("上传成功").setData(new LayImgDto()
-                    .setSrc("http://api.jiwuzao.com/jiwuzao/" + fName).setTitle(file.getOriginalFilename()));
+                    .setSrc("https://api.jiwuzao.com/jiwuzao/" + fName).setTitle(file.getOriginalFilename()));
             log.info("上传成功");
             return JsonUtil.toJsonString(layUploadDto);
         } catch (IOException e) {

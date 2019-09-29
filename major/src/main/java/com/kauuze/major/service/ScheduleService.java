@@ -63,14 +63,14 @@ public class ScheduleService {
     }
 
     /**
-     * 每日0点30分扫描已发货订单，订单发货15天后无异常视为订单完成
+     * 每日0点30分扫描已发货订单，订单发货14天后无异常视为订单完成
      */
     @Scheduled(cron = "0 30 0 * * ?")
     public void checkFinish() {
         List<GoodsOrder> collect = goodsOrderRepository.findAll().stream().filter(goodsOrder -> goodsOrder.getOrderStatus() != OrderStatusEnum.waitReceive)
                 .filter(goodsOrder -> goodsOrder.getOrderExStatus() == OrderExStatusEnum.normal)
                 .filter(goodsOrder -> payOrderRepository.findById(goodsOrder.getPayid()).isPresent())
-                .filter(goodsOrder -> System.currentTimeMillis() - goodsOrder.getDeliverTime() > 1000 * 60 * 60 * 24 * 15)
+                .filter(goodsOrder -> System.currentTimeMillis() - goodsOrder.getDeliverTime() > 1000 * 60 * 60 * 24 * 14)
                 .map(goodsOrder -> goodsOrder.setOrderStatus(OrderStatusEnum.finish))
                 .collect(Collectors.toList());
         goodsOrderRepository.saveAll(collect);
