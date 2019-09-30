@@ -1,6 +1,7 @@
 package com.jiwuzao.common.domain.mysql.entity;
 
 import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
+import com.jiwuzao.common.exception.excEnum.OrderExceptionEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -142,4 +143,9 @@ public class GoodsOrderDetail {
      */
     @Enumerated(EnumType.STRING)
     private AuditTypeEnum complaintAuditType;
+    /**
+     * 记录异常订单原因
+     */
+    @Enumerated(EnumType.STRING)
+    private OrderExceptionEnum exceptionReason;//订单异常原因
 }

@@ -90,7 +90,7 @@ public class GoodsOrder {
     //该订单可提现金额，（finalPay-postage)*0.8
     private BigDecimal withdrawal;
 
-    //商家是否可提现，默认不可提现，在成功支付15天后可提现，定时任务实现
+    //商家是否可提现，默认不可提现，在成功支付15天后无异常可提现，定时任务实现（异常包含）
     private Boolean canRemit = false;
 
     //是否开发票

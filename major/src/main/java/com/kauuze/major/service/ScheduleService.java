@@ -34,7 +34,6 @@ public class ScheduleService {
     @Resource
     private PayOrderRepository payOrderRepository;
 
-
     /**
      * 每日0点扫描店铺信息，更新提现上限
      */
@@ -51,26 +50,43 @@ public class ScheduleService {
      * 每日0:15扫描订单，如果发货超过7天不异常就当作收货待评论
      */
     @Scheduled(cron = "0 15 0 * * ?")
-    public void waitAppraiseOrder(){
+    public void waitAppraiseOrder() {
         List<GoodsOrder> collect = goodsOrderRepository.findAllByOrderStatus(OrderStatusEnum.waitReceive).stream()
                 .filter(goodsOrder -> goodsOrder.getOrderExStatus() == OrderExStatusEnum.normal)//判断订单正常
                 .filter(goodsOrder -> payOrderRepository.findById(goodsOrder.getPayid()).isPresent())//判断订单已支付
                 .filter(goodsOrder -> System.currentTimeMillis() - goodsOrder.getDeliverTime() > 1000 * 60 * 60 * 24 * 7)//判断订单发货时间是否超过七天
-                .map(goodsOrder -> goodsOrder.setOrderStatus(OrderStatusEnum.waitAppraise))//设置订单状态为待评价
+                .map(goodsOrder -> goodsOrder.setOrderStatus(OrderStatusEnum.waitAppraise).setTakeTime(System.currentTimeMillis()))//设置订单状态为待评价(已收货)
                 .collect(Collectors.toList());
         goodsOrderRepository.saveAll(collect);
         log.info("每日0:15扫描订单，如果发货超过7天不异常就当作收货待评论:{}", collect);
     }
 
     /**
-     * 每日0点30分扫描已发货订单，订单发货14天后无异常视为订单完成
+     * 每日0点30分扫描已发货订单，订单发货15天后无异常视为订单完成
      */
     @Scheduled(cron = "0 30 0 * * ?")
     public void checkFinish() {
-        List<GoodsOrder> collect = goodsOrderRepository.findAll().stream().filter(goodsOrder -> goodsOrder.getOrderStatus() != OrderStatusEnum.waitReceive)
+        List<GoodsOrder> collect = goodsOrderRepository.findAll().stream()
+//                .filter(goodsOrder -> goodsOrder.getOrderStatus() == OrderStatusEnum.waitReceive)
                 .filter(goodsOrder -> goodsOrder.getOrderExStatus() == OrderExStatusEnum.normal)
                 .filter(goodsOrder -> payOrderRepository.findById(goodsOrder.getPayid()).isPresent())
-                .filter(goodsOrder -> System.currentTimeMillis() - goodsOrder.getDeliverTime() > 1000 * 60 * 60 * 24 * 14)
+                .filter(goodsOrder -> null != goodsOrder.getDeliverTime() && System.currentTimeMillis() - goodsOrder.getDeliverTime() > 1000 * 60 * 60 * 24 * 15)
+                .map(goodsOrder -> goodsOrder.setOrderStatus(OrderStatusEnum.finish).setCanRemit(true).setWithdrawal(goodsOrder.getFinalPay().multiply(new BigDecimal("0.8"))))
+                .collect(Collectors.toList());
+        goodsOrderRepository.saveAll(collect);
+        log.info("凌晨0点30，扫描订单完成情况，发货15天后如果无异常就算订单完成:{}", collect);
+    }
+
+    /**
+     * 每日0点30分扫描已发货订单，订单发货14天后无异常视为订单完成
+     */
+    @Scheduled(cron = "0 45 0 * * ?")
+    public void checkAppraise() {
+        List<GoodsOrder> collect = goodsOrderRepository.findAll().stream()
+                .filter(goodsOrder -> goodsOrder.getOrderStatus() == OrderStatusEnum.waitAppraise)
+                .filter(goodsOrder -> goodsOrder.getOrderExStatus() == OrderExStatusEnum.normal)
+//                .filter(goodsOrder -> payOrderRepository.findById(goodsOrder.getPayid()).isPresent())
+                .filter(goodsOrder -> System.currentTimeMillis() - goodsOrder.getTakeTime() > 1000 * 60 * 60 * 24 * 7)
                 .map(goodsOrder -> goodsOrder.setOrderStatus(OrderStatusEnum.finish))
                 .collect(Collectors.toList());
         goodsOrderRepository.saveAll(collect);

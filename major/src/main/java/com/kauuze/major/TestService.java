@@ -80,8 +80,4 @@ public class TestService {
     }
 
 
-    @Test
-    public void show() {
-
-    }
 }

@@ -8,18 +8,12 @@ import com.github.binarywang.wxpay.bean.result.WxPayCommonResult;
 import com.github.binarywang.wxpay.bean.result.WxPayRefundResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
-import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
-import com.jiwuzao.common.domain.enumType.OrderExStatusEnum;
-import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
-import com.jiwuzao.common.domain.enumType.PayChannelEnum;
+import com.jiwuzao.common.domain.enumType.*;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.jiwuzao.common.domain.mongo.entity.GoodsDetail;
 import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
-import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
-import com.jiwuzao.common.domain.mysql.entity.GoodsOrderDetail;
-import com.jiwuzao.common.domain.mysql.entity.PayOrder;
-import com.jiwuzao.common.domain.mysql.entity.Receipt;
+import com.jiwuzao.common.domain.mysql.entity.*;
 import com.jiwuzao.common.dto.order.GoodsOrderDto;
 import com.jiwuzao.common.dto.order.GoodsOrderSimpleDto;
 import com.jiwuzao.common.dto.order.UserGoodsOrderDto;
@@ -35,11 +29,13 @@ import com.kauuze.major.domain.mongo.repository.StoreRepository;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderDetailRepository;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
+import com.kauuze.major.domain.mysql.repository.ReturnOrderRepository;
 import com.kauuze.major.include.Rand;
 import com.kauuze.major.include.StringUtil;
 import com.kauuze.major.include.yun.TencentUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -80,6 +76,8 @@ public class OrderService {
     private TencentUtil tencentUtil;
     @Autowired
     private WxMaProperties wxMaProperties;
+    @Autowired
+    private ReturnOrderRepository returnOrderRepository;
 
     /**
      * 用户通过购物车或者单个商品结算，传入商品数组生成订单
@@ -576,7 +574,7 @@ public class OrderService {
         goodsOrderDetailRepository.save(detail);
         //发起退款请求
         WxPayRefundRequest req = new WxPayRefundRequest();
-        req.setNotifyUrl("http://api.jiwuzao.com/pay/notify/refundOrder");
+        req.setNotifyUrl("https://api.jiwuzao.com/pay/notify/refundOrder");
         req.setOutTradeNo(goodsOrder.getGoodsOrderNo());//传给微信的订单号
         req.setOutRefundNo(refundOrderNo);
         req.setTotalFee(order.getFinalPay().multiply(BigDecimal.valueOf(100)).intValue());//金额,分
@@ -639,4 +637,37 @@ public class OrderService {
             goodsOrderRepository.save(orderOptional.get().setOrderStatus(waitAppraise));
         }
     }
+
+    /**
+     * 申请退货
+     *
+     * @param uid           申请用户的id
+     * @param goodsOrderNo  申请订单no
+     * @param returnContent 退货内容
+     * @param image         退货图片(暂时单图)
+     * @return ReturnOrder
+     */
+    public ReturnOrder askGoodsReturn(int uid, String goodsOrderNo, String returnContent, String image) {
+        //订单空值抛出异常。
+        Optional<GoodsOrder> byGoodsOrderNo = goodsOrderRepository.findByGoodsOrderNo(goodsOrderNo);
+        if (!byGoodsOrderNo.isPresent()) throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
+        Optional<GoodsOrderDetail> detailByGoodsOrderNo = goodsOrderDetailRepository.findByGoodsOrderNo(goodsOrderNo);
+        if (!detailByGoodsOrderNo.isPresent()) throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
+        GoodsOrder goodsOrder = byGoodsOrderNo.get();
+        GoodsOrderDetail goodsOrderDetail = detailByGoodsOrderNo.get();
+        if (goodsOrder.getOrderExStatus() == OrderExStatusEnum.exception)//如果订单已经处于异常，则不能继续申请退货。
+            throw new OrderException(OrderExceptionEnum.EXCEPTION_ORDER);
+        if (uid != goodsOrder.getUid()) throw new OrderException(OrderExceptionEnum.USER_INVALID);//订单用户不匹配异常
+        Optional<ReturnOrder> optional = returnOrderRepository.findByGoodsOrderNo(goodsOrderNo);
+        if (optional.isPresent()) {
+            throw new RuntimeException("该订单已经申请退款，不能重复申请");
+        }
+        goodsOrderRepository.save(goodsOrder.setOrderExStatus(OrderExStatusEnum.exception));//订单异常处理
+        goodsOrderDetailRepository.save(goodsOrderDetail.setExceptionReason(OrderExceptionEnum.PROCESSING_RETURN));
+        ReturnOrder returnOrder = new ReturnOrder().setContent(returnContent).setImages(image).setCreateTime(System.currentTimeMillis()).setUid(uid)
+                .setStoreId(goodsOrder.getSid()).setGoodsOrderNo(goodsOrderNo).setStatus(ReturnStatusEnum.WAIT_RECEIVE);
+        return returnOrderRepository.save(returnOrder);
+    }
+
+
 }
