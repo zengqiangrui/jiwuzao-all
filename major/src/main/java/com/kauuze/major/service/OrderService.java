@@ -9,6 +9,7 @@ import com.github.binarywang.wxpay.bean.result.WxPayRefundResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.jiwuzao.common.domain.enumType.*;
+import com.jiwuzao.common.domain.mongo.entity.Express;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.jiwuzao.common.domain.mongo.entity.GoodsDetail;
 import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
@@ -23,6 +24,7 @@ import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.pojo.order.ReceiptPojo;
 import com.jiwuzao.common.pojo.shopcart.AddItemPojo;
 import com.kauuze.major.config.contain.properties.WxMaProperties;
+import com.kauuze.major.config.contain.properties.WxPayProperties;
 import com.kauuze.major.domain.mongo.repository.GoodsRepository;
 import com.kauuze.major.domain.mongo.repository.GoodsSpecRepository;
 import com.kauuze.major.domain.mongo.repository.StoreRepository;
@@ -73,11 +75,19 @@ public class OrderService {
     @Autowired
     private ReceiptService receiptService;
     @Autowired
+    private WxPayService wxPayService;//支付服务
+    @Autowired
+    private WxPayProperties wxPayProperties;
+    @Autowired
     private TencentUtil tencentUtil;
+    @Autowired
+    private ExpressService expressService;
     @Autowired
     private WxMaProperties wxMaProperties;
     @Autowired
     private ReturnOrderRepository returnOrderRepository;
+    @Autowired
+    private UserBasicService userBasicService;
 
     /**
      * 用户通过购物车或者单个商品结算，传入商品数组生成订单
@@ -391,9 +401,6 @@ public class OrderService {
     }
 
 
-    @Autowired
-    private WxPayService wxPayService;
-
     /**
      * 根据支付方式调用统一下单接口
      *
@@ -408,12 +415,12 @@ public class OrderService {
          */
         WxPayUnifiedOrderRequest req = new WxPayUnifiedOrderRequest();
         req.setSpbillCreateIp(ip);
-        req.setNotifyUrl("http://api.jiwuzao.com/pay/notify/order");
+        req.setNotifyUrl("https://api.jiwuzao.com/pay/notify/order");
         req.setTradeType("APP");//支付类型,jsapi需要传openid
         req.setBody(body);//商品介绍
         req.setOutTradeNo(payOrderNo);//传给微信的订单号
         req.setTotalFee(price.multiply(BigDecimal.valueOf(100)).intValue());//金额,分
-        log.info("请求参数", req);
+        log.info("请求参数:{}", req);
         return this.wxPayService.createOrder(req);
     }
 
@@ -498,6 +505,23 @@ public class OrderService {
     }
 
     /**
+     * 用户确认订单收货
+     *
+     * @param uid
+     * @param orderNo
+     */
+    public GoodsOrder confirmReceive(int uid, String orderNo) {
+        Optional<GoodsOrder> opt = goodsOrderRepository.findByGoodsOrderNo(orderNo);
+        Optional<GoodsOrderDetail> opt2 = goodsOrderDetailRepository.findByGoodsOrderNo(orderNo);
+        if (!opt.isPresent() || !opt2.isPresent()) throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
+        GoodsOrder goodsOrder = opt.get();
+        if (goodsOrder.getOrderExStatus() == OrderExStatusEnum.exception || goodsOrder.getOrderStatus() != OrderStatusEnum.waitReceive || goodsOrder.getUid() != uid) {
+            throw new OrderException(OrderExceptionEnum.ORDER_STATUS_NO_FIT);
+        }
+        return goodsOrderRepository.save(goodsOrder.setTakeTime(System.currentTimeMillis()).setOrderStatus(OrderStatusEnum.waitAppraise));
+    }
+
+    /**
      * 取消订单
      *
      * @param uid
@@ -548,6 +572,7 @@ public class OrderService {
      * @param amount
      * @return
      */
+    @Deprecated
     public WxPayRefundResult confirmRefund(int uid, String goodsOrderNo, BigDecimal amount) throws WxPayException {
         GoodsOrder goodsOrder = getByGoodsOrderNo(goodsOrderNo);
         Optional<PayOrder> payOrderOptional = payOrderRepository.findById(goodsOrder.getPayid());
@@ -574,7 +599,7 @@ public class OrderService {
         goodsOrderDetailRepository.save(detail);
         //发起退款请求
         WxPayRefundRequest req = new WxPayRefundRequest();
-        req.setNotifyUrl("https://api.jiwuzao.com/pay/notify/refundOrder");
+        req.setNotifyUrl(wxPayProperties.getRefundNotify());
         req.setOutTradeNo(goodsOrder.getGoodsOrderNo());//传给微信的订单号
         req.setOutRefundNo(refundOrderNo);
         req.setTotalFee(order.getFinalPay().multiply(BigDecimal.valueOf(100)).intValue());//金额,分
@@ -620,54 +645,8 @@ public class OrderService {
         return receiptService.getOne(goodsOrderNo);
     }
 
-    /**
-     * 订单已签收，待评价
-     *
-     * @param logisticCode
-     * @param waitAppraise
-     */
-    public void takeOver(String logisticCode, OrderStatusEnum waitAppraise) {
-        Optional<GoodsOrderDetail> detailOptional = goodsOrderDetailRepository.findByExpressNo(logisticCode);
-        if (!detailOptional.isPresent()) {
-            throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
-        } else {
-            GoodsOrderDetail goodsOrderDetail = detailOptional.get();
-            Optional<GoodsOrder> orderOptional = goodsOrderRepository.findByGoodsOrderNo(goodsOrderDetail.getGoodsOrderNo());
-            if (!orderOptional.isPresent()) throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
-            goodsOrderRepository.save(orderOptional.get().setOrderStatus(waitAppraise));
-        }
-    }
 
-    /**
-     * 申请退货
-     *
-     * @param uid           申请用户的id
-     * @param goodsOrderNo  申请订单no
-     * @param returnContent 退货内容
-     * @param image         退货图片(暂时单图)
-     * @return ReturnOrder
-     */
-    public ReturnOrder askGoodsReturn(int uid, String goodsOrderNo, String returnContent, String image) {
-        //订单空值抛出异常。
-        Optional<GoodsOrder> byGoodsOrderNo = goodsOrderRepository.findByGoodsOrderNo(goodsOrderNo);
-        if (!byGoodsOrderNo.isPresent()) throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
-        Optional<GoodsOrderDetail> detailByGoodsOrderNo = goodsOrderDetailRepository.findByGoodsOrderNo(goodsOrderNo);
-        if (!detailByGoodsOrderNo.isPresent()) throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
-        GoodsOrder goodsOrder = byGoodsOrderNo.get();
-        GoodsOrderDetail goodsOrderDetail = detailByGoodsOrderNo.get();
-        if (goodsOrder.getOrderExStatus() == OrderExStatusEnum.exception)//如果订单已经处于异常，则不能继续申请退货。
-            throw new OrderException(OrderExceptionEnum.EXCEPTION_ORDER);
-        if (uid != goodsOrder.getUid()) throw new OrderException(OrderExceptionEnum.USER_INVALID);//订单用户不匹配异常
-        Optional<ReturnOrder> optional = returnOrderRepository.findByGoodsOrderNo(goodsOrderNo);
-        if (optional.isPresent()) {
-            throw new RuntimeException("该订单已经申请退款，不能重复申请");
-        }
-        goodsOrderRepository.save(goodsOrder.setOrderExStatus(OrderExStatusEnum.exception));//订单异常处理
-        goodsOrderDetailRepository.save(goodsOrderDetail.setExceptionReason(OrderExceptionEnum.PROCESSING_RETURN));
-        ReturnOrder returnOrder = new ReturnOrder().setContent(returnContent).setImages(image).setCreateTime(System.currentTimeMillis()).setUid(uid)
-                .setStoreId(goodsOrder.getSid()).setGoodsOrderNo(goodsOrderNo).setStatus(ReturnStatusEnum.WAIT_RECEIVE);
-        return returnOrderRepository.save(returnOrder);
-    }
+
 
 
 }

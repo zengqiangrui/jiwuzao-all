@@ -22,6 +22,13 @@ public interface GoodsOrderRepository extends JpaRepository<GoodsOrder,Integer> 
     Optional<GoodsOrder> findByGoodsOrderNo(String goodsOrderNo);
 
     /**
+     * 根据商品id查找
+     * @param gid 商品id
+     * @return GoodsOrderList
+     */
+    List<GoodsOrder> findAllByGid(String gid);
+
+    /**
      * 查找店铺中某用户的下单情况
      * @param uid 用户id
      * @param sid 店铺id

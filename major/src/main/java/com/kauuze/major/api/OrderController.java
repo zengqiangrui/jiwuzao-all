@@ -6,12 +6,14 @@ import com.github.binarywang.wxpay.service.WxPayService;
 import com.jiwuzao.common.domain.enumType.GoodsReturnEnum;
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
+import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
 import com.jiwuzao.common.domain.mysql.entity.Receipt;
 import com.jiwuzao.common.domain.mysql.entity.ReturnOrder;
 import com.jiwuzao.common.dto.order.GoodsOrderDto;
 import com.jiwuzao.common.dto.order.GoodsOrderSimpleDto;
 import com.jiwuzao.common.include.JsonResult;
 import com.jiwuzao.common.include.PageDto;
+import com.jiwuzao.common.pojo.common.OrderNoPojo;
 import com.jiwuzao.common.pojo.common.OrderStatusPojo;
 import com.jiwuzao.common.pojo.order.*;
 import com.jiwuzao.common.vo.order.GoodsOrderVO;
@@ -81,6 +83,17 @@ public class OrderController {
             return JsonResult.failure();
         } else {
             return JsonResult.success(result);
+        }
+    }
+
+    @RequestMapping("/confirmReceive")
+    @Authorization
+    public JsonResult confirmOrder(@RequestAttribute("uid") int uid, @Valid @RequestBody OrderNoPojo pojo) {
+        GoodsOrder goodsOrder = orderService.confirmReceive(uid, pojo.getOrderNo());
+        if (goodsOrder != null) {
+            return JsonResult.success();
+        } else {
+            return JsonResult.failure();
         }
     }
 
@@ -178,18 +191,6 @@ public class OrderController {
             return JsonResult.failure();
         } else {
             return JsonResult.success(result);
-        }
-    }
-
-    @RequestMapping("/askGoodsReturn")
-    @Authorization
-    public JsonResult askGoodsReturn(@RequestAttribute int uid, @RequestBody GoodsReturnPojo pojo) {
-        log.info("入参{}",pojo);
-        ReturnOrder returnOrder = orderService.askGoodsReturn(uid, pojo.getGoodsOrderNo(), pojo.getReturnContent(), pojo.getImage());
-        if (returnOrder != null) {
-            return JsonResult.success(returnOrder);
-        } else {
-            return JsonResult.failure();
         }
     }
 

@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 public class GoodsPostagePojo {
     @StringMax
     private String gid;
-    @Decimal
+
+    @Decimal(zero = true)
     private BigDecimal postage;
 }

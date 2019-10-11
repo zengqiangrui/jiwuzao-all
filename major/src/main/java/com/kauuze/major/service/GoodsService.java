@@ -138,13 +138,15 @@ public class GoodsService {
         if (goods == null) {
             return "该商品不存在";
         }
-
         if (goods.getUid() != uid) {
             return "你没有权限";
         }
         if (!goods.getPutaway()) {
             return "该商品已下架";
         }
+        List<GoodsOrder> goodsOrderList = goodsOrderRepository.findAllByGid(gid);
+        Optional<GoodsOrder> any = goodsOrderList.stream().filter(goodsOrder -> goodsOrder.getOrderExStatus() == OrderExStatusEnum.exception).findAny();
+        if (any.isPresent()) return "该商品还有异常订单";
         goods.setPutaway(false).setPutOffTime(System.currentTimeMillis());
         Goods save = goodsRepository.save(goods);
         if (null != save)
@@ -522,7 +524,7 @@ public class GoodsService {
         } else {
             return null;
         }
-        if(order.getOrderExStatus() == OrderExStatusEnum.exception) return null;
+        if (order.getOrderExStatus() == OrderExStatusEnum.exception) return null;
         Comment old = goodsCommentRepository.findByGoodsOrderNoAndUid(goodsOrderNo, uid);
         if (old != null)
             return null;
@@ -566,7 +568,7 @@ public class GoodsService {
             Integer uid = e.getUid();
             UserInfo info = userInfoRepository.findByUid(uid);
             GoodsCommentVO vo = new GoodsCommentVO(e.getUid(), info.getNickName(), e.getTime(),
-                    info.getPortrait(), e.getContent(),e.getStar());
+                    info.getPortrait(), e.getContent(), e.getStar());
             res.add(vo);
         });
         return res;

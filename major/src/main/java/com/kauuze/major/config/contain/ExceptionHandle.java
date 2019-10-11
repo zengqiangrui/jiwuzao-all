@@ -30,11 +30,12 @@ import java.io.StringWriter;
 public class ExceptionHandle {
     @Autowired
     private LogRepository logRepository;
+
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
     public String handle(Exception e, HttpServletResponse response, HttpServletRequest request) {
         response.setCharacterEncoding("utf-8");
-        if(e instanceof MethodArgumentNotValidException || e instanceof HttpMessageNotReadableException || e instanceof ParamMismatchException){
+        if (e instanceof MethodArgumentNotValidException || e instanceof HttpMessageNotReadableException || e instanceof ParamMismatchException) {
             StateModel stateModel = new StateModel();
             stateModel.setState("param mismatch");
             try {
@@ -47,12 +48,12 @@ public class ExceptionHandle {
         }
 
         //处理订单异常
-        if(e instanceof OrderException){
+        if (e instanceof OrderException) {
             try {
                 Log log = new Log();
                 log.setService("orderService").setCreateTime(System.currentTimeMillis()).setLog(e.getMessage()).setError(true).setErrCode(((OrderException) e).getCode());
                 logRepository.save(log);
-                response.setStatus(600);
+                response.setStatus(505);
                 StateModel stateModel = new StateModel();
                 stateModel.setState("order exception");
                 stateModel.setData(e.getMessage());
@@ -60,20 +61,19 @@ public class ExceptionHandle {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-        }
-
-
-        try {
-            StringWriter stringWriter = new StringWriter();
-            e.printStackTrace(new PrintWriter(stringWriter));
-            logRepository.save(new Log(null, System.currentTimeMillis(),request.getRequestURL().toString() + "\r\n" + stringWriter.toString(), "major",true,null, DateTimeUtil.covertDateView(System.currentTimeMillis())));
-            response.setStatus(500);
-            StateModel stateModel = new StateModel();
-            stateModel.setState("service wrong");
-            stateModel.setData(e.getMessage());
-            response.getWriter().write(stateModel.toJsonString());
-        } catch (Exception e1) {
-            return null;
+        } else {
+            try {
+                StringWriter stringWriter = new StringWriter();
+                e.printStackTrace(new PrintWriter(stringWriter));
+                logRepository.save(new Log(null, System.currentTimeMillis(), request.getRequestURL().toString() + "\r\n" + stringWriter.toString(), "major", true, null, DateTimeUtil.covertDateView(System.currentTimeMillis())));
+                response.setStatus(500);
+                StateModel stateModel = new StateModel();
+                stateModel.setState("service wrong");
+                stateModel.setData(e.getMessage());
+                response.getWriter().write(stateModel.toJsonString());
+            } catch (Exception e1) {
+                return null;
+            }
         }
         return null;
     }

@@ -85,8 +85,8 @@ public class PayController {
          * 解析回调的信息，完成进一步
          */
         final WxPayRefundNotifyResult notifyResult = wxPayService.parseRefundNotifyResult(xmlData);
-        log.info("退款回调信息",notifyResult);
-        payService.handleRefundNotify(notifyResult);
+        log.info("退款回调信息:{}",notifyResult);
+//        payService.handleRefundNotify(notifyResult);
         return WxPayNotifyResponse.success("成功");
     }
 }

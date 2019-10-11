@@ -1,21 +1,15 @@
-package com.jiwuzao.common.pojo.common;
+package com.jiwuzao.common.pojo.merchant;
 
-
-import com.jiwuzao.common.include.valid.Idv;
+import com.jiwuzao.common.pojo.main.PagePojo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-/**
- * Uid传参
- *
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class UidPojo {
-    @Idv
-    private Integer uid;
+public class StorePagePojo extends PagePojo {
+    private String storeId;
 }

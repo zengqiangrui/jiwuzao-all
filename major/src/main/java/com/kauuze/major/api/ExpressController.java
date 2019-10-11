@@ -1,5 +1,7 @@
 package com.kauuze.major.api;
 
+import com.jiwuzao.common.domain.enumType.ExpressEnum;
+import com.jiwuzao.common.domain.enumType.ExpressStatusEnum;
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
 import com.jiwuzao.common.domain.mongo.entity.Express;
 import com.jiwuzao.common.domain.mongo.entity.ExpressResult;
@@ -207,6 +209,17 @@ public class ExpressController {
             List<Express> expressCategory = expressService.getExpressCategory(pojo.getExpressStatus());
             return JsonResult.success(expressCategory);
         }
+    }
+
+    /**
+     * 获取常用寄件的快递公司信息
+     * @return
+     */
+    @RequestMapping("/getExpressList")
+    @Authorization
+    public JsonResult getExpressList(){
+        List<Express> list = expressService.getExpressCategory(ExpressEnum.COMMON);
+        return JsonResult.success(list);
     }
 
     /**

@@ -6,7 +6,9 @@ import com.kauuze.manager.api.pojo.userView.FindByNickNamePojo;
 import com.kauuze.manager.config.permission.Cms;
 import com.kauuze.manager.config.permission.Root;
 import com.kauuze.manager.include.JsonResult;
+import com.kauuze.manager.service.MerchantService;
 import com.kauuze.manager.service.UserViewService;
+import com.qiniu.util.Json;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +27,9 @@ import javax.validation.Valid;
 public class UserViewController {
     @Autowired
     private UserViewService userViewService;
+    @Autowired
+    private MerchantService merchantService;
+
     @RequestMapping("/findByUid")
     @Cms
     public JsonResult findByUid(@Valid @RequestBody UidPojo uidPojo){
@@ -90,5 +95,10 @@ public class UserViewController {
         }
     }
 
+    @RequestMapping("/getVerifyActor")
+    @Cms
+    public JsonResult getVerifyActor(@RequestBody @Valid UidPojo pojo){
+        return JsonResult.success(merchantService.findVerifyActorByUid(pojo.getUid()));
+    }
 
 }

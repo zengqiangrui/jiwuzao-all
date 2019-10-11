@@ -104,4 +104,8 @@ public class PayService {
         goodsOrderDetailRepository.save(detail);
         payOrderRepository.save(payOrder);
     }
+
+    public void createRefundPay(){
+
+    }
 }

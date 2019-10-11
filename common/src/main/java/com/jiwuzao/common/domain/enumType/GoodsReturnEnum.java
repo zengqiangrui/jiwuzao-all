@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum GoodsReturnEnum {
     CANNOT_RETURN(1,"不可退换"),
-    CAN_RETURN(2,"可退换");
+    CAN_RETURN(2,"七日可退换");
 
     private Integer code;
 

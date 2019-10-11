@@ -260,10 +260,7 @@ public class UserBasicService {
      */
     public boolean validPhone(String phone) {
         User user = userRepository.findByPhone(phone);
-        if (user != null) {
-            return true;
-        }
-        return false;
+        return user != null;
     }
 
     /**

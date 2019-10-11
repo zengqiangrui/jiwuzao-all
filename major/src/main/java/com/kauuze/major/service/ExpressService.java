@@ -63,13 +63,13 @@ public class ExpressService {
      * @throws Exception
      */
     public ExpressResult getOrderTracesByJson(String expCode, String expNo, String orderCode) throws Exception {
-        if(StringUtils.isAnyBlank(expCode,expNo,orderCode)) {
+        if (StringUtils.isAnyBlank(expCode, expNo, orderCode)) {
             throw new RuntimeException("快递输入参数为空");
         }
         KdniaoUtil kdniaoUtil = new KdniaoUtil();
         ExpressRequestDataDto requestDataDto = new ExpressRequestDataDto().setLogisticCode(expNo).setShipperCode(expCode).setOrderCode(orderCode);
         String requestData = JsonUtil.toJsonString(requestDataDto);
-        if(expCode.equals("SF")){
+        if (expCode.equals("SF")) {
             GoodsOrderDetail orderDetail = orderService.getDetailByGoodsOrderNo(orderCode);
             requestData = JsonUtil.toJsonString(requestDataDto.setCustomerName(StringUtil.getPhoneLast4(orderDetail.getReceiverPhone())));
         }
@@ -140,8 +140,10 @@ public class ExpressService {
      * @param expCode
      * @return
      */
-    public Optional<Express> getOneByExpCode(String expCode) {
-        return expressRepository.findByCode(expCode.toUpperCase());
+    public Express getOneByExpCode(String expCode) {
+        Optional<Express> byCode = expressRepository.findByCode(expCode.toUpperCase());
+        if (!byCode.isPresent()) throw new RuntimeException("快递公司不支持");
+        return byCode.get();
     }
 
     /**
@@ -265,7 +267,7 @@ public class ExpressService {
         } else {
             GoodsOrderDetail goodsOrderDetail = optional.get();
             Optional<Express> byCode = expressRepository.findByCode(goodsOrderDetail.getExpCode());
-            if(!byCode.isPresent()) throw new RuntimeException("不支持快递类型");
+            if (!byCode.isPresent()) throw new RuntimeException("不支持快递类型");
             Express express = byCode.get();
             ExpressShowDto expressShowDto = new ExpressShowDto().setOrderNo(goodsOrderNo).setExpCompany(express.getName()).setExpNo(goodsOrderDetail.getExpressNo());
 //            return getExpressOneByLogistic(goodsOrderDetail.getExpressNo());
@@ -276,7 +278,7 @@ public class ExpressService {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            log.info("showDTO:{}",expressShowDto);
+            log.info("showDTO:{}", expressShowDto);
             return expressShowDto;
         }
 

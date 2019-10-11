@@ -21,7 +21,7 @@ public enum OrderExceptionEnum {
     HAS_RECEIPT(13, "已经开具发票"),
     ORDER_STATUS_NO_FIT(14, "订单状态不匹配"),
     REFUND_NOT_FOUND(15, "退款订单未找到"),
-    GOODS_TAKE_OFF(16, "所购商品已下架"),
+    GOODS_TAKE_OFF(16, "商品已下架"),
     USER_INVALID(17, "请求订单用户不匹配"),
     PROCESSING_RETURN(18, "处理退货中");
 

@@ -280,6 +280,12 @@ public class GoodsController {
         }
     }
 
+    /**
+     * 
+     * @param uid
+     * @param pojo
+     * @return
+     */
     @RequestMapping("/modifyInventory")
     @Merchant
     public JsonResult modifyInventory(@RequestAttribute int uid, @Valid @RequestBody GoodsSpecInventoryPojo pojo) {
