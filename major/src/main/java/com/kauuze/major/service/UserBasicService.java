@@ -10,6 +10,7 @@ import com.jiwuzao.common.domain.mongo.entity.userBastic.UserToken;
 import com.jiwuzao.common.domain.mysql.entity.Sms;
 import com.jiwuzao.common.domain.mysql.entity.User;
 import com.jiwuzao.common.dto.user.FansAndFocusDTO;
+import com.jiwuzao.common.dto.user.UserPhoneDto;
 import com.jiwuzao.common.include.yun.QiniuUtil;
 import com.kauuze.major.domain.common.MongoUtil;
 import com.kauuze.major.domain.mongo.repository.StoreRepository;
@@ -126,6 +127,17 @@ public class UserBasicService {
         TokenUtil.judgeEndTime(userToken);
         FansAndFocusDTO dto = focusService.getFocusAndFansNum(uid);
         return new UserPrivateDto(uid, user.getPhone(), userToken.getRole(), userToken.getBackRole(), userToken.getVip(), userToken.getVipEndTime(), userToken.getAccessToken(), userToken.getUserState(), userToken.getUserStateEndTime(), System.currentTimeMillis(), userInfo.getNickName(), userInfo.getPortrait(), userInfo.getSex(), userInfo.getBirthday(), userInfo.getProvince(), userInfo.getCity(), userInfo.getPersonalSign(), userInfo.getOpenWxId(), userInfo.getOpenQQ(), dto.getFansNum(), dto.getFocusNum());
+    }
+
+    /**
+     * 获取昵称和手机
+     * @param uid
+     * @return
+     */
+    public UserPhoneDto getUserPhoneDto(int uid){
+        User user = userRepository.findById(uid);
+        if(user == null) throw new RuntimeException("用户没找到");
+        return new UserPhoneDto().setPhone(user.getPhone()).setNickname(user.getNickName()).setUid(uid);
     }
 
     /**

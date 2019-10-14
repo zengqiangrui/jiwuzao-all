@@ -20,4 +20,6 @@ public interface ReturnOrderRepository extends JpaRepository<ReturnOrder, Intege
 
     Page<ReturnOrder> findAllByStoreId(String storeId, Pageable pageable);
 
+    Optional<ReturnOrder> findByGoodsReturnNo(String goodsReturnNo);
+
 }

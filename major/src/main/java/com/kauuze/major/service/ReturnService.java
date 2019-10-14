@@ -1,5 +1,6 @@
 package com.kauuze.major.service;
 
+import com.github.binarywang.wxpay.bean.notify.WxPayRefundNotifyResult;
 import com.github.binarywang.wxpay.bean.request.WxPayRefundRequest;
 import com.github.binarywang.wxpay.bean.result.WxPayRefundResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
@@ -13,6 +14,7 @@ import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrderDetail;
 import com.jiwuzao.common.domain.mysql.entity.PayOrder;
 import com.jiwuzao.common.domain.mysql.entity.ReturnOrder;
+import com.jiwuzao.common.dto.user.UserPhoneDto;
 import com.jiwuzao.common.exception.OrderException;
 import com.jiwuzao.common.exception.excEnum.OrderExceptionEnum;
 import com.jiwuzao.common.include.PageDto;
@@ -115,7 +117,7 @@ public class ReturnService {
      * @param id
      * @return
      */
-    public ReturnOrder confirmReturnOrder(Integer id) {
+    public ReturnOrder allowReturnOrder(Integer id) {
         ReturnOrder returnOrder = getReturnOrder(id);
         return returnOrderRepository.save(returnOrder.setStatus(ReturnStatusEnum.WAIT_DELIVER)).setUpdateTime(System.currentTimeMillis());
     }
@@ -189,8 +191,8 @@ public class ReturnService {
             }
             return returnOrderRepository.save(returnOrder);
         }
-
     }
+
 
     /**
      * 获取订单
@@ -226,6 +228,7 @@ public class ReturnService {
                     .setGoodsTitle(goods.getTitle()).setGoodsOrderNo(returnOrder.getGoodsOrderNo())
                     .setGoodsReturnNo(returnOrder.getGoodsReturnNo()).setId(returnOrder.getId()).setReturnReason(returnOrder.getContent())
                     .setReturnStatus(returnOrder.getStatus()).setReturnPromise(goods.getGoodsReturn().getMsg())
+                    .setFailReason(returnOrder.getFailReason())
                     .setStoreName(store.getStoreName());
         }).collect(Collectors.toList());
         PageDto<ReturnOrderVO> pageDto = new PageDto<>();
@@ -236,26 +239,46 @@ public class ReturnService {
     /**
      * 商家端获取用户申请的退款信息
      *
-     * @param storeId
+     * @param uid 商家用户id
      * @param currentPage
      * @param pageSize
      * @return
      */
-    public PageDto<ReturnOrderVO> getReturnListByStore(String storeId, Integer currentPage, Integer pageSize) {
+    public PageDto<ReturnOrderVO> getReturnListByStore(int uid, Integer currentPage, Integer pageSize) {
+        Optional<Store> optional = storeRepository.findByUid(uid);
+        if(!optional.isPresent()) throw new RuntimeException("店铺不存在");
+        Store store = optional.get();
+        if(store.getViolation()) throw new RuntimeException("店铺违规");
+        String storeId = store.getId();
         Page<ReturnOrder> returnOrderPage = returnOrderRepository.findAllByStoreId(storeId, PageRequest.of(currentPage, pageSize, Sort.by("createTime").descending()));//时间降序排列
         List<ReturnOrderVO> list = returnOrderPage.getContent().stream().map(returnOrder -> {
             Optional<GoodsOrder> byGoodsOrderNo = goodsOrderRepository.findByGoodsOrderNo(returnOrder.getGoodsOrderNo());
             if (!byGoodsOrderNo.isPresent()) throw new RuntimeException("订单不存在");
             GoodsOrder goodsOrder = byGoodsOrderNo.get();
             Goods goods = goodsRepository.findByGid(goodsOrder.getGid());
+            UserPhoneDto userPhoneDto = userBasicService.getUserPhoneDto(returnOrder.getUid());
             return new ReturnOrderVO().setGoodsImg(StringUtil.isBlank(returnOrder.getImages()) ? goods.getCover() : returnOrder.getImages())
                     .setGoodsTitle(goods.getTitle()).setGoodsOrderNo(returnOrder.getGoodsOrderNo())
                     .setGoodsReturnNo(returnOrder.getGoodsReturnNo()).setId(returnOrder.getId()).setReturnReason(returnOrder.getContent())
                     .setReturnStatus(returnOrder.getStatus()).setReturnPromise(goods.getGoodsReturn().getMsg())
+                    .setUserName(userPhoneDto.getNickname()).setUserPhone(userPhoneDto.getPhone())
+                    .setFailReason(returnOrder.getFailReason())
                     ;
         }).collect(Collectors.toList());
         PageDto<ReturnOrderVO> pageDto = new PageDto<>();
         pageDto.setTotal(returnOrderPage.getTotalElements()).setContent(list);
         return pageDto;
+    }
+
+    public void handleRefundNotify(WxPayRefundNotifyResult notifyResult) {
+        Optional<ReturnOrder> optional = returnOrderRepository.findByGoodsReturnNo(notifyResult.getReqInfo().getOutRefundNo());
+        if(!optional.isPresent()) throw new RuntimeException("退款订单不存在");
+        ReturnOrder returnOrder = optional.get();
+        Optional<GoodsOrder> byGoodsOrderNo = goodsOrderRepository.findByGoodsOrderNo(returnOrder.getGoodsOrderNo());
+        Optional<GoodsOrderDetail> goodsOrderNo = goodsOrderDetailRepository.findByGoodsOrderNo(returnOrder.getGoodsOrderNo());
+        //todo 成功退款处理
+
+        returnOrder.setStatus(ReturnStatusEnum.SUCCESS);
+        returnOrder.setUpdateTime(System.currentTimeMillis());
     }
 }

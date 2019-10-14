@@ -36,4 +36,6 @@ public class ReturnOrderVO {
     private ReturnStatusEnum returnStatus;
 
     private String returnPromise;
+
+    private String failReason;
 }

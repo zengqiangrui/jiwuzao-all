@@ -5,10 +5,12 @@ import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
 import com.jiwuzao.common.domain.enumType.ReturnStatusEnum;
 import com.jiwuzao.common.domain.mongo.entity.ExpressResult;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
+import com.jiwuzao.common.domain.mysql.entity.GoodsOrderDetail;
 import com.jiwuzao.common.domain.mysql.entity.PayOrder;
 import com.jiwuzao.common.domain.mysql.entity.ReturnOrder;
 import com.jiwuzao.common.pojo.shopcart.AddItemPojo;
 import com.jiwuzao.common.vo.store.AllEarningVO;
+import com.kauuze.major.domain.mysql.repository.GoodsOrderDetailRepository;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
 import com.kauuze.major.domain.mysql.repository.ReturnOrderRepository;
@@ -26,6 +28,8 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -50,9 +54,11 @@ public class OrderServiceTest {
     private ScheduleService scheduleService;
     @Resource
     private ReturnOrderRepository returnOrderRepository;
+    @Resource
+    private GoodsOrderDetailRepository goodsOrderDetailRepository;
 
     @Test
-    public void showRepository(){
+    public void showRepository() {
 //        ReturnOrder test1 = returnOrderRepository.save(new ReturnOrder().setImages("test1").setStatus(ReturnStatusEnum.WAIT_RECEIVE).setContent("1111")
 //                .setCreateTime(System.currentTimeMillis()).setGoodsOrderNo("123123").setUid(1).setStoreId("21"));
 //
@@ -61,22 +67,23 @@ public class OrderServiceTest {
     }
 
     @Test
-    public void showScechule(){
+    public void showScechule() {
         scheduleService.checkFinish();
     }
 
     @Test
-    public void genOrder(){
+    public void genOrder() {
         List<AddItemPojo> list = new ArrayList<>();
-        AddItemPojo item = new AddItemPojo("5d2c0a292197fd13b83d7311","5d2c0a292197fd13b83d7314",2);
+        AddItemPojo item = new AddItemPojo("5d2c0a292197fd13b83d7311", "5d2c0a292197fd13b83d7314", 2);
         list.add(item);
-        item = new AddItemPojo("5d2c0b332197fd13b83d7349","5d2c0b332197fd13b83d734b",2);
+        item = new AddItemPojo("5d2c0b332197fd13b83d7349", "5d2c0b332197fd13b83d734b", 2);
         list.add(item);
         orderService.genOrder(5, list);
     }
 
     /**
      * genOrder生成订单后，在数据库中取出payOrderNo
+     *
      * @throws WxPayException
      */
 //    @Test
@@ -89,9 +96,8 @@ public class OrderServiceTest {
 //
 //        orderService.confirmOrder(4, list, "重庆市渝中区", "金童路叠彩中心","18671450715","刘元庭","127.0.0.1");
 //    }
-
     @Test
-    public void handleNotify(){
+    public void handleNotify() {
         String pid = "17854015376b4709b8447ad4fcd0a9dc";
         String transactionId = "transId123";
         PayOrder payOrder = payOrderRepository.findByPayOrderNo(pid);
@@ -101,21 +107,21 @@ public class OrderServiceTest {
         payOrderRepository.save(payOrder);
 
         List<GoodsOrder> list = goodsOrderRepository.findByPayid(1);
-        list.forEach(e->{
+        list.forEach(e -> {
             e.setOrderStatus(OrderStatusEnum.waitDeliver);
             goodsOrderRepository.save(e);
         });
     }
 
     @Test
-    public void testSendNotice(){
+    public void testSendNotice() {
         GoodsOrder goodsOrder = goodsOrderRepository.findByGoodsOrderNo("2019091206552677566").get();
         merchantService.sendDeliverMessage(goodsOrder);
     }
 
 
     @Test
-    public void showExpress(){
+    public void showExpress() {
         try {
             ExpressResult sf = expressService.getOrderTracesByJson("SF", "1234564", "111");
             System.out.println(sf);
@@ -125,7 +131,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    public void showWithdraw(){
+    public void showWithdraw() {
         AllEarningVO allEarningVO = withdrawService.merchantGetAllEarning("5d241a0a3e6e8aadf857f2f9");
         System.out.println(allEarningVO);
     }
@@ -139,13 +145,18 @@ public class OrderServiceTest {
     }
 
     @Test
-    public void showSchedule(){
+    public void showSchedule() {
         scheduleService.checkFinish();
     }
 
     @Test
-    public void showEarning(){
+    public void showEarning() {
         AllEarningVO storeTurnover = merchantService.getStoreTurnover("5d6372987888ef4614cb1b26");
         System.out.println(storeTurnover);
+    }
+
+    @Test
+    public void addAddressId() {
+
     }
 }

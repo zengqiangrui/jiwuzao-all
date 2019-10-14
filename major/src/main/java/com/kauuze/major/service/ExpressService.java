@@ -1,13 +1,11 @@
 package com.kauuze.major.service;
 
 import com.jiwuzao.common.domain.common.MongoUtil;
-import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
-import com.jiwuzao.common.domain.enumType.ExpressEnum;
-import com.jiwuzao.common.domain.enumType.OrderExStatusEnum;
-import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
+import com.jiwuzao.common.domain.enumType.*;
 import com.jiwuzao.common.domain.mongo.entity.*;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
 import com.jiwuzao.common.domain.mysql.entity.GoodsOrderDetail;
+import com.jiwuzao.common.domain.mysql.entity.ReturnOrder;
 import com.jiwuzao.common.dto.express.*;
 import com.jiwuzao.common.exception.OrderException;
 import com.jiwuzao.common.exception.excEnum.OrderExceptionEnum;
@@ -18,10 +16,12 @@ import com.jiwuzao.common.pojo.express.ExpressPushDataPojo;
 import com.jiwuzao.common.pojo.express.ExpressPushPojo;
 import com.jiwuzao.common.pojo.order.ExpressPojo;
 import com.jiwuzao.common.vo.order.ExpressCancelVO;
+import com.jiwuzao.common.vo.order.ExpressResultVO;
 import com.kauuze.major.config.contain.properties.KdniaoProperties;
 import com.kauuze.major.domain.mongo.repository.*;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderDetailRepository;
 import com.kauuze.major.domain.mysql.repository.GoodsOrderRepository;
+import com.kauuze.major.domain.mysql.repository.ReturnOrderRepository;
 import com.qiniu.util.Json;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -55,6 +55,8 @@ public class ExpressService {
     private AddressRepository addressRepository;
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private ReturnOrderRepository returnOrderRepository;
 
 
     /**
@@ -63,6 +65,53 @@ public class ExpressService {
      * @throws Exception
      */
     public ExpressResult getOrderTracesByJson(String expCode, String expNo, String orderCode) throws Exception {
+        ExpressResultDto expressResultDto = getOrderTraces(expCode, expNo, orderCode);
+        Optional<ExpressResult> byOrderCode = resultRepository.findByOrderCode(orderCode);
+        ExpressResult expressResult = byOrderCode.orElse(new ExpressResult());
+        BeanUtils.copyProperties(expressResultDto, expressResult);
+        log.info("快递物流信息expressResult:{}", expressResult);
+        //保存或更新快递信息
+        return resultRepository.save(expressResult);
+    }
+
+    /**
+     * 根据退款订单你查找物流信息
+     *
+     * @param returnId
+     * @return
+     */
+    public ExpressResultVO queryReturnExpress(int returnId) throws Exception {
+        Optional<ReturnOrder> optional = returnOrderRepository.findById(returnId);
+        if (!optional.isPresent()) {
+            throw new RuntimeException("返回订单不存在");
+        }
+        ReturnOrder returnOrder = optional.get();
+        Optional<GoodsOrderDetail> opt = goodsOrderDetailRepository.findByGoodsOrderNo(returnOrder.getGoodsOrderNo());
+        if (!opt.isPresent()) throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
+        GoodsOrderDetail goodsOrderDetail = opt.get();
+        ExpressResultDto resultDto = getOrderTraces(returnOrder.getExpCode(), returnOrder.getExpNo(), goodsOrderDetail.getGoodsOrderNo());
+        Optional<Express> optional1 = expressRepository.findByCode(resultDto.getShipperCode());
+        if (!optional1.isPresent()) throw new RuntimeException("不支持快递公司类型");
+        Optional<Address> addressOptional = addressRepository.findById(goodsOrderDetail.getAddressId());
+        if(!addressOptional.isPresent()) throw new RuntimeException("不存在该地址");
+        Address address = addressOptional.get();
+        Collections.reverse(resultDto.getTraces());
+        return new ExpressResultVO().setExpCompany(optional1.get().getName())
+                .setExpNo(resultDto.getLogisticCode()).setOrderNo(goodsOrderDetail.getGoodsOrderNo())
+                .setDetailAddress(address.getProvinces()+":"+address.getAddressDetail())
+                .setState(resultDto.getState()).setSuccess(resultDto.getSuccess()).setTraces(resultDto.getTraces());
+    }
+
+    /**
+     * 查询订单
+     *
+     * @param expCode
+     * @param expNo
+     * @param orderCode
+     * @return
+     * @throws Exception
+     */
+    private ExpressResultDto getOrderTraces(String expCode, String expNo, String orderCode) throws Exception {
         if (StringUtils.isAnyBlank(expCode, expNo, orderCode)) {
             throw new RuntimeException("快递输入参数为空");
         }
@@ -82,14 +131,7 @@ public class ExpressService {
         params.put("DataType", "2");
         String result = kdniaoUtil.sendPost(properties.getTraceUrl(), params);
         log.info("kdniaoTraceResult:{}", result);
-        //获取并转换对象
-        ExpressResultDto expressResultDto = JsonUtil.parseJsonString(result, ExpressResultDto.class);
-        Optional<ExpressResult> byOrderCode = resultRepository.findByOrderCode(orderCode);
-        ExpressResult expressResult = byOrderCode.orElse(new ExpressResult());
-        BeanUtils.copyProperties(expressResultDto, expressResult);
-        log.info("快递物流信息expressResult:{}", expressResult);
-        //保存或更新快递信息
-        return resultRepository.save(expressResult);
+        return JsonUtil.parseJsonString(result, ExpressResultDto.class);
     }
 
     /**
@@ -154,7 +196,7 @@ public class ExpressService {
      * @param expNo
      * @return
      */
-    public GoodsOrder addExpressOrder(String expCode, String expNo, String orderNo, Boolean isSub) {
+    public GoodsOrder addExpressOrder(String expCode, String expNo, String orderNo,String addressId, Boolean isSub) {
         Optional<Express> code = expressRepository.findByCode(expCode);
         if (!code.isPresent()) {
             throw new OrderException(OrderExceptionEnum.NOT_SUPPORT_EXPRESS_CODE);
@@ -169,14 +211,14 @@ public class ExpressService {
                 if (!isSub) {//先处理订阅失败
                     //首先查询物流信息是否追踪到
                     if (getOrderTracesByJson(expCode, expNo, orderNo).getSuccess()) {
-                        goodsOrderDetailRepository.save(goodsOrderDetail.setIsSubscribe(false));
+                        goodsOrderDetailRepository.save(goodsOrderDetail.setIsSubscribe(false).setAddressId(addressId));
                         return createDeliver(orderNo);
                     } else {
                         //未找到信息则发货失败
                         throw new OrderException(OrderExceptionEnum.DELIVER_FAIL);
                     }
                 } else {//订阅成功
-                    goodsOrderDetailRepository.save(goodsOrderDetail.setIsSubscribe(true));
+                    goodsOrderDetailRepository.save(goodsOrderDetail.setIsSubscribe(true).setAddressId(addressId));
                     return createDeliver(orderNo);
                 }
             }

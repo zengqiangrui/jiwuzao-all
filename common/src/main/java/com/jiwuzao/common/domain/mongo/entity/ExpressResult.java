@@ -19,6 +19,8 @@ public class ExpressResult {
     @Id
     private String id;
 
+    private boolean isReturn;//是否是退货
+
     private String pushTime;
     /**
      * 物流运单号

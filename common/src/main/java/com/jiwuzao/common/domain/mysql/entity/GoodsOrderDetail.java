@@ -45,6 +45,8 @@ public class GoodsOrderDetail {
      */
     private Long cancelTime;
 
+    private String addressId;//寄件人的id（将会用于退货）
+
     /**
      * 物流单号
      */

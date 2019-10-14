@@ -74,14 +74,14 @@ public class ExpressController {
              * 订阅物流轨迹的推送
              */
             ExpressRequestReturnDto returnDto = expressService.orderTracesSubByJson(express.getExpCode(), express.getExpNo(), express.getOrderNo(), express.getAddressId());
-            log.info("物流订阅信息:{}",returnDto);
+            log.info("物流订阅信息:{}", returnDto);
             if (returnDto.getSuccess()) {
                 //订阅成功
-                expressService.addExpressOrder(express.getExpCode(), express.getExpNo(), express.getOrderNo(), true);
+                expressService.addExpressOrder(express.getExpCode(), express.getExpNo(), express.getOrderNo(), express.getAddressId(), true);
                 return JsonResult.success();
             } else {
                 //订阅失败
-                expressService.addExpressOrder(express.getExpCode(), express.getExpNo(), express.getOrderNo(), false);
+                expressService.addExpressOrder(express.getExpCode(), express.getExpNo(), express.getOrderNo(), express.getAddressId(), false);
                 return JsonResult.failure(returnDto.getReason());
             }
         } catch (Exception e) {
@@ -213,11 +213,12 @@ public class ExpressController {
 
     /**
      * 获取常用寄件的快递公司信息
+     *
      * @return
      */
     @RequestMapping("/getExpressList")
     @Authorization
-    public JsonResult getExpressList(){
+    public JsonResult getExpressList() {
         List<Express> list = expressService.getExpressCategory(ExpressEnum.COMMON);
         return JsonResult.success(list);
     }
