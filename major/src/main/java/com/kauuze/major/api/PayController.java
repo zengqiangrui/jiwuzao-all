@@ -85,14 +85,20 @@ public class PayController {
      * @throws WxPayException
      */
     @PostMapping("/notify/refundOrder")
-    public String parseRefundNotifyResult(@RequestBody String xmlData) throws WxPayException {
+    public String parseRefundNotifyResult(@RequestBody String xmlData) {
         /**
          * 解析回调的信息，完成进一步
          */
-        final WxPayRefundNotifyResult notifyResult = wxPayService.parseRefundNotifyResult(xmlData);
-        log.info("退款回调信息:{}",notifyResult);
+        final WxPayRefundNotifyResult notifyResult;
+        try {
+            notifyResult = wxPayService.parseRefundNotifyResult(xmlData);
+            log.info("退款回调信息:{}",notifyResult);
 //        payService.handleRefundNotify(notifyResult);
-        returnService.handleRefundNotify(notifyResult);
-        return WxPayNotifyResponse.success("成功");
+            returnService.handleRefundNotify(notifyResult);
+            return WxPayNotifyResponse.success("成功");
+        } catch (WxPayException e) {
+            e.printStackTrace();
+            return WxPayNotifyResponse.success("失败");
+        }
     }
 }

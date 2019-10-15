@@ -7,6 +7,7 @@ import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.jiwuzao.common.domain.enumType.GoodsReturnEnum;
 import com.jiwuzao.common.domain.enumType.OrderExStatusEnum;
+import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
 import com.jiwuzao.common.domain.enumType.ReturnStatusEnum;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
@@ -172,7 +173,7 @@ public class ReturnService {
                 Optional<PayOrder> payOptional = payOrderRepository.findById(goodsOrder.getPayid());
                 if (!payOptional.isPresent()) throw new RuntimeException("支付订单不存在");
                 PayOrder payOrder = payOptional.get();
-                if (!payOptional.get().getPay() || StringUtil.isBlank(payOrder.getTransactionId()))
+                if (!payOrder.getPay() || StringUtil.isBlank(payOrder.getTransactionId()))
                     throw new RuntimeException("支付信息异常");
                 WxPayRefundRequest request = new WxPayRefundRequest();
                 request.setRefundFee(goodsOrder.getFinalPay().multiply(new BigDecimal("100")).intValue());
@@ -209,9 +210,9 @@ public class ReturnService {
     /**
      * app 端普通用户获取个人申请的退款信息
      *
-     * @param uid 用户id
+     * @param uid         用户id
      * @param currentPage 当前页码
-     * @param pageSize 每页容量
+     * @param pageSize    每页容量
      * @return
      */
     public PageDto<ReturnOrderVO> getUserReturn(int uid, Integer currentPage, Integer pageSize) {
@@ -239,16 +240,16 @@ public class ReturnService {
     /**
      * 商家端获取用户申请的退款信息
      *
-     * @param uid 商家用户id
+     * @param uid         商家用户id
      * @param currentPage
      * @param pageSize
      * @return
      */
     public PageDto<ReturnOrderVO> getReturnListByStore(int uid, Integer currentPage, Integer pageSize) {
         Optional<Store> optional = storeRepository.findByUid(uid);
-        if(!optional.isPresent()) throw new RuntimeException("店铺不存在");
+        if (!optional.isPresent()) throw new RuntimeException("店铺不存在");
         Store store = optional.get();
-        if(store.getViolation()) throw new RuntimeException("店铺违规");
+        if (store.getViolation()) throw new RuntimeException("店铺违规");
         String storeId = store.getId();
         Page<ReturnOrder> returnOrderPage = returnOrderRepository.findAllByStoreId(storeId, PageRequest.of(currentPage, pageSize, Sort.by("createTime").descending()));//时间降序排列
         List<ReturnOrderVO> list = returnOrderPage.getContent().stream().map(returnOrder -> {
@@ -270,15 +271,26 @@ public class ReturnService {
         return pageDto;
     }
 
+    /**
+     * 处理退款成功回调
+     * @param notifyResult
+     */
     public void handleRefundNotify(WxPayRefundNotifyResult notifyResult) {
         Optional<ReturnOrder> optional = returnOrderRepository.findByGoodsReturnNo(notifyResult.getReqInfo().getOutRefundNo());
-        if(!optional.isPresent()) throw new RuntimeException("退款订单不存在");
+        if (!optional.isPresent()) throw new RuntimeException("退款订单不存在");
         ReturnOrder returnOrder = optional.get();
-        Optional<GoodsOrder> byGoodsOrderNo = goodsOrderRepository.findByGoodsOrderNo(returnOrder.getGoodsOrderNo());
-        Optional<GoodsOrderDetail> goodsOrderNo = goodsOrderDetailRepository.findByGoodsOrderNo(returnOrder.getGoodsOrderNo());
-        //todo 成功退款处理
-
-        returnOrder.setStatus(ReturnStatusEnum.SUCCESS);
-        returnOrder.setUpdateTime(System.currentTimeMillis());
+        Optional<GoodsOrder> opt1 = goodsOrderRepository.findByGoodsOrderNo(returnOrder.getGoodsOrderNo());
+        Optional<GoodsOrderDetail> opt2 = goodsOrderDetailRepository.findByGoodsOrderNo(returnOrder.getGoodsOrderNo());
+        if (!opt1.isPresent() || !opt2.isPresent()) {
+            throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
+        }
+        GoodsOrder goodsOrder = opt1.get();
+        GoodsOrderDetail goodsOrderDetail = opt2.get();
+        goodsOrderDetail.setRefund(true).setWeixinRefundId(notifyResult.getReqInfo().getRefundId()).setRefundTime(System.currentTimeMillis());
+        goodsOrder.setOrderStatus(OrderStatusEnum.refund).setOrderExStatus(OrderExStatusEnum.normal);
+        returnOrder.setStatus(ReturnStatusEnum.SUCCESS).setUpdateTime(System.currentTimeMillis());
+        goodsOrderDetailRepository.save(goodsOrderDetail);
+        goodsOrderRepository.save(goodsOrder);
+        returnOrderRepository.save(returnOrder);
     }
 }
