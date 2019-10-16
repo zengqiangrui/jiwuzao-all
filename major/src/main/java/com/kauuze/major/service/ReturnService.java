@@ -37,8 +37,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.net.ssl.HttpsURLConnection;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URLConnection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -273,6 +276,7 @@ public class ReturnService {
 
     /**
      * 处理退款成功回调
+     *
      * @param notifyResult
      */
     public void handleRefundNotify(WxPayRefundNotifyResult notifyResult) {
@@ -293,4 +297,24 @@ public class ReturnService {
         goodsOrderRepository.save(goodsOrder);
         returnOrderRepository.save(returnOrder);
     }
+
+    /**
+     * 取消退货
+     *
+     * @param id
+     * @return
+     */
+    public ReturnOrder cancelReturn(int id, int uid) {
+        ReturnOrder returnOrder = getReturnOrder(id);
+        if (returnOrder.getUid() != uid) throw new RuntimeException("退款订单用户不匹配");
+        Optional<GoodsOrder> byGoodsOrderNo = goodsOrderRepository.findByGoodsOrderNo(returnOrder.getGoodsOrderNo());
+        if (!byGoodsOrderNo.isPresent()) throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
+        GoodsOrder goodsOrder = byGoodsOrderNo.get();
+        goodsOrder.setOrderExStatus(OrderExStatusEnum.normal).setOrderStatus(OrderStatusEnum.refund).setCanRemit(false);
+        goodsOrderRepository.save(goodsOrder);
+        returnOrder.setStatus(ReturnStatusEnum.CANCEL).setUpdateTime(System.currentTimeMillis());
+
+        return returnOrderRepository.save(returnOrder);
+    }
+
 }

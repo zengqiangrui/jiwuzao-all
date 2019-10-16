@@ -33,6 +33,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.io.File;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -365,6 +366,24 @@ public class UserBasicService {
         }
         User user = userRepository.findById(uid);
         return StringUtil.isEq(user.getPwd(), SHA256.encryptAddSalt(pwd, user.getPwdSalt()));
+    }
+
+    /**
+     * 系统支付口令
+     * 用于退款等
+     * todo 支付密钥
+     * @param uid
+     * @param pwd
+     * @return
+     */
+    public boolean checkPaymentPassword(int uid,String pwd){
+        UserToken token = userTokenRepository.findByUid(uid);
+        if(TokenUtil.isBan(token)) return false;
+        return false;
+    }
+    @Test
+    public void myTest(){
+        File file = new File("classpath:banner.txt");
     }
 
     /**

@@ -50,6 +50,16 @@ public class UserBasicController {
         }
     }
 
+    /**
+     * 登录验证，拦截器中已经进行了处理
+     * @return
+     */
+    @RequestMapping("/checkLogin")
+    @Authorization
+    public JsonResult checkLogin(){
+        return JsonResult.success();
+    }
+
     @RequestMapping("/sendSms")
     public JsonResult sendSms(@Valid @RequestBody SendSmsPojo sendSmsPojo){
         if(!StringUtil.isEq(SHA256.encryptAddSalt(sendSmsPojo.getPhone(),"sendSms-kboot"),sendSmsPojo.getSha256())){
