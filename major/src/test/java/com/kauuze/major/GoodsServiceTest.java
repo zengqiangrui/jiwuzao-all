@@ -52,7 +52,7 @@ public class GoodsServiceTest {
 
     @Test
     public void showPage() throws Exception {
-        System.out.println(expressService.getOrderTracesByJson("SF", "118650888018", ""));
+//        System.out.println(expressService.getOrderTracesByJson("SF", "118650888018", ""));
     }
 
     @Test

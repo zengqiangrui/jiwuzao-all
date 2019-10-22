@@ -57,21 +57,17 @@ public class Pattern {
     /**
      * 2-8字符,且不能为纯数字
      *汉字字母数字下划线短横线
-     * @param nickeName
+     * @param nickName
      * @return
      */
-    public static boolean isNickName(String nickeName){
-        if(StringUtil.isBlank(nickeName)){
+    public static boolean isNickName(String nickName){
+        if(StringUtil.isBlank(nickName)){
             return false;
         }
-        if(isPositive(nickeName,false)){
+        if(isPositive(nickName,false)){
             return false;
         }
-        if(patternReg(nickeName,"^[a-zA-Z0-9\\u4e00-\\u9fa5_-]{2,8}$")){
-            return true;
-        }else{
-            return false;
-        }
+        return patternReg(nickName, "^[a-zA-Z0-9\\u4e00-\\u9fa5_-]{2,8}$");
     }
     //以下是固定规则
 
@@ -223,11 +219,8 @@ public class Pattern {
      * @return
      */
     public static boolean validPage(PagePojo pagePojo){
-        if(isPositive(String.valueOf(pagePojo.getNum()),false) && isPositive(String.valueOf(pagePojo.getSize()),false)
-                && isMill(pagePojo.getTime())){
-            return true;
-        }
-        return false;
+        return isPositive(String.valueOf(pagePojo.getNum()), true) && isPositive(String.valueOf(pagePojo.getSize()), false)
+                && isMill(pagePojo.getTime());
     }
 
     /**

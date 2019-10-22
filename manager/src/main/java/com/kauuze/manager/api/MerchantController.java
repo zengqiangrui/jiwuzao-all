@@ -60,7 +60,7 @@ public class MerchantController {
     @RequestMapping("/auditVerifyActor")
     @Cms
     public JsonResult auditVerifyActor(@Valid @RequestBody AuditVerifyActorPojo auditVerifyActorPojo){
-        String result = merchantService.auditVerifyActor(auditVerifyActorPojo.getUid(),auditVerifyActorPojo.getAuditType());
+        String result = merchantService.auditVerifyActor(auditVerifyActorPojo.getUid(),auditVerifyActorPojo.getAuditType(),auditVerifyActorPojo.getRefuseReason());
         if(result == null){
             return JsonResult.success();
         }else {

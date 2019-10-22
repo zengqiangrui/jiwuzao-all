@@ -26,6 +26,7 @@ import com.jiwuzao.common.pojo.order.ExpressPojo;
 import com.jiwuzao.common.pojo.order.GetOrderPojo;
 import com.jiwuzao.common.pojo.order.OrderPagePojo;
 import com.jiwuzao.common.vo.order.ExpressCancelVO;
+import com.jiwuzao.common.vo.order.ExpressReturnShowVO;
 import com.kauuze.major.config.permission.Authorization;
 import com.kauuze.major.config.permission.GreenWay;
 import com.kauuze.major.config.permission.Merchant;
@@ -145,13 +146,20 @@ public class ExpressController {
         return JsonResult.success(showDto);
     }
 
+    @RequestMapping("/getReturnTraceByOrder")
+    @Authorization
+    public JsonResult getReturnTraceByOrder(@Valid @RequestBody GetOrderPojo getOrderPojo){
+        ExpressReturnShowVO returnTraceByOrder = expressService.getReturnTraceByOrder(getOrderPojo.getGoodsOrderNo());
+        return JsonResult.success(returnTraceByOrder);
+    }
+
     /**
-     * 根据物流id，获取单一商品订单物流轨迹
+     * 根据物流id，获取本地单一商品订单物流轨迹
      *
      * @param expressNo
      * @return
      */
-    @RequestMapping("/getTraceByExpNo")
+    @RequestMapping("/getLocalTraceByExpNo")
     @Authorization
     public JsonResult getTraceByExpNo(@Valid @RequestBody ExpressNoPojo expressNo) {
         ExpressShowDto showDto = expressService.getExpressOneByLogistic(expressNo.getExpressNo());
@@ -168,7 +176,7 @@ public class ExpressController {
     @Authorization
     public JsonResult getOrderTraceByKdniao(@Valid @RequestBody ExpressPojo expressPojo) {
         try {
-            ExpressResult result = expressService.getOrderTracesByJson(expressPojo.getExpCode(), expressPojo.getExpNo(), expressPojo.getOrderNo());
+            ExpressResult result = expressService.getOrderTracesByJson(expressPojo.getExpCode(), expressPojo.getExpNo(), expressPojo.getOrderNo(),false);
             return JsonResult.success(result);
         } catch (Exception e) {
             e.printStackTrace();

@@ -75,10 +75,11 @@ public class MerchantService {
     /**
      * 审批用户实名认证
      */
-    public String auditVerifyActor(int uid, AuditTypeEnum auditType){
+    public String auditVerifyActor(int uid, AuditTypeEnum auditType,String refuseReason){
         VerifyActor verifyActor = verifyActorRepository.findByUid(uid);
         if(verifyActor == null || verifyActor.getAuditType() != AuditTypeEnum.wait){
-            return "操作失败";
+            throw new RuntimeException("用户认证状态异常");
+//            return "用户状态异常";
         }
         if(verifyActorRepository.findByIdcardAndAuditType(verifyActor.getIdcard(), AuditTypeEnum.agree) != null){
             return "该身份证已被实名注册过";
@@ -90,6 +91,7 @@ public class MerchantService {
         verifyActor2.setId(verifyActor.getId());
         verifyActor2.setAuditTime(System.currentTimeMillis());
         verifyActor2.setAuditType(auditType);
+        verifyActor2.setRefuseCause(refuseReason);
         MongoUtil.updateNotNon("id",verifyActor2,VerifyActor.class);
         UserToken userToken = new UserToken();
         userToken.setUid(uid);

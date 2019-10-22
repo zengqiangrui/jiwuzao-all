@@ -28,11 +28,7 @@ public class PageValid implements ConstraintValidator<Page,Object> {
             if(Pattern.require(o,require)){
                 return true;
             }
-            if(Pattern.validPage(JsonUtil.copy(o, PagePojo.class))){
-                return true;
-            }else{
-                return false;
-            }
+            return Pattern.validPage(JsonUtil.copy(o, PagePojo.class));
         } catch (Exception e) {
             return false;
         }

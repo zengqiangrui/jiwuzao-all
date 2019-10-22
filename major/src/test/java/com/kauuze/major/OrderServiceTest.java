@@ -122,12 +122,12 @@ public class OrderServiceTest {
 
     @Test
     public void showExpress() {
-        try {
-            ExpressResult sf = expressService.getOrderTracesByJson("SF", "1234564", "111");
-            System.out.println(sf);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            ExpressResult sf = expressService.getOrderTracesByJson("SF", "1234564", "111");
+//            System.out.println(sf);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Test
@@ -138,10 +138,10 @@ public class OrderServiceTest {
 
     @Test
     public void showMyExpress() throws Exception {
-        ExpressResult sf = expressService.getOrderTracesByJson("SF", "265950109782", "2019091410055429234");
+//        ExpressResult sf = expressService.getOrderTracesByJson("SF", "265950109782", "2019091410055429234");
 //        ExpressResult sf = expressService.getOrderTracesByJson("YD", "4300633884396", "");
 
-        System.out.println(sf);
+//        System.out.println(sf);
     }
 
     @Test

@@ -1,7 +1,6 @@
 package com.jiwuzao.common.vo.goods;
 
-import com.jiwuzao.common.domain.enumType.DeliveryTimeEnum;
-import com.jiwuzao.common.domain.enumType.GoodsReturnEnum;
+import com.jiwuzao.common.domain.enumType.GoodsClassifyEnum;
 import com.jiwuzao.common.domain.mongo.entity.GoodsSpec;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,11 +10,11 @@ import lombok.experimental.Accessors;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Data
 @Accessors(chain = true)
-public class GoodsDetailVO {
+public class ManageGoodsVO {
 
     private int uid;
 
@@ -104,6 +103,5 @@ public class GoodsDetailVO {
     private List<UserIconVO> appriseList;
     private Boolean putAway;
     private String gid;
-
-
+    private GoodsClassifyEnum classify;
 }

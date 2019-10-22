@@ -1,18 +1,20 @@
-package com.jiwuzao.common.pojo.common;
+package com.jiwuzao.common.vo.order;
 
-import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
+import com.jiwuzao.common.pojo.common.PagePojo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 @Accessors(chain = true)
-public class OrderStatusPojo{
-    private OrderStatusEnum status;
+public class StoreOrderPagePojo {
+
+    private String storeId;
+
+    private String storeName;
 
     private PagePojo page;
 }

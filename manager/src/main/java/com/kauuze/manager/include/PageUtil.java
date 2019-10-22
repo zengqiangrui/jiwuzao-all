@@ -20,7 +20,7 @@ public class PageUtil {
      * @return
      */
     public static Pageable getNewsInsert(int page,int size){
-        return PageRequest.of(page - 1,size,new Sort(Sort.Direction.DESC,"createTime"));
+        return PageRequest.of(page,size,new Sort(Sort.Direction.DESC,"createTime"));
     }
 
     /**

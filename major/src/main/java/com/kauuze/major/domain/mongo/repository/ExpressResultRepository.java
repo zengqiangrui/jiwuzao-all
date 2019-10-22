@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 @Repository
 public interface ExpressResultRepository extends MongoRepository<ExpressResult, String> {
-    Optional<ExpressResult> findByOrderCode(String orderNo);
+//    Optional<ExpressResult> findByOrderCode(String orderNo);
     Optional<ExpressResult> findByLogisticCode(String logisticCode);
 }

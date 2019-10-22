@@ -1,6 +1,7 @@
 package com.kauuze.manager.api.pojo.userPermission;
 
 import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
+import com.jiwuzao.common.include.valid.StringMax;
 import com.kauuze.manager.include.valid.Idv;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,4 +24,7 @@ public class AuditVerifyActorPojo {
     private Integer uid;
     @NotNull
     private AuditTypeEnum auditType;
+
+    @StringMax(require = false)
+    private String refuseReason;
 }

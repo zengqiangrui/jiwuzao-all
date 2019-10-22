@@ -28,6 +28,7 @@ public class ExceptionHandle {
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
     public String handle(Exception e, HttpServletResponse response, HttpServletRequest request) {
+        response.setCharacterEncoding("utf-8");
         if(e instanceof MethodArgumentNotValidException){
             StateModel stateModel = new StateModel();
             stateModel.setState("param mismatch");
@@ -56,6 +57,7 @@ public class ExceptionHandle {
             logRepository.save(new Log(null, System.currentTimeMillis(),request.getRequestURL().toString() + "\r\n" + stringWriter.toString(), "major",true,null, DateTimeUtil.covertDateView(System.currentTimeMillis())));
             response.setStatus(500);
             StateModel stateModel = new StateModel();
+            stateModel.setData(e.getMessage());
             stateModel.setState("service wrong");
             response.getWriter().write(stateModel.toJsonString());
         } catch (Exception e1) {

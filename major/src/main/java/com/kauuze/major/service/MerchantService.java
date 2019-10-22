@@ -274,6 +274,7 @@ public class MerchantService {
         vo.setStoreId(storeId);
         BigDecimal bigDecimal =
                 list.stream().filter(goodsOrder -> goodsOrder.getOrderExStatus() != OrderExStatusEnum.exception)
+                        .filter(goodsOrder -> goodsOrder.getOrderStatus()!=OrderStatusEnum.refund)
                         .filter(goodsOrder -> {
                             Optional<PayOrder> optional = payOrderRepository.findById(goodsOrder.getPayid());
                             if (!optional.isPresent()) {

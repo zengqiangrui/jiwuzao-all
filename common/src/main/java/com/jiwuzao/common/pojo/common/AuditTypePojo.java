@@ -3,10 +3,13 @@ package com.jiwuzao.common.pojo.common;
 
 import com.jiwuzao.common.domain.enumType.AuditTypeEnum;
 import com.jiwuzao.common.include.valid.Page;
+import com.jiwuzao.common.include.valid.StringMax;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * @author kauuze
