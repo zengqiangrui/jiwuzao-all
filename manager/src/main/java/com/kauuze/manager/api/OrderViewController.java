@@ -1,9 +1,11 @@
 package com.kauuze.manager.api;
 
 import com.jiwuzao.common.include.JsonResult;
+import com.jiwuzao.common.pojo.common.OrderNoPojo;
 import com.jiwuzao.common.pojo.common.OrderStatusPojo;
 import com.jiwuzao.common.pojo.common.PagePojo;
 import com.jiwuzao.common.pojo.store.StorePagePojo;
+import com.jiwuzao.common.vo.order.OrderDetailVO;
 import com.jiwuzao.common.vo.order.StoreOrderPagePojo;
 import com.kauuze.manager.config.permission.Cms;
 import com.kauuze.manager.service.OrderViewService;
@@ -20,6 +22,12 @@ public class OrderViewController {
 
     @Resource
     private OrderViewService orderViewService;
+
+    @RequestMapping("/getByOrderNo")
+    @Cms
+    public JsonResult getByOrderNo(@Valid @RequestBody OrderNoPojo pojo){
+        return JsonResult.success(orderViewService.getSimpleByOrderNo(pojo.getOrderNo()));
+    }
 
     /**
      * 获取所有订单简单对象
@@ -48,10 +56,10 @@ public class OrderViewController {
      * @param pojo
      * @return
      */
-    @RequestMapping("/getSimpleOrderByStore")
+    @RequestMapping("/getSimpleOrderByStoreId")
     @Cms
     public JsonResult getSimpleOrderByStore(@RequestBody @Valid StoreOrderPagePojo pojo) {
-        return JsonResult.success(orderViewService.getSimpleOrderByStore(pojo.getStoreId(),pojo.getPage().getNum(),pojo.getPage().getSize()));
+        return JsonResult.success(orderViewService.getSimpleOrderByStoreId(pojo.getStoreId(),pojo.getPage().getNum(),pojo.getPage().getSize()));
     }
 
     /**
@@ -62,7 +70,7 @@ public class OrderViewController {
     @RequestMapping("/getSimpleOrderByStoreName")
     @Cms
     public JsonResult getSimpleOrderByStoreName(@RequestBody @Valid StoreOrderPagePojo pojo) {
-        return JsonResult.success(orderViewService.getSimpleOrderByStoreName(pojo.getStoreId(),pojo.getPage().getNum(),pojo.getPage().getSize()));
+        return JsonResult.success(orderViewService.getSimpleOrderByStoreName(pojo.getStoreName(),pojo.getPage().getNum(),pojo.getPage().getSize()));
     }
 
     /**
@@ -75,4 +83,24 @@ public class OrderViewController {
     public JsonResult getSimpleExceptionOrder(@RequestBody @Valid PagePojo pojo) {
         return JsonResult.success(orderViewService.getSimpleExceptionOrder(pojo.getNum(),pojo.getSize()));
     }
+
+    @RequestMapping("/getSimpleByStoreIdStatus")
+    @Cms
+    public JsonResult getSimpleByStoreIdStatus(@RequestBody @Valid OrderStatusPojo pojo){
+        return JsonResult.success(orderViewService.getSimpleByStoreIdStatus(pojo.getStoreId(),pojo.getStatus(),pojo.getPage().getNum(),pojo.getPage().getSize()));
+    }
+
+    @RequestMapping("/getSimpleByStoreNameStatus")
+    @Cms
+    public JsonResult getSimpleByStoreNameStatus(@RequestBody @Valid OrderStatusPojo pojo){
+        return JsonResult.success(orderViewService.getSimpleByStoreNameStatus(pojo.getStoreName(),pojo.getStatus(),pojo.getPage().getNum(),pojo.getPage().getSize()));
+    }
+
+    @RequestMapping("/getDetailOrder")
+    @Cms
+    public JsonResult getDetailOrder(@RequestBody @Valid OrderNoPojo pojo){
+        OrderDetailVO vo = orderViewService.getDetailOrder(pojo.getOrderNo());
+        return JsonResult.success(vo);
+    }
+
 }

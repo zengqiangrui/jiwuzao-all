@@ -1,46 +1,24 @@
-package com.jiwuzao.common.domain.mysql.entity;
-
+package com.jiwuzao.common.vo.order;
 
 import com.jiwuzao.common.domain.enumType.OrderExStatusEnum;
 import com.jiwuzao.common.domain.enumType.OrderStatusEnum;
+import com.jiwuzao.common.domain.enumType.PayChannelEnum;
+import com.jiwuzao.common.domain.mysql.entity.GoodsOrder;
+import com.jiwuzao.common.exception.excEnum.OrderExceptionEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import javax.persistence.*;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import java.math.BigDecimal;
 
-/**
- * @author kauuze
- * @email 3412879785@qq.com
- * @time 2019-05-20 15:10
- */
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 @Accessors(chain = true)
-@AllArgsConstructor
-@NoArgsConstructor
-@Entity
-@Table(indexes = {
-        @Index(name = "index_goodsOrder_uid", columnList = "uid"),
-        @Index(name = "index_goodsOrder_sid", columnList = "sid"),
-        @Index(name = "index_goodsOrder_gid", columnList = "gid"),
-        @Index(name = "index_goodsOrder_goodsOrderDetailId", columnList = "goodsOrderDetailId", unique = true),
-        @Index(name = "index_goodsOrder_createTime", columnList = "createTime"),
-        @Index(name = "index_goodsOrder_goodsOrderNo", columnList = "goodsOrderNo", unique = true),
-        @Index(name = "index_goodsOrder_orderStatus", columnList = "orderStatus")
-})
-public class GoodsOrder {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    private Integer uid;//用户id
-    private Integer uid2;//匠人id
-    private String sid;//店铺id
-    private String gid;//商品id
-    private Integer payid;
-    private Integer goodsOrderDetailId;
-    private Long createTime;
+public class OrderDetailVO {
 
     /**
      * 商品订单号
@@ -54,13 +32,8 @@ public class GoodsOrder {
      * 商品封面
      */
     private String cover;
-    /**
-     * 商品规格(多个逗号规格)
-     */
-    //private String specOrderIds;
-    /**
-     * 商品规格id
-     */
+
+    //规格id
     private String gsid;
     /**
      * 规格分类
@@ -99,25 +72,22 @@ public class GoodsOrder {
     //今日是否催单
     private Boolean isHastened = false;
 
-    private Boolean isAppraised = false;
-
     /**
      * 订单状态
      */
     @Enumerated(EnumType.STRING)
     private OrderStatusEnum orderStatus;
-
     /**
      * 订单异常状态
      */
     @Enumerated(EnumType.STRING)
     private OrderExStatusEnum orderExStatus = OrderExStatusEnum.normal;
+    private Long createTime;//下单时间
 
     /**
      * 发货时间
      */
     private Long deliverTime;
-
     /**
      * 收货时间
      */
@@ -128,5 +98,71 @@ public class GoodsOrder {
      */
     private Long refundTime;
 
+    /**
+     * 物流单号
+     */
+    private String expressNo;
+    /**
+     * 收货省市区
+     */
+    private String receiverCity;
+    /**
+     * 收货详细地址
+     */
+    private String receiverAddress;
 
+    /**
+     * 邮编
+     */
+    private String postCode;
+
+    /**
+     * 收货人
+     */
+    private String receiverTrueName;
+
+    /**
+     * 收货人手机
+     */
+    private String receiverPhone;
+
+    /**
+     * 记录异常订单原因
+     */
+    @Enumerated(EnumType.STRING)
+    private OrderExceptionEnum exceptionReason;//订单异常原因
+    private String openid;//微信openid
+    private BigDecimal afterFee;
+
+    /**
+     * 支付回调时间
+     */
+    private Long payTime;
+    /**
+     * 支付渠道：微信支付
+     */
+    @Enumerated(EnumType.STRING)
+    private PayChannelEnum payChannel;
+    /**
+     * 是否支付
+     */
+    private Boolean pay;
+    /**
+     * 预支付会话标识
+     */
+    private String prepayId;
+    /**
+     * 微信支付订单号
+     */
+    private String transactionId;
+
+    private String storeName;
+    /**
+     * 店铺图标
+     */
+    private String storeIcon;
+    /**
+     * 客服电话:短信确认
+     */
+    private String servicePhone;
 }

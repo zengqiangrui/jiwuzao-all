@@ -150,4 +150,6 @@ public class GoodsOrderDetail {
      */
     @Enumerated(EnumType.STRING)
     private OrderExceptionEnum exceptionReason;//订单异常原因
+
+
 }

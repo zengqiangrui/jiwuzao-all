@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author kauuze
@@ -18,6 +19,7 @@ import java.util.List;
  */
 @Repository
 public interface GoodsOrderRepository extends JpaRepository<GoodsOrder, Integer> {
+    Optional<GoodsOrder> findByGoodsOrderNo(String orderNo);
 
     List<GoodsOrder> findBySid(String sid);
 
