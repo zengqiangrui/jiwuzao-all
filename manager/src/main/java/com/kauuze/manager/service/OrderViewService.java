@@ -20,6 +20,7 @@ import com.kauuze.manager.include.StringUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -155,6 +156,16 @@ public class OrderViewService {
             throw new RuntimeException("不存在该店铺");
         }
         return getSimpleByStoreIdStatus(store.getId(), status, num, size);
+    }
+
+    public PageDto<OrderSimpleVO> getSimpleByUidStatus(int uid,OrderStatusEnum status,Integer num,Integer size){
+        Page<GoodsOrder> page = goodsOrderRepository.findAllByUidAndOrderStatus(uid, status, PageUtil.getNewsInsert(num, size));
+        return createOrderPage(page);
+    }
+
+    public PageDto<OrderSimpleVO> getSimpleByUid(int uid, Integer num,Integer size){
+        Page<GoodsOrder> page = goodsOrderRepository.findAllByUid(uid,PageUtil.getNewsInsert(num,size));
+        return createOrderPage(page);
     }
 
     /**

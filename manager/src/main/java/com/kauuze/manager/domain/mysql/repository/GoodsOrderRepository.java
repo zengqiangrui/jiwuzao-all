@@ -51,5 +51,8 @@ public interface GoodsOrderRepository extends JpaRepository<GoodsOrder, Integer>
      */
     Page<GoodsOrder> findAllByOrderExStatusAndSid(OrderExStatusEnum status,String sid,Pageable pageable);
 
+    Page<GoodsOrder> findAllByUid(Integer uid,Pageable pageable);
+
+    Page<GoodsOrder> findAllByUidAndOrderStatus(Integer uid,OrderStatusEnum status,Pageable pageable);
 
 }
