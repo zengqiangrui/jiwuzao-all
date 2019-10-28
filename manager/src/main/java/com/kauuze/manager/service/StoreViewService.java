@@ -2,14 +2,17 @@ package com.kauuze.manager.service;
 
 import com.jiwuzao.common.domain.enumType.UserStateEnum;
 import com.jiwuzao.common.domain.mongo.entity.Goods;
+import com.jiwuzao.common.domain.mongo.entity.RecommendStore;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.UserToken;
+import com.jiwuzao.common.include.DateTimeUtil;
+import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.include.PageUtil;
+import com.jiwuzao.common.include.StringUtil;
 import com.kauuze.manager.domain.common.MongoUtil;
 import com.kauuze.manager.domain.mongo.repository.GoodsRepository;
+import com.kauuze.manager.domain.mongo.repository.RecommendStoreRepository;
 import com.kauuze.manager.domain.mongo.repository.StoreRepository;
-import com.kauuze.manager.include.DateTimeUtil;
-import com.kauuze.manager.include.PageDto;
 import com.kauuze.manager.service.dto.storeView.StoreShowDto;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +20,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +34,8 @@ public class StoreViewService {
     private StoreRepository storeRepository;
     @Autowired
     private GoodsRepository goodsRepository;
+    @Resource
+    private RecommendStoreRepository recommendStoreRepository;
 
     /**
      * 通过Uid搜索店铺
@@ -40,9 +48,7 @@ public class StoreViewService {
         if (store == null) {
             return null;
         }
-        return new StoreShowDto(store.getId(), store.getUid(), store.getCreateTime(), store.getViolation(),
-                store.getViolationCause(), store.getStoreName(), store.getStoreIcon(), store.getServicePhone(),
-                store.getStoreIntro(), store.getBusinessLicense());
+        return createShow(store);
     }
 
     /**
@@ -56,9 +62,13 @@ public class StoreViewService {
         if (store == null) {
             return null;
         }
-        return new StoreShowDto(store.getId(), store.getUid(), store.getCreateTime(), store.getViolation(),
-                store.getViolationCause(), store.getStoreName(), store.getStoreIcon(), store.getServicePhone(),
-                store.getStoreIntro(), store.getBusinessLicense());
+        return createShow(store);
+    }
+
+    private StoreShowDto createShow(Store store) {
+        StoreShowDto dto = new StoreShowDto();
+        BeanUtils.copyProperties(store, dto);
+        return dto;
     }
 
     /**
@@ -72,7 +82,6 @@ public class StoreViewService {
         Store store = storeRepository.findByUid(uid);
         if (store == null)
             return false;
-
         Store store2 = new Store();
         store2.setId(store.getId());
         store2.setViolation(true);
@@ -106,10 +115,57 @@ public class StoreViewService {
         PageDto<StoreShowDto> pageDto = new PageDto<>();
         List<StoreShowDto> collect = page.getContent().stream().map(store -> {
             StoreShowDto storeDto = new StoreShowDto();
-            BeanUtils.copyProperties(store, storeDto,"storeIntro");
+            BeanUtils.copyProperties(store, storeDto, "storeIntro");
             return storeDto;
         }).collect(Collectors.toList());
         return pageDto.setTotal(page.getTotalElements()).setContent(collect);
     }
 
+    /**
+     * 根据id 查找店铺
+     *
+     * @param storeId
+     * @return
+     */
+    public StoreShowDto findByStoreId(String storeId) {
+        return createShow(storeRepository.findById(storeId).orElseThrow(() -> new RuntimeException("店铺不存在")));
+    }
+
+    /**
+     * 获取一个推荐店铺
+     *
+     * @return 推荐
+     */
+    public RecommendStore getLatestRecommendStore() {
+        ArrayList<String> images = new ArrayList<>();
+        images.add("http://cdn.jiwuzao.com/image/jijiang/MasterMap.png");//todo 默认极物造页面
+        return recommendStoreRepository.findAll().stream().max(Comparator.comparingLong(RecommendStore::getCreateTime)).orElse(
+                new RecommendStore().setStoreId("5d639c11d6018000015e1865").setImages(images)
+        );
+    }
+
+    /**
+     * 添加一个推荐店铺
+     *
+     * @param storeName
+     * @param images
+     * @return
+     */
+    public RecommendStore addRecommendStore(String storeName, String images) {
+        Store store = storeRepository.findByStoreName(storeName);
+        if (store == null) {
+            throw new RuntimeException("店铺不存在");
+        }
+        List<String> strings = StringUtil.splitComma(images);
+        return recommendStoreRepository.save(
+                new RecommendStore().setStoreId(store.getId())
+                        .setImages(strings).setStoreName(storeName)
+                        .setCreateTime(System.currentTimeMillis())
+        );
+    }
+
+    public PageDto<RecommendStore> getRecommendHistory(Integer num, Integer size) {
+        Page<RecommendStore> page = recommendStoreRepository.findAll(PageUtil.getNewsInsert(num, size));
+        return new PageDto<RecommendStore>().setTotal(page.getTotalElements()).setContent(page.getContent());
+    }
 }

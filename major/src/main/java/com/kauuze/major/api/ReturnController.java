@@ -12,9 +12,11 @@ import com.jiwuzao.common.pojo.order.SendReturnPojo;
 import com.jiwuzao.common.vo.order.ExpressResultVO;
 import com.jiwuzao.common.vo.order.ReturnOrderVO;
 import com.kauuze.major.config.permission.Authorization;
+import com.kauuze.major.config.permission.Cms;
 import com.kauuze.major.config.permission.Merchant;
 import com.kauuze.major.service.ExpressService;
 import com.kauuze.major.service.ReturnService;
+import com.qiniu.util.Json;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,13 +106,24 @@ public class ReturnController {
         return JsonResult.success(expressResultVO);
     }
 
-    @RequestMapping("/confirmReturnOrder")
+    @RequestMapping("/confirmReceive")
     @Merchant
-    public JsonResult confirmReturnOrder(@RequestAttribute int uid, @Valid @RequestBody ConfirmReturnPojo pojo){
-        ReturnOrder returnOrder = returnService.confirmReturnOrder(pojo.getId(), uid, pojo.getPassword());
-        if(returnOrder!=null){
+    public JsonResult confirmReceive(@RequestBody @Valid ReturnPojo pojo) {
+        ReturnOrder returnOrder = returnService.confirmReceive(pojo.getId());
+        if (returnOrder != null) {
             return JsonResult.success(returnOrder);
-        }else{
+        } else {
+            return JsonResult.failure();
+        }
+    }
+
+    @RequestMapping("/confirmReturnOrder")
+    @Cms
+    public JsonResult confirmReturnOrder(@RequestAttribute int uid, @Valid @RequestBody ConfirmReturnPojo pojo) {
+        ReturnOrder returnOrder = returnService.confirmReturnOrder(pojo.getId(), uid, pojo.getPassword());
+        if (returnOrder != null) {
+            return JsonResult.success(returnOrder);
+        } else {
             return JsonResult.failure();
         }
     }

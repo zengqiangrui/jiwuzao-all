@@ -1,6 +1,7 @@
 package com.kauuze.manager.domain.mongo.repository;
 
 import com.jiwuzao.common.domain.enumType.BackRoleEnum;
+import com.jiwuzao.common.domain.enumType.RoleEnum;
 import com.jiwuzao.common.domain.mongo.entity.userBastic.UserToken;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,9 @@ public interface UserTokenRepository extends MongoRepository<UserToken,String> {
 
     @Query("{'backRole': {$in:['root', 'cms']}}")
     Page<UserToken> findCms(Pageable pageable);
+
+    Page<UserToken> findAllByRole(RoleEnum role,Pageable pageable);
+
     UserToken findByAccessToken(String accessToken);
     UserToken findByUid(int uid);
 }

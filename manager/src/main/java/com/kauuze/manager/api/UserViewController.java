@@ -1,11 +1,12 @@
 package com.kauuze.manager.api;
 
+import com.jiwuzao.common.include.JsonResult;
+import com.jiwuzao.common.pojo.common.PagePojo;
 import com.jiwuzao.common.pojo.common.PhonePojo;
 import com.jiwuzao.common.pojo.common.UidPojo;
 import com.kauuze.manager.api.pojo.userView.FindByNickNamePojo;
 import com.kauuze.manager.config.permission.Cms;
 import com.kauuze.manager.config.permission.Root;
-import com.kauuze.manager.include.JsonResult;
 import com.kauuze.manager.service.MerchantService;
 import com.kauuze.manager.service.UserViewService;
 import com.qiniu.util.Json;
@@ -32,72 +33,84 @@ public class UserViewController {
 
     @RequestMapping("/findByUid")
     @Cms
-    public JsonResult findByUid(@Valid @RequestBody UidPojo uidPojo){
+    public JsonResult findByUid(@Valid @RequestBody UidPojo uidPojo) {
         return JsonResult.success(userViewService.findByUid(uidPojo.getUid()));
     }
 
     @RequestMapping("/findByNickName")
     @Cms
-    public JsonResult findByNickName(@Valid @RequestBody FindByNickNamePojo findByNickNamePojo){
+    public JsonResult findByNickName(@Valid @RequestBody FindByNickNamePojo findByNickNamePojo) {
         return JsonResult.success(userViewService.findByNickName(findByNickNamePojo.getNickName(),
                 findByNickNamePojo.getNum(), findByNickNamePojo.getSize()));
     }
 
     @RequestMapping("/findByPhone")
     @Cms
-    public JsonResult findByPhone(@Valid @RequestBody PhonePojo phonePojo){
+    public JsonResult findByPhone(@Valid @RequestBody PhonePojo phonePojo) {
         return JsonResult.success(userViewService.findByPhone(phonePojo.getPhone()));
     }
 
     @RequestMapping("/findAllCms")
     @Root
-    public JsonResult findAllCms(@RequestParam int page){
-        return JsonResult.success(userViewService.findAllCms(page, 20));
+    public JsonResult findAllCms(@RequestBody @Valid PagePojo pojo) {
+        return JsonResult.success(userViewService.findAllCms(pojo.getNum(), pojo.getSize()));
+    }
+
+    @RequestMapping("/findAllUser")
+    @Cms
+    public JsonResult findAllUser(@RequestBody @Valid PagePojo pojo) {
+        return JsonResult.success(userViewService.findAllUser(pojo.getNum(),pojo.getSize()));
+    }
+
+    @RequestMapping("/findAllMerchant")
+    @Cms
+    public JsonResult findAllMerchant(@RequestBody @Valid PagePojo pojo){
+        return JsonResult.success(userViewService.findAllMerchant(pojo.getNum(),pojo.getSize()));
     }
 
     @RequestMapping("/illegalNickname")
     @Cms
-    public JsonResult illegalNickname(@Valid @RequestBody UidPojo uidPojo){
-        if(userViewService.illegalNickname(uidPojo.getUid())){
+    public JsonResult illegalNickname(@Valid @RequestBody UidPojo uidPojo) {
+        if (userViewService.illegalNickname(uidPojo.getUid())) {
             return JsonResult.success();
-        }else{
+        } else {
             return JsonResult.failure();
         }
     }
 
     @RequestMapping("/illegalPortrait")
     @Cms
-    public JsonResult illegalPortrait(@Valid @RequestBody UidPojo uidPojo){
-        if(userViewService.illegalPortrait(uidPojo.getUid())){
+    public JsonResult illegalPortrait(@Valid @RequestBody UidPojo uidPojo) {
+        if (userViewService.illegalPortrait(uidPojo.getUid())) {
             return JsonResult.success();
-        }else{
+        } else {
             return JsonResult.failure();
         }
     }
 
     @RequestMapping("/illegalPersonalSign")
     @Cms
-    public JsonResult illegalPersonalSign(@Valid @RequestBody UidPojo uidPojo){
-        if(userViewService.illegalPersonalSign(uidPojo.getUid())){
+    public JsonResult illegalPersonalSign(@Valid @RequestBody UidPojo uidPojo) {
+        if (userViewService.illegalPersonalSign(uidPojo.getUid())) {
             return JsonResult.success();
-        }else {
+        } else {
             return JsonResult.failure();
         }
     }
 
     @RequestMapping("/illegalOpenWxIdAndQQ")
     @Cms
-    public JsonResult illegalOpenWxIdAndQQ(@Valid @RequestBody UidPojo uidPojo){
-        if(userViewService.illegalOpenWxIdAndQQ(uidPojo.getUid())){
+    public JsonResult illegalOpenWxIdAndQQ(@Valid @RequestBody UidPojo uidPojo) {
+        if (userViewService.illegalOpenWxIdAndQQ(uidPojo.getUid())) {
             return JsonResult.success();
-        }else{
+        } else {
             return JsonResult.failure();
         }
     }
 
     @RequestMapping("/getVerifyActor")
     @Cms
-    public JsonResult getVerifyActor(@RequestBody @Valid UidPojo pojo){
+    public JsonResult getVerifyActor(@RequestBody @Valid UidPojo pojo) {
         return JsonResult.success(merchantService.findVerifyActorByUid(pojo.getUid()));
     }
 

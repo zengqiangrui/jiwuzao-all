@@ -156,8 +156,9 @@ public class ReturnService {
         return returnOrder.setExpCode(expCode).setExpNo(expNo).setStatus(ReturnStatusEnum.WAIT_RECEIVE).setUpdateTime(System.currentTimeMillis());
     }
 
+
     /**
-     * 商家确认退货
+     * 管理端确认退货
      *
      * @param id
      * @param uid
@@ -169,7 +170,7 @@ public class ReturnService {
             throw new RuntimeException("用户无权限");
         } else {
             ReturnOrder returnOrder = getReturnOrder(id);
-            if (returnOrder.getStatus() != ReturnStatusEnum.WAIT_RECEIVE) throw new RuntimeException("订单状态错误");
+            if (returnOrder.getStatus() != ReturnStatusEnum.WAIT_REFUND_CONFIRM) throw new RuntimeException("订单状态错误");
             Optional<GoodsOrder> optional = goodsOrderRepository.findByGoodsOrderNo(returnOrder.getGoodsOrderNo());
             if (optional.isPresent()) {
                 GoodsOrder goodsOrder = optional.get();
@@ -313,8 +314,13 @@ public class ReturnService {
         goodsOrder.setOrderExStatus(OrderExStatusEnum.normal).setOrderStatus(OrderStatusEnum.refund).setCanRemit(false);
         goodsOrderRepository.save(goodsOrder);
         returnOrder.setStatus(ReturnStatusEnum.CANCEL).setUpdateTime(System.currentTimeMillis());
-
         return returnOrderRepository.save(returnOrder);
     }
 
+
+    public ReturnOrder confirmReceive(Integer id) {
+        ReturnOrder returnOrder = getReturnOrder(id);
+        if (returnOrder.getStatus() != ReturnStatusEnum.WAIT_RECEIVE) throw new RuntimeException("订单状态不匹配");
+        return returnOrderRepository.save(returnOrder.setStatus(ReturnStatusEnum.WAIT_REFUND_CONFIRM).setUpdateTime(System.currentTimeMillis()));
+    }
 }

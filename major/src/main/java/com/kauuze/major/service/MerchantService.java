@@ -241,14 +241,13 @@ public class MerchantService {
         Page<Store> storesPage = storeRepository.findAllByStoreStyle(style, pageable);
         PageDto<StoreSimpleVO> pageDto = new PageDto<>();
         pageDto.setTotal(storesPage.getTotalElements());
-        List<StoreSimpleVO> list = new ArrayList<>();
-        for (Store store : storesPage.getContent()) {
-            StoreSimpleVO storeSimpleVO = new StoreSimpleVO()
-                    .setStoreIcon(store.getStoreIcon()).setStoreId(store.getId()).setArtisanName(getVerifyActor(store.getUid()).getTrueName())
-                    .setStoreName(store.getStoreName()).setStyle(store.getStoreStyle())
-                    .setDescription(userBasicService.getUserOpenDto(store.getUid()).getPersonalSign());
-            list.add(storeSimpleVO);
-        }
+        List<StoreSimpleVO> list = storesPage.getContent().stream()
+                .filter(store -> !store.getViolation())
+                .map(store -> new StoreSimpleVO()
+                        .setStoreIcon(store.getStoreIcon()).setStoreId(store.getId()).setArtisanName(getVerifyActor(store.getUid()).getTrueName())
+                        .setStoreName(store.getStoreName()).setStyle(store.getStoreStyle())
+                        .setDescription(userBasicService.getUserOpenDto(store.getUid()).getPersonalSign()))
+                .collect(Collectors.toList());
         pageDto.setContent(list);
         return pageDto;
     }
@@ -274,7 +273,7 @@ public class MerchantService {
         vo.setStoreId(storeId);
         BigDecimal bigDecimal =
                 list.stream().filter(goodsOrder -> goodsOrder.getOrderExStatus() != OrderExStatusEnum.exception)
-                        .filter(goodsOrder -> goodsOrder.getOrderStatus()!=OrderStatusEnum.refund)
+                        .filter(goodsOrder -> goodsOrder.getOrderStatus() != OrderStatusEnum.refund)
                         .filter(goodsOrder -> {
                             Optional<PayOrder> optional = payOrderRepository.findById(goodsOrder.getPayid());
                             if (!optional.isPresent()) {
