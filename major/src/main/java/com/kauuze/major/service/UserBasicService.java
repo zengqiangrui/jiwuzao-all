@@ -122,7 +122,7 @@ public class UserBasicService {
         if (user == null) {
             return null;
         }
-        TokenUtil.refreshRddy(uid);
+//        TokenUtil.refreshRddy(uid);todo 刷新用户token另作打算
         UserToken userToken = userTokenRepository.findByUid(uid);
         UserInfo userInfo = userInfoRepository.findByUid(uid);
         TokenUtil.judgeEndTime(userToken);
@@ -322,6 +322,7 @@ public class UserBasicService {
         userInfoRepository.insert(userInfo);
         return new StateModel("success", accessToken);
     }
+    
 
     /**
      * 登录:mismatch--用户名密码不匹配,unsafety--不安全,ban--封禁,success-accessToken

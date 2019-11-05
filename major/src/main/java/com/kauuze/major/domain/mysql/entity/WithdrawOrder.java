@@ -27,7 +27,6 @@ import java.math.BigDecimal;
         @Index(name = "index_withdrawWxOrder_withdrawStatus",columnList = "withdrawStatus"),
         @Index(name = "index_withdrawWxOrder_withdrawOrderNo",columnList = "withdrawOrderNo"),
         @Index(name = "index_withdrawWxOrder_remitMoney",columnList = "remitMoney")
-
 })
 public class WithdrawOrder {
     @Id
