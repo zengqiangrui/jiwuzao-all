@@ -17,7 +17,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class OpenStorePojo {
-    @NickName
+    @StringMax(max = 32)
     private String storeName;
     @Url
     private String storeIcon;
