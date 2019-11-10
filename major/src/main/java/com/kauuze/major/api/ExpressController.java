@@ -70,25 +70,27 @@ public class ExpressController {
     @Merchant
     public JsonResult deliveryGoods(@RequestAttribute int uid, @RequestBody @Valid ExpressPojo express) {
         checkStoreStatus(uid);
-        try {
-            /**
-             * 订阅物流轨迹的推送
-             */
-            ExpressRequestReturnDto returnDto = expressService.orderTracesSubByJson(express.getExpCode(), express.getExpNo(), express.getOrderNo(), express.getAddressId());
-            log.info("物流订阅信息:{}", returnDto);
-            if (returnDto.getSuccess()) {
-                //订阅成功
-                expressService.addExpressOrder(express.getExpCode(), express.getExpNo(), express.getOrderNo(), express.getAddressId(), true);
-                return JsonResult.success();
-            } else {
-                //订阅失败
-                expressService.addExpressOrder(express.getExpCode(), express.getExpNo(), express.getOrderNo(), express.getAddressId(), false);
-                return JsonResult.failure(returnDto.getReason());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return JsonResult.failure("发货失败");
+//        try {
+//            /**
+//             * 订阅物流轨迹的推送
+//             */
+//            ExpressRequestReturnDto returnDto = expressService.orderTracesSubByJson(express.getExpCode(), express.getExpNo(), express.getOrderNo(), express.getAddressId());
+//            log.info("物流订阅信息:{}", returnDto);
+//            if (returnDto.getSuccess()) {
+//                //订阅成功
+//                expressService.addExpressOrder(express.getExpCode(), express.getExpNo(), express.getOrderNo(), express.getAddressId(), true);
+//                return JsonResult.success();
+//            } else {
+//                //订阅失败
+//                expressService.addExpressOrder(express.getExpCode(), express.getExpNo(), express.getOrderNo(), express.getAddressId(), false);
+//                return JsonResult.failure(returnDto.getReason());
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }todo 订阅功能，暂时直接查看
+        expressService.addExpressOrder(express.getExpCode(), express.getExpNo(), express.getOrderNo(), express.getAddressId(), false);
+        return JsonResult.success("发货成功");
+//        return JsonResult.failure("发货失败");
     }
 
     @RequestMapping("/cancelDeliver")
@@ -148,7 +150,7 @@ public class ExpressController {
 
     @RequestMapping("/getReturnTraceByOrder")
     @Authorization
-    public JsonResult getReturnTraceByOrder(@Valid @RequestBody GetOrderPojo getOrderPojo){
+    public JsonResult getReturnTraceByOrder(@Valid @RequestBody GetOrderPojo getOrderPojo) {
         ExpressReturnShowVO returnTraceByOrder = expressService.getReturnTraceByOrder(getOrderPojo.getGoodsOrderNo());
         return JsonResult.success(returnTraceByOrder);
     }
@@ -176,7 +178,7 @@ public class ExpressController {
     @Authorization
     public JsonResult getOrderTraceByKdniao(@Valid @RequestBody ExpressPojo expressPojo) {
         try {
-            ExpressResult result = expressService.getOrderTracesByJson(expressPojo.getExpCode(), expressPojo.getExpNo(), expressPojo.getOrderNo(),false);
+            ExpressResult result = expressService.getOrderTracesByJson(expressPojo.getExpCode(), expressPojo.getExpNo(), expressPojo.getOrderNo(), false);
             return JsonResult.success(result);
         } catch (Exception e) {
             e.printStackTrace();

@@ -19,7 +19,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
     @Bean
-   public Interceptor interceptor() {
+    public Interceptor interceptor() {
         return new Interceptor();
     }
 
@@ -38,6 +38,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     /**
      * 本地资源路径
+     *
      * @param registry
      */
     @Override
