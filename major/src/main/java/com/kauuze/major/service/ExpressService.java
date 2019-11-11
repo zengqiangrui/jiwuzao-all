@@ -76,7 +76,8 @@ public class ExpressService {
      */
     public ExpressResult getOrderTracesByJson(String expCode, String expNo, String orderCode,boolean isReturn) throws Exception {
         ExpressResultDto expressResultDto = getOrderTraces(expCode, expNo, orderCode);
-        Optional<ExpressResult> opt = resultRepository.findByLogisticCode(expNo);
+//        Optional<ExpressResult> opt = resultRepository.findByLogisticCode(expNo);
+        Optional<ExpressResult> opt = resultRepository.findByOrderCode(orderCode);
         ExpressResult expressResult = opt.orElse(new ExpressResult()).setReturn(isReturn);
         BeanUtils.copyProperties(expressResultDto, expressResult);
         log.info("快递物流信息expressResult:{}", expressResult);

@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Entity
 @Table(indexes = {
-        @Index(name = "index_goodsOrder_expressNo",columnList = "expressNo",unique = true),
+        @Index(name = "index_goodsOrder_expressNo",columnList = "expressNo"),
         @Index(name = "index_goodsOrder_applyCancel",columnList = "applyCancel"),
         @Index(name = "index_goodsOrder_applyCancelMerchantAudit",columnList = "expressNo"),
         @Index(name = "index_goodsOrder_refundOrderNo",columnList = "refundOrderNo",unique = true),

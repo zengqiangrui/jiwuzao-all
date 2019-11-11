@@ -9,4 +9,11 @@ import java.util.Optional;
 public interface ExpressResultRepository extends MongoRepository<ExpressResult, String> {
 //    Optional<ExpressResult> findByOrderCode(String orderNo);
     Optional<ExpressResult> findByLogisticCode(String logisticCode);
+
+    /**
+     * 根据订单号查物流
+     * @param orderCode
+     * @return
+     */
+    Optional<ExpressResult> findByOrderCode(String orderCode);
 }
