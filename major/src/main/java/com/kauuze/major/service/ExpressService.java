@@ -22,6 +22,7 @@ import com.jiwuzao.common.pojo.express.ExpressPushPojo;
 import com.jiwuzao.common.vo.order.ExpressCancelVO;
 import com.jiwuzao.common.vo.order.ExpressResultVO;
 import com.jiwuzao.common.vo.order.ExpressReturnShowVO;
+import com.kauuze.major.config.contain.ExpressTempDemo;
 import com.kauuze.major.config.contain.properties.KdniaoProperties;
 import com.kauuze.major.domain.mongo.repository.AddressRepository;
 import com.kauuze.major.domain.mongo.repository.ExpressRepository;
@@ -38,6 +39,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -67,14 +69,15 @@ public class ExpressService {
 
     /**
      * 调用查询的方法，同时将物流信息存入数据表中
+     *
      * @param expCode
-     * @param expNo 快递单号
+     * @param expNo     快递单号
      * @param orderCode 订单号
-     * @param isReturn 是否是退货信息
+     * @param isReturn  是否是退货信息
      * @return
      * @throws Exception
      */
-    public ExpressResult getOrderTracesByJson(String expCode, String expNo, String orderCode,boolean isReturn) throws Exception {
+    public ExpressResult getOrderTracesByJson(String expCode, String expNo, String orderCode, boolean isReturn) throws Exception {
         ExpressResultDto expressResultDto = getOrderTraces(expCode, expNo, orderCode);
 //        Optional<ExpressResult> opt = resultRepository.findByLogisticCode(expNo);
         Optional<ExpressResult> opt = resultRepository.findByOrderCode(orderCode);
@@ -104,15 +107,15 @@ public class ExpressService {
         Optional<Express> optional1 = expressRepository.findByCode(resultDto.getShipperCode());
         if (!optional1.isPresent()) throw new RuntimeException("不支持快递公司类型");
         Optional<Address> addressOptional = addressRepository.findById(goodsOrderDetail.getAddressId());
-        if(!addressOptional.isPresent()) throw new RuntimeException("不存在该地址");
+        if (!addressOptional.isPresent()) throw new RuntimeException("不存在该地址");
         Address address = addressOptional.get();
         Collections.reverse(resultDto.getTraces());
         ExpressResult result = new ExpressResult().setReturn(true);
-        BeanUtils.copyProperties(resultDto,result);
-        log.warn("查看物流对象{}",result);
+        BeanUtils.copyProperties(resultDto, result);
+        log.warn("查看物流对象{}", result);
         return new ExpressResultVO().setExpCompany(optional1.get().getName())
                 .setExpNo(resultDto.getLogisticCode()).setOrderNo(goodsOrderDetail.getGoodsOrderNo())
-                .setDetailAddress(address.getProvinces()+":"+address.getAddressDetail())
+                .setDetailAddress(address.getProvinces() + ":" + address.getAddressDetail())
                 .setState(resultDto.getState()).setSuccess(resultDto.getSuccess()).setTraces(resultDto.getTraces());
     }
 
@@ -210,7 +213,7 @@ public class ExpressService {
      * @param expNo
      * @return
      */
-    public GoodsOrder addExpressOrder(String expCode, String expNo, String orderNo,String addressId, Boolean isSub) {
+    public GoodsOrder addExpressOrder(String expCode, String expNo, String orderNo, String addressId, Boolean isSub) {
         Optional<Express> code = expressRepository.findByCode(expCode);
         if (!code.isPresent()) {
             throw new OrderException(OrderExceptionEnum.NOT_SUPPORT_EXPRESS_CODE);
@@ -224,7 +227,7 @@ public class ExpressService {
                 goodsOrderDetail.setExpressNo(expNo).setExpCode(expCode);
                 if (!isSub) {//先处理订阅失败
                     //首先查询物流信息是否追踪到
-                    if (getOrderTracesByJson(expCode, expNo, orderNo,false).getSuccess()) {
+                    if (getOrderTracesByJson(expCode, expNo, orderNo, false).getSuccess()) {
                         goodsOrderDetailRepository.save(goodsOrderDetail.setIsSubscribe(false).setAddressId(addressId));
                         return createDeliver(orderNo);
                     } else {
@@ -327,7 +330,7 @@ public class ExpressService {
             Express express = byCode.get();
             ExpressShowDto expressShowDto = new ExpressShowDto().setOrderNo(goodsOrderNo).setExpCompany(express.getName()).setExpNo(goodsOrderDetail.getExpressNo());
             try {
-                ExpressResult expressResult = getOrderTracesByJson(goodsOrderDetail.getExpCode(), goodsOrderDetail.getExpressNo(), goodsOrderNo,false);
+                ExpressResult expressResult = getOrderTracesByJson(goodsOrderDetail.getExpCode(), goodsOrderDetail.getExpressNo(), goodsOrderNo, false);
                 Collections.reverse(expressResult.getTraces());
                 expressShowDto.setTraces(expressResult.getTraces());
                 return expressShowDto;
@@ -440,15 +443,16 @@ public class ExpressService {
 
     /**
      * 获取退货物流信息
+     *
      * @param goodsOrderNo
      * @return
      */
     public ExpressReturnShowVO getReturnTraceByOrder(String goodsOrderNo) {
         Optional<ReturnOrder> optional = returnOrderRepository.findByGoodsOrderNo(goodsOrderNo);
-        if(!optional.isPresent()) throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
+        if (!optional.isPresent()) throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
         ReturnOrder returnOrder = optional.get();
         Optional<Express> byCode = expressRepository.findByCode(returnOrder.getExpCode());
-        if(!byCode.isPresent()) throw new RuntimeException("不支持类型");
+        if (!byCode.isPresent()) throw new RuntimeException("不支持类型");
         Express express = byCode.get();
         ExpressReturnShowVO expressReturnShowVO = new ExpressReturnShowVO();
         try {
@@ -462,5 +466,38 @@ public class ExpressService {
             e.printStackTrace();
         }
         return expressReturnShowVO;
+    }
+
+    public ExpressShowDto getExpressOneByOrderTemp(String goodsOrderNo) {
+        Optional<GoodsOrderDetail> optional = goodsOrderDetailRepository.findByGoodsOrderNo(goodsOrderNo);
+        if (!optional.isPresent()) {
+            throw new OrderException(OrderExceptionEnum.ORDER_NOT_FOUND);
+        } else {
+            GoodsOrderDetail goodsOrderDetail = optional.get();
+            Optional<Express> byCode = expressRepository.findByCode(goodsOrderDetail.getExpCode());
+            if (!byCode.isPresent()) throw new RuntimeException("不支持快递类型");
+            Express express = byCode.get();
+            ExpressShowDto expressShowDto = new ExpressShowDto().setOrderNo(goodsOrderNo).setExpCompany(express.getName()).setExpNo(goodsOrderDetail.getExpressNo());
+            try {
+                ExpressTempDemo expressTempDemo = new ExpressTempDemo();
+                String expressNo = goodsOrderDetail.getExpressNo();
+                if (express.getCode().equals("SF")) {
+                    expressNo = expressNo + "_" + StringUtil.getPhoneLast4(goodsOrderDetail.getReceiverPhone());
+                }
+                String queryExpress = expressTempDemo.queryExpress(expressNo, express.getName().substring(0, 2));
+                if (queryExpress != null) {
+                    ExpressResultTempDto expressResultTempDto = JsonUtil.parseJsonString(queryExpress, ExpressResultTempDto.class);
+                    ExpressTraceDto dto = new ExpressTraceDto();
+                    List<ExpressTraceDto> collect = expressResultTempDto.getData().stream().map(expressTempTraceDto -> new ExpressTraceDto().setAcceptTime(expressTempTraceDto.getTime()).setAcceptStation(expressTempTraceDto.getContent())).collect(Collectors.toList());
+//                Collections.reverse(expressResult.getTraces());
+                    expressShowDto.setTraces(collect);
+                }
+                return expressShowDto;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            log.info("showDTO:{}", expressShowDto);
+            return expressShowDto;
+        }
     }
 }

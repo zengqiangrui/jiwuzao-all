@@ -144,7 +144,9 @@ public class ExpressController {
     @RequestMapping("/getTraceByOrder")
     @Authorization
     public JsonResult getTraceByOrder(@Valid @RequestBody GetOrderPojo getOrderPojo) {
-        ExpressShowDto showDto = expressService.getExpressOneByOrder(getOrderPojo.getGoodsOrderNo());
+//        ExpressShowDto showDto = expressService.getExpressOneByOrder(getOrderPojo.getGoodsOrderNo());
+
+        ExpressShowDto showDto = expressService.getExpressOneByOrderTemp(getOrderPojo.getGoodsOrderNo());
         return JsonResult.success(showDto);
     }
 

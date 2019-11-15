@@ -1,6 +1,7 @@
 import com.jiwuzao.common.domain.enumType.ReceiptEnum;
 import com.jiwuzao.common.vo.common.AppUpdateVO;
 import com.kauuze.major.MajorApplication;
+import com.kauuze.major.config.contain.ExpressTempDemo;
 import com.kauuze.major.domain.mysql.repository.ReceiptRepository;
 import com.kauuze.major.service.ShopCartService;
 import com.kauuze.major.service.SystemService;
@@ -11,6 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
