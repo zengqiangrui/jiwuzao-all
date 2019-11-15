@@ -330,7 +330,7 @@ public class ExpressService {
                 ExpressResult expressResult = getOrderTracesByJson(goodsOrderDetail.getExpCode(), goodsOrderDetail.getExpressNo(), goodsOrderNo,false);
                 Collections.reverse(expressResult.getTraces());
                 expressShowDto.setTraces(expressResult.getTraces());
-
+                return expressShowDto;
             } catch (Exception e) {
                 e.printStackTrace();
             }

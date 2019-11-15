@@ -68,8 +68,9 @@ public class ApplicationRunnerAfter implements ApplicationRunner {
             appVersionRepository.insert(appVersion);
         }
 
+        //版本更迭
 //        SystemService bean = SpringContext.getBean(SystemService.class);
-//        AppVersion appVersion = bean.createUpdateVersion("1.0.6", 106, "http://download.jiwuzao.com/jiwuzao.apk", "内容优化");
+//        AppVersion appVersion = bean.createUpdateVersion("1.0.7", 107, "http://download.jiwuzao.com/jiwuzao.apk", "内容优化");
 //        if (appVersion == null) throw new RuntimeException("请检查版本信息和更新环境");
 
 
