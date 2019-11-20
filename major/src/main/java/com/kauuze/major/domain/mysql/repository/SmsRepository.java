@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.LockModeType;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author kauuze
@@ -19,4 +21,5 @@ public interface SmsRepository extends JpaRepository<Sms,Integer> {
     @Lock(value = LockModeType.PESSIMISTIC_WRITE)
     @Query(value = "select e from Sms e where e.id = ?1")
     Sms findByIdForUpdate(int id);
+
 }

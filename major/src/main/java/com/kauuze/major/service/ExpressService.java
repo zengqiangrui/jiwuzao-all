@@ -487,11 +487,11 @@ public class ExpressService {
                 String queryExpress = expressTempDemo.queryExpress(expressNo, express.getName().substring(0, 2));
                 if (queryExpress != null) {
                     ExpressResultTempDto expressResultTempDto = JsonUtil.parseJsonString(queryExpress, ExpressResultTempDto.class);
-                    ExpressTraceDto dto = new ExpressTraceDto();
                     List<ExpressTraceDto> collect = expressResultTempDto.getData().stream().map(expressTempTraceDto -> new ExpressTraceDto().setAcceptTime(expressTempTraceDto.getTime()).setAcceptStation(expressTempTraceDto.getContent())).collect(Collectors.toList());
 //                Collections.reverse(expressResult.getTraces());
                     expressShowDto.setTraces(collect);
                 }
+                log.info("物流查询：{}",expressShowDto);
                 return expressShowDto;
             } catch (Exception e) {
                 e.printStackTrace();

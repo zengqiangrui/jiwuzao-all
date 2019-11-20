@@ -11,10 +11,12 @@ import com.jiwuzao.common.pojo.userBasic.*;
 import com.jiwuzao.common.vo.user.UserCommentVO;
 import com.kauuze.major.config.permission.Authorization;
 import com.kauuze.major.config.permission.GreenWay;
+import com.kauuze.major.include.Rand;
 import com.kauuze.major.include.StateModel;
 import com.kauuze.major.service.GoodsService;
 import com.kauuze.major.service.UserBasicService;
 import com.kauuze.major.service.dto.userBasic.UserPrivateDto;
+import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +32,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/userBasic")
 @CrossOrigin
+@Slf4j
 public class UserBasicController {
     @Autowired
     private UserBasicService userBasicService;
@@ -41,7 +44,7 @@ public class UserBasicController {
     private WxMaService wxMaService;
 
     @RequestMapping("/weixinMaLogin")
-    public JsonResult weixinMalogin(@Valid @RequestBody MaLoginPojo pojo){
+    public JsonResult weixinMalogin(@Valid @RequestBody MaLoginPojo pojo) {
         try {
             WxMaJscode2SessionResult sessionInfo = wxMaService.getUserService().getSessionInfo(pojo.getCode());
             return JsonResult.success(sessionInfo);
@@ -52,55 +55,69 @@ public class UserBasicController {
 
     /**
      * 登录验证，拦截器中已经进行了处理
+     *
      * @return
      */
     @RequestMapping("/checkLogin")
     @Authorization
-    public JsonResult checkLogin(){
+    public JsonResult checkLogin() {
         return JsonResult.success();
     }
 
     @RequestMapping("/sendSms")
-    public JsonResult sendSms(@Valid @RequestBody SendSmsPojo sendSmsPojo){
-        if(!StringUtil.isEq(SHA256.encryptAddSalt(sendSmsPojo.getPhone(),"sendSms-kboot"),sendSmsPojo.getSha256())){
+    public JsonResult sendSms(@Valid @RequestBody SendSmsPojo sendSmsPojo) {
+        if (!StringUtil.isEq(SHA256.encryptAddSalt(sendSmsPojo.getPhone(), "sendSms-kboot"), sendSmsPojo.getSha256())) {
             return JsonResult.failure("发送失败");
         }
-        if(userBasicService.sendSms(sendSmsPojo.getPhone()) != null){
+        if (userBasicService.sendSms(sendSmsPojo.getPhone()) != null) {
             return JsonResult.success();
-        }else{
+        } else {
             return JsonResult.failure("发送失败");
         }
     }
 
     @RequestMapping("/register")
-    public JsonResult register(@Valid @RequestBody RegisterPojo registerPojo){
-        StateModel stateModel = userBasicService.register(registerPojo.getPhone(),registerPojo.getPwd()
-                ,registerPojo.getNickName(),registerPojo.getMsCode());
-        if(stateModel.eq("mismatch")){
+    public JsonResult register(@Valid @RequestBody RegisterPojo registerPojo) {
+        StateModel stateModel = userBasicService.register(registerPojo.getPhone(), registerPojo.getPwd()
+                , registerPojo.getNickName(), registerPojo.getMsCode());
+        if (stateModel.eq("mismatch")) {
             return JsonResult.failure("验证码错误");
         }
-        if(stateModel.eq("registered")){
+        if (stateModel.eq("registered")) {
             return JsonResult.failure("已注册");
         }
-        if(stateModel.eq("nickNameExist")){
+        if (stateModel.eq("nickNameExist")) {
             return JsonResult.failure("昵称已存在");
         }
         return JsonResult.success(stateModel.getData());
     }
 
+    @RequestMapping("/smsRegistLogin")
+    public JsonResult smsRegistLogin(@Valid @RequestBody SmsLoginPojo pojo) {
+        StateModel stateModel = userBasicService.smsRegistLogin(pojo.getPhone(), pojo.getCode());
+        if(stateModel.getState().equals("ban")){
+            return JsonResult.failure("用户被封禁");
+        }else{
+            return JsonResult.success(stateModel.getData());
+        }
+    }
+
     @RequestMapping("/login")
-    public JsonResult login(@Valid @RequestBody LoginPojo loginPojo){
-        if(!StringUtil.isEq(SHA256.encryptAddSalt(loginPojo.getPhone(),"login-kboot"),loginPojo.getSha256())){
+    public JsonResult login(@Valid @RequestBody LoginPojo loginPojo) {
+        if (!StringUtil.isEq(SHA256.encryptAddSalt(loginPojo.getPhone(), "login-kboot"), loginPojo.getSha256())) {
             return JsonResult.failure("登录失败");
         }
-        StateModel stateModel = userBasicService.login(loginPojo.getPhone(),loginPojo.getPwd());
-        if(stateModel.eq("mismatch")){
+        StateModel stateModel = userBasicService.login(loginPojo.getPhone(), loginPojo.getPwd());
+        if (stateModel.eq("mismatch")) {
             return JsonResult.failure("用户名或密码不匹配");
         }
-        if(stateModel.eq("unsafety")){
+        if (stateModel.eq("needPwd")){
+            return JsonResult.failure("需要绑定密码");
+        }
+        if (stateModel.eq("unsafety")) {
             return JsonResult.failure("需修改密码");
         }
-        if(stateModel.eq("ban")){
+        if (stateModel.eq("ban")) {
             //返回封禁结束时间
             return JsonResult.failure("封禁直到:" + DateTimeUtil.covertDateView(Long.valueOf(String.valueOf(stateModel.getData()))));
         }
@@ -108,15 +125,15 @@ public class UserBasicController {
     }
 
     @RequestMapping("/alterPwd")
-    public JsonResult alterPwd(@Valid @RequestBody AlterPwdPojo alterPwdPojo){
+    public JsonResult alterPwd(@Valid @RequestBody AlterPwdPojo alterPwdPojo) {
         int result = userBasicService.alterPwd(alterPwdPojo.getPhone(), alterPwdPojo.getNewPwd(), alterPwdPojo.getMsCode());
-        if(result == 0){
+        if (result == 0) {
             return JsonResult.failure("未注册");
         }
-        if(result == 2){
+        if (result == 2) {
             return JsonResult.failure("验证码错误");
         }
-        if(result == 3){
+        if (result == 3) {
             return JsonResult.failure("与原密码一致");
         }
         return JsonResult.success();
@@ -124,32 +141,32 @@ public class UserBasicController {
 
     @RequestMapping("/getUserPrivateDto")
     @Authorization
-    public JsonResult getUserPrivateDto(@RequestAttribute int uid){
+    public JsonResult getUserPrivateDto(@RequestAttribute int uid) {
         UserPrivateDto userPrivateDto = userBasicService.getUserPrivateDto(uid);
         return JsonResult.success(userPrivateDto);
     }
 
     @RequestMapping("/validPhone")
-    public JsonResult validPhone(@Valid @RequestBody PhonePojo phonePojo){
-        if(userBasicService.validPhone(phonePojo.getPhone())){
+    public JsonResult validPhone(@Valid @RequestBody PhonePojo phonePojo) {
+        if (userBasicService.validPhone(phonePojo.getPhone())) {
             return JsonResult.success(true);
-        }else{
+        } else {
             return JsonResult.success(false);
         }
     }
 
     @RequestMapping("/validNickName")
-    public JsonResult validNickName(@Valid @RequestBody NickNamePojo nickNamePojo){
-        if(userBasicService.validNickName(nickNamePojo.getNickName())){
+    public JsonResult validNickName(@Valid @RequestBody NickNamePojo nickNamePojo) {
+        if (userBasicService.validNickName(nickNamePojo.getNickName())) {
             return JsonResult.success(true);
-        }else{
+        } else {
             return JsonResult.success(false);
         }
     }
 
     @RequestMapping("/alterUserData")
     @Authorization
-    public JsonResult alterUserData(@RequestAttribute int uid,@Valid @RequestBody AlterUserDataPojo alterUserDataPojo){
+    public JsonResult alterUserData(@RequestAttribute int uid, @Valid @RequestBody AlterUserDataPojo alterUserDataPojo) {
         userBasicService.alterUserData(uid, alterUserDataPojo.getSex(), alterUserDataPojo.getBirthday(), alterUserDataPojo.getProvince()
                 , alterUserDataPojo.getCity(), alterUserDataPojo.getOpenWxId(), alterUserDataPojo.getOpenQQ());
         return JsonResult.success();
@@ -157,10 +174,10 @@ public class UserBasicController {
 
     @RequestMapping("/alterNickName")
     @Authorization
-    public JsonResult alterNickName(@RequestAttribute int uid,@Valid @RequestBody NickNamePojo nickNamePojo){
-        if(userBasicService.alterNickName(uid, nickNamePojo.getNickName())){
+    public JsonResult alterNickName(@RequestAttribute int uid, @Valid @RequestBody NickNamePojo nickNamePojo) {
+        if (userBasicService.alterNickName(uid, nickNamePojo.getNickName())) {
             return JsonResult.success();
-        }else{
+        } else {
             return JsonResult.failure();
         }
 
@@ -168,61 +185,61 @@ public class UserBasicController {
 
     @RequestMapping("/alterPortrait")
     @Authorization
-    public JsonResult alterPortrait(@RequestAttribute int uid, @Valid @RequestBody AlterPortraitPojo alterPortraitPojo){
+    public JsonResult alterPortrait(@RequestAttribute int uid, @Valid @RequestBody AlterPortraitPojo alterPortraitPojo) {
         userBasicService.alterPortrait(uid, alterPortraitPojo.getPortrait());
         return JsonResult.success();
     }
 
     @RequestMapping("/alterPersonalSign")
     @Authorization
-    public JsonResult alterPersonalSign(@RequestAttribute int uid, @Valid @RequestBody AlterPersonalSignPojo alterPersonalSignPojo){
+    public JsonResult alterPersonalSign(@RequestAttribute int uid, @Valid @RequestBody AlterPersonalSignPojo alterPersonalSignPojo) {
         userBasicService.alterPersonalSign(uid, alterPersonalSignPojo.getPersonalSign());
         return JsonResult.success();
     }
 
     @RequestMapping("/alterGender")
     @Authorization
-    public JsonResult alterGender(@RequestAttribute int uid, @Valid @RequestBody AlterGenderPojo alterGenderPojo){
+    public JsonResult alterGender(@RequestAttribute int uid, @Valid @RequestBody AlterGenderPojo alterGenderPojo) {
         userBasicService.alterGender(uid, alterGenderPojo.getGender());
         return JsonResult.success();
     }
 
     @RequestMapping("/alterBirthday")
     @Authorization
-    public JsonResult alterBirthday(@RequestAttribute int uid, @Valid @RequestBody AlterBirthdayPojo alterBirthdayPojo){
+    public JsonResult alterBirthday(@RequestAttribute int uid, @Valid @RequestBody AlterBirthdayPojo alterBirthdayPojo) {
         userBasicService.alterBirthday(uid, alterBirthdayPojo.getBirthday());
         return JsonResult.success();
     }
 
     @RequestMapping("/getUserSimpleOpenDto")
-    public JsonResult getUserSimpleOpenDto(@Valid @RequestBody UidPojo uidPojo){
+    public JsonResult getUserSimpleOpenDto(@Valid @RequestBody UidPojo uidPojo) {
         return JsonResult.success(userBasicService.getUserSimpleOpenDto(uidPojo.getUid()));
     }
 
     @RequestMapping("/getUserOpenDto")
-    public JsonResult getUserOpenDto(@Valid @RequestBody UidPojo uidPojo){
+    public JsonResult getUserOpenDto(@Valid @RequestBody UidPojo uidPojo) {
         return JsonResult.success(userBasicService.getUserOpenDto(uidPojo.getUid()));
     }
 
     @RequestMapping("/getUserSimpleOpenDtos")
-    public JsonResult getUserSimpleOpenDtos(@Valid @RequestBody UidsPojo uidsPojo){
+    public JsonResult getUserSimpleOpenDtos(@Valid @RequestBody UidsPojo uidsPojo) {
         return JsonResult.success(userBasicService.getUserSimpleOpenDtos(uidsPojo.convert()));
     }
 
     @RequestMapping("/searchByNickName")
-    public JsonResult searchByNickName(@Valid @RequestBody SearchByNickNamePojo searchByNickNamePojo){
+    public JsonResult searchByNickName(@Valid @RequestBody SearchByNickNamePojo searchByNickNamePojo) {
         return JsonResult.success(userBasicService.searchByNickName(searchByNickNamePojo.getNickName(), searchByNickNamePojo.getPage().getNum()
                 , searchByNickNamePojo.getPage().getSize(), searchByNickNamePojo.getPage().getTime()));
     }
 
     @RequestMapping("/searchByStoreName")
-    public JsonResult searchByStoreName(@Valid @RequestBody SearchByStoreNamePojo searchByStoreNamePojo){
+    public JsonResult searchByStoreName(@Valid @RequestBody SearchByStoreNamePojo searchByStoreNamePojo) {
         PagePojo pagePojo = searchByStoreNamePojo.getPage();
-        return JsonResult.success(userBasicService.searchByStoreName(searchByStoreNamePojo.getStoreName(),pagePojo.getNum(),pagePojo.getSize(),pagePojo.getTime()));
+        return JsonResult.success(userBasicService.searchByStoreName(searchByStoreNamePojo.getStoreName(), pagePojo.getNum(), pagePojo.getSize(), pagePojo.getTime()));
     }
 
     @RequestMapping("/findBySid")
-    public JsonResult findBySid(@Valid @RequestBody SidPojo sidPojo){
+    public JsonResult findBySid(@Valid @RequestBody SidPojo sidPojo) {
         return JsonResult.success(userBasicService.findBySid(sidPojo.getSid()));
     }
 

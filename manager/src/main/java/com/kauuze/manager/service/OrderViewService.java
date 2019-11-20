@@ -189,9 +189,10 @@ public class OrderViewService {
         Store store = storeRepository.findById(goodsOrder.getSid()).orElseThrow(() -> new RuntimeException("店铺不存在"));
         OrderDetailVO orderDetailVO = new OrderDetailVO();
         BeanUtils.copyProperties(goodsOrder, orderDetailVO);
-        BeanUtils.copyProperties(goodsOrderDetail, orderDetailVO);
-        BeanUtils.copyProperties(payOrder, orderDetailVO);
-        BeanUtils.copyProperties(store, orderDetailVO);
+        BeanUtils.copyProperties(goodsOrderDetail, orderDetailVO,"createTime");
+        BeanUtils.copyProperties(payOrder, orderDetailVO,"createTime");
+        BeanUtils.copyProperties(store, orderDetailVO,"createTime");
+
         return orderDetailVO;
     }
 }

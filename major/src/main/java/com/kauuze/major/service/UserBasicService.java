@@ -79,7 +79,7 @@ public class UserBasicService {
         }
         Sms sms = smsRepository.findByPhone(phone);
         if (sms == null) {
-            smsRepository.save(new Sms(null, phone, msCode, DateTimeUtil.covertMill(LocalDateTime.now().plusMinutes(5)), 0));
+            smsRepository.save(new Sms(null, phone, msCode, (System.currentTimeMillis() + DateTimeUtil.getOneMinMill() * 5), 0));
         } else {
             sms = smsRepository.findByIdForUpdate(sms.getId());
             sms.setOverTime(System.currentTimeMillis() + DateTimeUtil.getOneMinMill() * 5);
@@ -132,21 +132,23 @@ public class UserBasicService {
 
     /**
      * 获取昵称和手机
+     *
      * @param uid
      * @return
      */
-    public UserPhoneDto getUserPhoneDto(int uid){
+    public UserPhoneDto getUserPhoneDto(int uid) {
         User user = userRepository.findById(uid);
-        if(user == null) throw new RuntimeException("用户没找到");
+        if (user == null) throw new RuntimeException("用户没找到");
         return new UserPhoneDto().setPhone(user.getPhone()).setNickname(user.getNickName()).setUid(uid);
     }
 
     /**
      * 选择一个客服用户对象
+     *
      * @param uid
      * @return
      */
-    public UserOpenDto getOneCms(int uid){
+    public UserOpenDto getOneCms(int uid) {
         List<UserToken> list = userTokenRepository.findAllByBackRole(BackRoleEnum.cms);
 //        list.stream().filter(userToken -> userToken.getUid()!=uid)
         //todo 选举客服用户对象
@@ -166,7 +168,7 @@ public class UserBasicService {
             return null;
         }
         userToken = TokenUtil.judgeEndTime(userToken);
-        return new UserSimpleOpenDto(uid, userToken.getVip(), userInfo.getNickName(), userInfo.getPortrait(),userInfo.getPersonalSign());
+        return new UserSimpleOpenDto(uid, userToken.getVip(), userInfo.getNickName(), userInfo.getPortrait(), userInfo.getPersonalSign());
     }
 
     /**
@@ -295,7 +297,7 @@ public class UserBasicService {
      * success--accessToken
      *
      * @param phone
-     * @param pwd 密码
+     * @param pwd      密码
      * @param nickName
      * @param msCode
      * @return
@@ -322,7 +324,7 @@ public class UserBasicService {
         userInfoRepository.insert(userInfo);
         return new StateModel("success", accessToken);
     }
-    
+
 
     /**
      * 登录:mismatch--用户名密码不匹配,unsafety--不安全,ban--封禁,success-accessToken
@@ -336,10 +338,15 @@ public class UserBasicService {
         if (user == null) {
             return new StateModel("mismatch", null);
         }
+        if (StringUtil.isBlank(user.getPwd())) {
+            //需要绑定密码
+            return new StateModel("needPwd", null);
+        }
         if (user.getPwdFailCount() >= 10) {
             //需要修改密码
             return new StateModel("unsafety", null);
         }
+
         if (!StringUtil.isEq(user.getPwd(), SHA256.encryptAddSalt(pwd, user.getPwdSalt()))) {
             user = userRepository.findByIdForUpdate(user.getId());
             user.setPwdFailCount(user.getPwdFailCount() + 1);
@@ -359,6 +366,46 @@ public class UserBasicService {
         return new StateModel("success", userTokenUp.getAccessToken());
     }
 
+
+    /**
+     * 用户通过手机快捷登录
+     *
+     * @param phone
+     * @param code
+     * @return
+     */
+    public StateModel smsRegistLogin(String phone, String code) {
+        if (!validSms(phone, Integer.parseInt(code))) {
+            throw new RuntimeException("验证码错误");
+        } else {
+            User user = userRepository.findByPhone(phone);
+            if (user == null) {
+                String nickName = StringUtil.getRandomNickName(4);
+                user = new User(null, phone, null, null, 0, false, new BigDecimal("0"), new BigDecimal("0"), nickName, false, 0L);
+                userRepository.save(user);
+                String accessToken = TokenUtil.generateToken(user.getId());
+                Long mill = System.currentTimeMillis();
+                UserToken userToken = new UserToken(null, user.getId(), RoleEnum.user, BackRoleEnum.user, false, 0L, accessToken, UserStateEnum.normal, null, mill, mill);
+                userTokenRepository.insert(userToken);
+                UserInfo userInfo = new UserInfo(null, user.getId(), mill, nickName , null, SexEnum.unknown, null, null, null, null, null, null);
+                userInfoRepository.insert(userInfo);
+                return new StateModel("success", accessToken);
+            } else {
+                UserToken userToken = userTokenRepository.findByUid(user.getId());
+                if (TokenUtil.isBan(userToken)) {
+                    //用户被封禁
+                    return new StateModel("ban", userToken.getUserStateEndTime());
+                }
+                UserToken userTokenUp = new UserToken();
+                userTokenUp.setAccessToken(TokenUtil.generateToken(userToken.getUid()));
+                userTokenUp.setUid(userToken.getUid());
+                userTokenUp.setLastLoginTime(System.currentTimeMillis());
+                MongoUtil.updateNotNon("uid", userTokenUp, UserToken.class);
+                return new StateModel("success", userTokenUp.getAccessToken());
+            }
+        }
+    }
+
     public boolean checkPwd(int uid, String pwd) {
         UserToken userToken = userTokenRepository.findByUid(uid);
         if (TokenUtil.isBan(userToken)) {
@@ -373,18 +420,15 @@ public class UserBasicService {
      * 系统支付口令
      * 用于退款等
      * todo 支付密钥
+     *
      * @param uid
      * @param pwd
      * @return
      */
-    public boolean checkPaymentPassword(int uid,String pwd){
+    public boolean checkPaymentPassword(int uid, String pwd) {
         UserToken token = userTokenRepository.findByUid(uid);
-        if(TokenUtil.isBan(token)) return false;
+        if (TokenUtil.isBan(token)) return false;
         return false;
-    }
-    @Test
-    public void myTest(){
-        File file = new File("classpath:banner.txt");
     }
 
     /**
@@ -429,7 +473,6 @@ public class UserBasicService {
      */
     public void alterUserData(int uid, SexEnum sex, Long birthday, String province, String city
             , String openWxId, String openQQ) {
-        ;
         Map<String, Object> map = new HashMap<>();
         map.put("sex", sex);
         map.put("birthday", birthday);
@@ -508,4 +551,5 @@ public class UserBasicService {
         MongoUtil.updateNotNon("uid", userInfo, UserInfo.class);
         return true;
     }
+
 }

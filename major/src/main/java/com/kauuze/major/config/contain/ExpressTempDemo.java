@@ -25,9 +25,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jiwuzao.common.dto.express.ExpressResultTempDto;
 import com.jiwuzao.common.include.JsonUtil;
 import com.qiniu.util.Json;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import sun.misc.BASE64Encoder;
-
+@Slf4j
 public class ExpressTempDemo {
     private final static String secretId = "AKID5BpiM34rI46XBbrjiVd0XenyntQN8Ohwus8n";
     private final static String secretKey = "dnp23z1fi6j3gdq1t0ana6cf88uvjohmltkgjlr";
@@ -114,7 +115,6 @@ public class ExpressTempDemo {
             Boolean hasBody = methods.get(method);
             if (hasBody != null) {
                 conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-
                 conn.setDoOutput(true);
                 DataOutputStream out = new DataOutputStream(conn.getOutputStream());
                 out.writeBytes(urlencode(bodyParams));
@@ -145,10 +145,4 @@ public class ExpressTempDemo {
         return null;
     }
 
-
-    @Test
-    public void show() throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException {
-        String s = queryExpress("1202247993799", "韵达");
-        System.out.println();
-    }
 }
