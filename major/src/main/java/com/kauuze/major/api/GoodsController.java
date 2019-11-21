@@ -67,7 +67,7 @@ public class GoodsController {
         if (countSpec != addGoodsPojo.getGoodsSpecPojo().size()) {
             throw new ParamMismatchException();
         }
-        String result = goodsService.addGoods(uid, addGoodsPojo.getGoodsClassify(), addGoodsPojo.getTitle(), addGoodsPojo.getCover(), addGoodsPojo.getDefaultPrice(), addGoodsPojo.getSlideshow(), addGoodsPojo.getPostage(), addGoodsPojo.getDetailLabel(), addGoodsPojo.getGoodsType(), addGoodsPojo.getGoodsTypeClass(), addGoodsPojo.getDetailPhotos(), addGoodsPojo.getGoodsSpecPojo(), addGoodsPojo.getGoodsReturn(), addGoodsPojo.getDeliveryTime());
+        String result = goodsService.addGoods(uid, addGoodsPojo.getGoodsClassify(), addGoodsPojo.getTitle(), addGoodsPojo.getCover(), addGoodsPojo.getDefaultPrice(), addGoodsPojo.getSlideshow(), addGoodsPojo.getPostage(), addGoodsPojo.getDetailLabel(), addGoodsPojo.getGoodsType(), addGoodsPojo.getGoodsTypeClass(), addGoodsPojo.getDetailPhotos(), addGoodsPojo.getGoodsSpecPojo(), addGoodsPojo.getGoodsReturn(), addGoodsPojo.getDeliveryTime(),addGoodsPojo.getGoodsSecondClassify(), addGoodsPojo.getGoodsThirdClassify());
         if (result == null) {
             return JsonResult.success();
         } else {
@@ -260,7 +260,6 @@ public class GoodsController {
      */
     @RequestMapping("/getGoodsByClassfy")
     public JsonResult getGoodsByClassify(@RequestBody GoodsPagePojo goodsPagePojo) {
-        System.out.println(goodsPagePojo);
         List<Goods> goodsList = goodsService.getGoodsList(goodsPagePojo);
         if (!goodsList.isEmpty()) {
             return JsonResult.success(goodsList);

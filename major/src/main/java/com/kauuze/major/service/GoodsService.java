@@ -70,7 +70,7 @@ public class GoodsService {
     /**
      * 添加商品
      */
-    public String addGoods(int uid, GoodsClassifyEnum classify, String title, String cover, BigDecimal defaultPrice, String slideshow, BigDecimal postage, String detailLabel, String goodsType, String goodsTypeClass, String detailPhotos, List<GoodsSpecPojo> goodsSpecPojo, GoodsReturnEnum goodsReturnEnum, DeliveryTimeEnum deliveryTimeEnum) {
+    public String addGoods(int uid, GoodsClassifyEnum classify, String title, String cover, BigDecimal defaultPrice, String slideshow, BigDecimal postage, String detailLabel, String goodsType, String goodsTypeClass, String detailPhotos, List<GoodsSpecPojo> goodsSpecPojo, GoodsReturnEnum goodsReturnEnum, DeliveryTimeEnum deliveryTimeEnum, String goodsSecondClassify, String goodsThirdClassify) {
         Optional<Store> opt = storeRepository.findByUid(uid);
         if (!opt.isPresent()) {
             return "未开通店铺";
@@ -82,7 +82,7 @@ public class GoodsService {
         }
         Goods goods = new Goods(null, uid, opt.get().getId(), title, cover, classify, 0, 0, defaultPrice, goodsReturnEnum, deliveryTimeEnum, postage, false, null, null, AuditTypeEnum.wait, null, System.currentTimeMillis(), null);
         goodsRepository.save(goods);
-        GoodsDetail goodsDetail = new GoodsDetail(null, goods.getGid(), slideshow, detailLabel, classify, goodsType, goodsTypeClass, detailPhotos, 0L);
+        GoodsDetail goodsDetail = new GoodsDetail(null, goods.getGid(), slideshow, detailLabel, classify, goodsSecondClassify, goodsThirdClassify, goodsType, goodsTypeClass, detailPhotos, 0L);
         goodsDetailRepository.save(goodsDetail);
         for (GoodsSpecPojo specPojo : goodsSpecPojo) {
             goodsSpecRepository.save(new GoodsSpec(null, goods.getGid(), specPojo.getSpecClass(), specPojo.getSpecPrice(), specPojo.getSpecInventory()));
@@ -427,28 +427,28 @@ public class GoodsService {
                 goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.food, true);
                 break;
             case 1:
-                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.special, true);
-                break;
-            case 2:
                 goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.food, true);
                 break;
-            case 3:
-                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.clothing, true);
-                break;
-            case 4:
-                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.jewelry, true);
-                break;
-            case 5:
-                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.bags, true);
-                break;
-            case 6:
+            case 2:
                 goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.appliance, true);
                 break;
-            case 7:
+            case 3:
                 goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.gift, true);
                 break;
-            case 8:
+            case 4:
+                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.bags, true);
+                break;
+            case 5:
+                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.jewelry, true);
+                break;
+            case 6:
+                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.clothing, true);
+                break;
+            case 7:
                 goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.beauty, true);
+                break;
+            case 8:
+                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.special, true);
                 break;
             case 9:
                 goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.other, true);

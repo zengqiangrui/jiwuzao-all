@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -39,7 +40,20 @@ public class GoodsDetail {
     /**
      * 商品一级分类
      */
+    @Indexed
     private GoodsClassifyEnum goodsClassify;
+
+    /**
+     * 商品二级分类，暂时用逗号分隔。
+     */
+    @Indexed
+    private String goodsSecondClassify;
+
+    /**
+     * 商品三级分类，用逗号分隔，即全部分类。
+     */
+    @Indexed
+    private String goodsThirdClassify;
     /**
      * 商品规格分类
      */

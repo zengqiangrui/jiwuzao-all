@@ -26,8 +26,10 @@ import java.util.List;
 public class AddGoodsPojo {
     @NotNull
     private GoodsClassifyEnum goodsClassify;
-    @NotNull
-    private String goodsClassDetail;
+    @StringMax
+    private String goodsSecondClassify;
+    @StringMax(require = false)
+    private String goodsThirdClassify;
     @StringMax(max = 40)
     private String title;
     @NotNull
