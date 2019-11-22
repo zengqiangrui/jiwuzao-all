@@ -427,28 +427,28 @@ public class GoodsService {
                 goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.food, true);
                 break;
             case 1:
-                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.food, true);
+                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.special, true);
                 break;
             case 2:
-                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.appliance, true);
+                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.food, true);
                 break;
             case 3:
-                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.gift, true);
-                break;
-            case 4:
-                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.bags, true);
-                break;
-            case 5:
-                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.jewelry, true);
-                break;
-            case 6:
                 goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.clothing, true);
                 break;
+            case 4:
+                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.jewelry, true);
+                break;
+            case 5:
+                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.bags, true);
+                break;
+            case 6:
+                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.appliance, true);
+                break;
             case 7:
-                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.beauty, true);
+                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.gift, true);
                 break;
             case 8:
-                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.special, true);
+                goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.beauty, true);
                 break;
             case 9:
                 goodsPage = goodsRepository.findByClassifyAndPutaway(pageRequest, GoodsClassifyEnum.other, true);
