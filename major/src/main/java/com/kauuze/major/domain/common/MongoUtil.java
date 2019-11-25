@@ -1,6 +1,8 @@
 package com.kauuze.major.domain.common;
 
 import com.jiwuzao.common.config.contain.SpringContext;
+import com.jiwuzao.common.domain.mongo.entity.Goods;
+import com.jiwuzao.common.domain.mongo.entity.GoodsDetail;
 import com.kauuze.major.include.JsonUtil;
 import com.kauuze.major.include.ObjectUtil;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -10,7 +12,10 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * mongodb求和、更新、增加数值
@@ -85,5 +90,18 @@ public class MongoUtil {
         Aggregation aggregation = Aggregation.newAggregation(Aggregation.group("id").sum(field).as("sum"));
         AggregationResults<Map> max = mongoTemplate.aggregate(aggregation, type.getName().toLowerCase(),Map.class);
         return max.iterator().next().get("sum");
+    }
+
+    /**
+     * 模糊查询
+     * @param tips
+     * @return
+     */
+    public static List<Goods> search(String tips){
+        MongoTemplate mongoTemplate = SpringContext.getBean(MongoTemplate.class);
+        String tip = "^.*"+tips+".*$";
+        Pattern pattern = Pattern.compile(tip, Pattern.CASE_INSENSITIVE);
+        Query query = Query.query(Criteria.where("title").regex(pattern));
+        return mongoTemplate.find(query,Goods.class,"goods");
     }
 }

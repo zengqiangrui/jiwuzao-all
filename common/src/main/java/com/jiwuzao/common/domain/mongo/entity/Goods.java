@@ -49,6 +49,19 @@ public class Goods {
 //    @Indexed(unique = true)
     @Indexed
     private GoodsClassifyEnum classify;
+
+    /**
+     * 商品二级分类，暂时用逗号分隔。
+     */
+    @Indexed
+    private String goodsSecondClassify;
+
+    /**
+     * 商品三级分类，用逗号分隔，即全部分类。
+     */
+    @Indexed
+    private String goodsThirdClassify;
+
     /**
      * 评分:默认排序,排序必含
      */

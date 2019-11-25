@@ -28,10 +28,12 @@ public class GoodsDetail {
      * 关联商品gid
      */
     private String gid;
+
     /**
      * 短视频或图片轮播最多5，分析连接
      */
     private String slideshow;
+
     /**
      *详情标签,最多5个,每个5字
      */

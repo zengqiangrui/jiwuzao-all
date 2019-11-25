@@ -20,6 +20,7 @@ import com.kauuze.major.config.contain.ParamMismatchException;
 import com.kauuze.major.config.permission.Authorization;
 import com.kauuze.major.config.permission.Merchant;
 import com.kauuze.major.service.GoodsService;
+import com.qiniu.util.Json;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -67,7 +68,7 @@ public class GoodsController {
         if (countSpec != addGoodsPojo.getGoodsSpecPojo().size()) {
             throw new ParamMismatchException();
         }
-        String result = goodsService.addGoods(uid, addGoodsPojo.getGoodsClassify(), addGoodsPojo.getTitle(), addGoodsPojo.getCover(), addGoodsPojo.getDefaultPrice(), addGoodsPojo.getSlideshow(), addGoodsPojo.getPostage(), addGoodsPojo.getDetailLabel(), addGoodsPojo.getGoodsType(), addGoodsPojo.getGoodsTypeClass(), addGoodsPojo.getDetailPhotos(), addGoodsPojo.getGoodsSpecPojo(), addGoodsPojo.getGoodsReturn(), addGoodsPojo.getDeliveryTime(),addGoodsPojo.getGoodsSecondClassify(), addGoodsPojo.getGoodsThirdClassify());
+        String result = goodsService.addGoods(uid, addGoodsPojo.getGoodsClassify(), addGoodsPojo.getTitle(), addGoodsPojo.getCover(), addGoodsPojo.getDefaultPrice(), addGoodsPojo.getSlideshow(), addGoodsPojo.getPostage(), addGoodsPojo.getDetailLabel(), addGoodsPojo.getGoodsType(), addGoodsPojo.getGoodsTypeClass(), addGoodsPojo.getDetailPhotos(), addGoodsPojo.getGoodsSpecPojo(), addGoodsPojo.getGoodsReturn(), addGoodsPojo.getDeliveryTime(), addGoodsPojo.getGoodsSecondClassify(), addGoodsPojo.getGoodsThirdClassify());
         if (result == null) {
             return JsonResult.success();
         } else {
@@ -156,33 +157,34 @@ public class GoodsController {
 
     /**
      * 商户查询某审核状态下的商品信息
-     * @param uid 用户id
+     *
+     * @param uid           用户id
      * @param goodsPagePojo 商品分页信息
      * @return
      */
     @RequestMapping("/getGoodsListByStatus")
     @Merchant
-    public JsonResult getGoodsListByStatus(@RequestAttribute int uid,@Valid @RequestBody GoodsPagePojo goodsPagePojo){
+    public JsonResult getGoodsListByStatus(@RequestAttribute int uid, @Valid @RequestBody GoodsPagePojo goodsPagePojo) {
         Pageable pageAble;
         if (goodsPagePojo.getIsAsc()) {
             pageAble = PageRequest.of(goodsPagePojo.getCurrentPage(), goodsPagePojo.getPageSize(), Sort.Direction.ASC, goodsPagePojo.getSortBy());
         } else {
             pageAble = PageRequest.of(goodsPagePojo.getCurrentPage(), goodsPagePojo.getPageSize(), Sort.Direction.DESC, goodsPagePojo.getSortBy());
         }
-        PageDto<GoodsSimpleDto> pageDto = goodsService.getGoodsListStatus(uid,goodsPagePojo.getAuditType(),pageAble);
+        PageDto<GoodsSimpleDto> pageDto = goodsService.getGoodsListStatus(uid, goodsPagePojo.getAuditType(), pageAble);
         return JsonResult.success(pageDto);
     }
 
     @RequestMapping("/getGoodsListByPutAway")
     @Merchant
-    public JsonResult getGoodsListByPutAway(@RequestAttribute int uid,@Valid @RequestBody GoodsPagePojo goodsPagePojo){
+    public JsonResult getGoodsListByPutAway(@RequestAttribute int uid, @Valid @RequestBody GoodsPagePojo goodsPagePojo) {
         Pageable pageAble;
         if (goodsPagePojo.getIsAsc()) {
             pageAble = PageRequest.of(goodsPagePojo.getCurrentPage(), goodsPagePojo.getPageSize(), Sort.Direction.ASC, goodsPagePojo.getSortBy());
         } else {
             pageAble = PageRequest.of(goodsPagePojo.getCurrentPage(), goodsPagePojo.getPageSize(), Sort.Direction.DESC, goodsPagePojo.getSortBy());
         }
-        PageDto<GoodsSimpleDto> pageDto = goodsService.getGoodsListByPutAway(uid,goodsPagePojo.getPutaway(),pageAble);
+        PageDto<GoodsSimpleDto> pageDto = goodsService.getGoodsListByPutAway(uid, goodsPagePojo.getPutaway(), pageAble);
         return JsonResult.success(pageDto);
     }
 
@@ -268,6 +270,36 @@ public class GoodsController {
         }
     }
 
+    /**
+     * 根据二级分类查找商品分页
+     *
+     * @param pojo
+     * @return
+     */
+    @RequestMapping("/getGoodsBySecondCategory")
+    public JsonResult getGoodsBySecondCategory(@RequestBody @Valid GoodsCategoryPojo pojo) {
+        PageDto<GoodsSimpleVO> page = goodsService.getGoodsBySecondCategory(pojo.getSecondCategory(), pojo.getNum(), pojo.getSize());
+        return JsonResult.success(page);
+    }
+
+    /**
+     * 根据三级分类查找商品分页
+     *
+     * @param pojo 商品分类对象
+     * @return
+     */
+    @RequestMapping("/getGoodsByThirdCategory")
+    public JsonResult getGoodsByThirdCategory(@RequestBody @Valid GoodsCategoryPojo pojo) {
+        PageDto<GoodsSimpleVO> page = goodsService.getGoodsByThirdCategory(pojo.getThirdCategory(), pojo.getNum(), pojo.getSize());
+        return JsonResult.success(page);
+    }
+
+    @RequestMapping("/searchGoodsLike")
+    public JsonResult searchGoodsTitleLike(@RequestBody @Valid GoodsTipsPojo pojo) {
+        List<GoodsSimpleVO> list = goodsService.searchGoodsLike(pojo.getTips());
+        return JsonResult.success(list);
+    }
+
     @RequestMapping("/modifyPrice")
     @Merchant
     public JsonResult modifyPrice(@RequestAttribute int uid, @Valid @RequestBody GoodsSpecPricePojo pojo) {
@@ -280,7 +312,6 @@ public class GoodsController {
     }
 
     /**
-     * 
      * @param uid
      * @param pojo
      * @return
@@ -310,12 +341,13 @@ public class GoodsController {
     /**
      * 获取店铺商品信息，分页展示
      * putAway:上架
+     *
      * @param pojo
      * @return
      */
     @RequestMapping("/getGoodsByStore")
     public JsonResult getGoodsByStore(@Valid @RequestBody StorePojo pojo) {
-        PageDto<GoodsSimpleVO> page = goodsService.getGoodsByStore(pojo.getStoreId(),true, PageRequest.of(pojo.getPageNum(), pojo.getPageSize(), Sort.by(pojo.getOrderBy())));
+        PageDto<GoodsSimpleVO> page = goodsService.getGoodsByStore(pojo.getStoreId(), true, PageRequest.of(pojo.getPageNum(), pojo.getPageSize(), Sort.by(pojo.getOrderBy())));
         return JsonResult.success(page);
     }
 
@@ -325,7 +357,7 @@ public class GoodsController {
     @RequestMapping("/addComment")
     @Authorization
     public JsonResult addComment(@RequestAttribute int uid, @Valid @RequestBody CommentPojo pojo) {
-        String s = goodsService.addComment(uid, pojo.getGoodsOrderNo(), pojo.getComment(),pojo.getStar());
+        String s = goodsService.addComment(uid, pojo.getGoodsOrderNo(), pojo.getComment(), pojo.getStar());
         if (s == null) {
             return JsonResult.failure();
         } else {
@@ -384,7 +416,7 @@ public class GoodsController {
      */
     @RequestMapping("/getAppriseList")
     public JsonResult getAppriseList(@Valid @RequestBody UidPojo pojo) {
-        List<AppriseVO> list= goodsService.getAppriseList(pojo.getUid());
+        List<AppriseVO> list = goodsService.getAppriseList(pojo.getUid());
         if (list != null) {
             return JsonResult.success(list);
         } else {

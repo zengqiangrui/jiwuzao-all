@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author kauuze
@@ -80,7 +81,7 @@ public class GoodsService {
         if (goodsRepository.countByUid(uid) > 100) {
             return "最多添加100个商品";
         }
-        Goods goods = new Goods(null, uid, opt.get().getId(), title, cover, classify, 0, 0, defaultPrice, goodsReturnEnum, deliveryTimeEnum, postage, false, null, null, AuditTypeEnum.wait, null, System.currentTimeMillis(), null);
+        Goods goods = new Goods(null, uid, opt.get().getId(), title, cover, classify, goodsSecondClassify, goodsThirdClassify, 0, 0, defaultPrice, goodsReturnEnum, deliveryTimeEnum, postage, false, null, null, AuditTypeEnum.wait, null, System.currentTimeMillis(), null);
         goodsRepository.save(goods);
         GoodsDetail goodsDetail = new GoodsDetail(null, goods.getGid(), slideshow, detailLabel, classify, goodsSecondClassify, goodsThirdClassify, goodsType, goodsTypeClass, detailPhotos, 0L);
         goodsDetailRepository.save(goodsDetail);
@@ -744,7 +745,6 @@ public class GoodsService {
         List<Comment> list = goodsCommentRepository.findByUid(uid);
         List<UserCommentVO> res = new ArrayList<>();
         list.forEach((e) -> {
-//            UserInfo info = userInfoRepository.findByUid(uid);
             String gid = e.getGid();
             Goods goods = goodsRepository.findByGid(gid);
             UserCommentVO vo = new UserCommentVO(e.getGid(), goods.getTitle(), e.getTime(),
@@ -753,4 +753,46 @@ public class GoodsService {
         });
         return res;
     }
+
+    public PageDto<GoodsSimpleVO> getGoodsBySecondCategory(String secondCategory, Integer num, Integer size) {
+        Page<Goods> page = goodsRepository.findAllByGoodsSecondClassifyAndPutaway(secondCategory, true, PageUtil.getNewsInsert(num, size));
+        return getGoodsSimpleByDetailPage(page);
+    }
+
+    private PageDto<GoodsSimpleVO> getGoodsSimpleByDetailPage(Page<Goods> page) {
+        PageDto<GoodsSimpleVO> pageDto = new PageDto<>();
+        List<GoodsSimpleVO> collect = page.getContent().stream()
+                .map(goodsDetail -> {
+                    Optional<Goods> optional = goodsRepository.findById(goodsDetail.getGid());
+                    if (optional.isPresent()) {
+                        Goods goods = optional.get();
+                        if (goods.getPutaway()) {
+                            return new GoodsSimpleVO().setGoodsId(goods.getGid()).setGoodsImg(goods.getCover()).setGoodsName(goods.getTitle());
+                        } else {
+                            return null;
+                        }
+                    } else {
+                        return null;
+                    }
+                }).filter(Objects::nonNull).collect(Collectors.toList());
+        return pageDto.setContent(collect).setTotal(page.getTotalElements());
+    }
+
+    public PageDto<GoodsSimpleVO> getGoodsByThirdCategory(String thirdCategory, Integer num, Integer size) {
+        Page<Goods> page = goodsRepository.findAllByGoodsThirdClassifyAndPutaway(thirdCategory, true, PageUtil.getNewsInsert(num, size));
+        return getGoodsSimpleByDetailPage(page);
+    }
+
+    /**
+     * 模糊搜索查找上架商品
+     *
+     * @param tips
+     * @return
+     */
+    public List<GoodsSimpleVO> searchGoodsLike(String tips) {
+        return MongoUtil.search(tips).stream().filter(Goods::getPutaway)
+                .map(goods -> new GoodsSimpleVO().setGoodsId(goods.getGid()).setGoodsName(goods.getTitle()).setGoodsPrice(goods.getDefaultPrice()).setGoodsImg(goods.getCover()))
+                .collect(Collectors.toList());
+    }
+
 }

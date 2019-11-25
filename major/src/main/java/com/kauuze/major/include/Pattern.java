@@ -22,11 +22,7 @@ public class Pattern {
      * @return
      */
     public static boolean isInfoType(String infoType){
-        if(StringUtil.isEq(infoType,"html")|| StringUtil.isEq(infoType,"image") || StringUtil.isEq(infoType,"audio") || StringUtil.isEq(infoType,"video")){
-            return true;
-        }else{
-            return false;
-        }
+        return StringUtil.isEq(infoType, "html") || StringUtil.isEq(infoType, "image") || StringUtil.isEq(infoType, "audio") || StringUtil.isEq(infoType, "video");
     }
 
 

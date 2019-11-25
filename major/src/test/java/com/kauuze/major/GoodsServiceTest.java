@@ -2,6 +2,7 @@ package com.kauuze.major;
 
 
 import com.jiwuzao.common.domain.mongo.entity.Goods;
+import com.jiwuzao.common.domain.mongo.entity.GoodsDetail;
 import com.jiwuzao.common.pojo.goods.GoodsPagePojo;
 import com.kauuze.major.domain.mongo.repository.*;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
@@ -10,6 +11,8 @@ import com.kauuze.major.service.ChatService;
 import com.kauuze.major.service.ExpressService;
 import com.kauuze.major.service.GoodsService;
 import com.kauuze.major.service.ScheduleService;
+import lombok.AllArgsConstructor;
+import org.bouncycastle.math.ec.ScaleYPointMap;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,32 +21,23 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Optional;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class GoodsServiceTest {
     @Autowired
     private GoodsService goodsService;
-    @Autowired
-    private CategoryRepository categoryRepository;
-    @Autowired
-    private ExpressRepository expressRepository;
-    @Autowired
-    private ExpressService expressService;
-    @Autowired
-    private PayOrderRepository payOrderRepository;
-    @Autowired
-    private GoodsSpecRepository goodsSpecRepository;
+
     @Autowired
     private GoodsRepository goodsRepository;
+
     @Autowired
-    private TencentUtil tencentUtil;
+    private PayOrderRepository payOrderRepository;
+
     @Autowired
-    private ChatService chatService;
-    @Autowired
-    private ChatMessageRepository chatMessageRepository;
-    @Resource
-    private ScheduleService scheduleService;
+    private GoodsDetailRepository goodsDetailRepository;
+
 
     @Test
     public void showGoods() {
@@ -92,8 +86,28 @@ public class GoodsServiceTest {
 //        goods.forEach(System.out::println);
     }
 
+//    @Test/
+//    public void cancelOrder(){
+//        scheduleService.waitAppraiseOrder();
+//    }
+
     @Test
-    public void cancelOrder(){
-        scheduleService.waitAppraiseOrder();
+    public void dataTrans(){
+//        List<Goods> all = goodsRepository.findAll();
+//        for (Goods goods : all) {
+//            Optional<GoodsDetail> optional = goodsDetailRepository.findByGid(goods.getGid());
+//            if(optional.isPresent()){
+//                GoodsDetail goodsDetail = optional.get();
+//                goodsDetail.setGoodsSecondClassify(goods.getGoodsSecondClassify()).setGoodsThirdClassify(goods.getGoodsThirdClassify());
+//                goodsDetailRepository.save(goodsDetail);
+//            }
+//        }
+    }
+
+    @Test
+    public void trans(){
+//        goodsRepository.findByUid(1).forEach(System.out::println);
+
     }
 }
+
