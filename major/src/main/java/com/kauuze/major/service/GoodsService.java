@@ -762,19 +762,9 @@ public class GoodsService {
     private PageDto<GoodsSimpleVO> getGoodsSimpleByDetailPage(Page<Goods> page) {
         PageDto<GoodsSimpleVO> pageDto = new PageDto<>();
         List<GoodsSimpleVO> collect = page.getContent().stream()
-                .map(goodsDetail -> {
-                    Optional<Goods> optional = goodsRepository.findById(goodsDetail.getGid());
-                    if (optional.isPresent()) {
-                        Goods goods = optional.get();
-                        if (goods.getPutaway()) {
-                            return new GoodsSimpleVO().setGoodsId(goods.getGid()).setGoodsImg(goods.getCover()).setGoodsName(goods.getTitle());
-                        } else {
-                            return null;
-                        }
-                    } else {
-                        return null;
-                    }
-                }).filter(Objects::nonNull).collect(Collectors.toList());
+                .map(goods -> new GoodsSimpleVO().setGoodsImg(goods.getCover())
+                .setGoodsId(goods.getGid()).setGoodsName(goods.getTitle()).setGoodsPrice(goods.getDefaultPrice()))
+                .collect(Collectors.toList());
         return pageDto.setContent(collect).setTotal(page.getTotalElements());
     }
 
