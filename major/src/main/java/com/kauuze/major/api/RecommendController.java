@@ -61,22 +61,6 @@ public class RecommendController {
     }
 
     /**
-     * 每个分类的商品推荐头部
-     *
-     * @param pojo
-     * @return
-     */
-    @RequestMapping("/getByClassify")
-    public JsonResult getByClassfy(@RequestBody @Valid GoodsClassifyPojo pojo) {
-        RecommendGoods one = recommendService.getOne(pojo.getGoodsClassify());
-        if (null != one) {
-            return JsonResult.success(one);
-        } else {
-            return JsonResult.failure();
-        }
-    }
-
-    /**
      * 生成一个推荐商品
      * @param pojo
      * @return

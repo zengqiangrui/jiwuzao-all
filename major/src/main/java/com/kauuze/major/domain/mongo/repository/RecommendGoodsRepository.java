@@ -9,9 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface RecommendGoodsRepository extends MongoRepository<RecommendGoods,String> {
+public interface RecommendGoodsRepository extends MongoRepository<RecommendGoods,Integer> {
 
-    List<RecommendGoods> findAllByGoodsClassify(GoodsClassifyEnum goodsClassify);
 
-    Optional<RecommendGoods> findByGoodsClassifyAndStatus(GoodsClassifyEnum goodsClassify, Boolean status);
 }

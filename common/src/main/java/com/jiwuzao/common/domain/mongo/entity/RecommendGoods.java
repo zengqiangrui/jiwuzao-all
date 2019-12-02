@@ -1,6 +1,5 @@
 package com.jiwuzao.common.domain.mongo.entity;
 
-import com.jiwuzao.common.domain.enumType.GoodsClassifyEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,7 +7,7 @@ import lombok.experimental.Accessors;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Id;
-import java.math.BigDecimal;
+import java.util.List;
 
 @Document
 @Data
@@ -18,19 +17,14 @@ import java.math.BigDecimal;
 public class RecommendGoods {
 
     @Id
-    private String id;
+    private Integer id;
 
-    private String goodsId;
-
-    private String name;
-
-    private String cover;
-
-    private BigDecimal price;
+    /**
+     * 商品ids
+     */
+    private List<String> gids;
 
     private String reason;
-
-    private GoodsClassifyEnum goodsClassify;
 
     private Boolean status;
 

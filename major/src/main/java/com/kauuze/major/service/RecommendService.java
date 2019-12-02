@@ -9,13 +9,20 @@ import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
 import com.jiwuzao.common.exception.OrderException;
 import com.jiwuzao.common.exception.StoreException;
 import com.jiwuzao.common.exception.excEnum.StoreExceptionEnum;
+import com.jiwuzao.common.include.PageUtil;
 import com.jiwuzao.common.vo.goods.GoodsSimpleVO;
 import com.kauuze.major.domain.mongo.repository.*;
+import com.kauuze.major.include.PageDto;
+import org.apache.logging.log4j.util.Strings;
 import org.omg.SendingContext.RunTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.util.Streamable;
 import org.springframework.stereotype.Service;
 
+import java.sql.PreparedStatement;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -58,30 +65,36 @@ public class RecommendService {
         return goodsSimpleVOS;
     }
 
-    public RecommendGoods saveOne(String goodsId, String reason) {
-        Optional<Goods> optional = goodsRepository.findById(goodsId);
-        if (!optional.isPresent()) throw new RuntimeException("商品信息不存在");
-        Goods goods = optional.get();
-        Optional<RecommendGoods> optional1 = recommendGoodsRepository.findByGoodsClassifyAndStatus(goods.getClassify(), true);
-        RecommendGoods recommendGoods = new RecommendGoods();
-        recommendGoods.setStatus(true).setCover(goods.getCover()).setGoodsClassify(goods.getClassify())
-                .setGoodsId(goods.getGid()).setPrice(goods.getDefaultPrice()).setReason(reason).setCreateTime(System.currentTimeMillis());
-        if (optional1.isPresent()) {
-            RecommendGoods recommendGoods1 = optional1.get();
-            recommendGoods1.setStatus(false);
-            recommendGoodsRepository.save(recommendGoods1);
-        }
-        return recommendGoodsRepository.save(recommendGoods);
+    public RecommendGoods saveOne(String gids, String reason) {
+        String[] strings = gids.split(",");
+        List<String> list = new ArrayList<>();
+        Collections.addAll(list, strings);
+        return recommendGoodsRepository.save(new RecommendGoods().setGids(list).setReason(reason).setStatus(true).setCreateTime(System.currentTimeMillis()));
     }
 
-    /**
-     * 根据主分类获取一个推荐
-     *
-     * @param goodsClassify
-     * @return
-     */
-    public RecommendGoods getOne(GoodsClassifyEnum goodsClassify) {
-        return recommendGoodsRepository.findByGoodsClassifyAndStatus(goodsClassify, true).orElse(null);
+    public PageDto<GoodsSimpleVO> showRecommendByStore(String storeId,Integer num,Integer size){
+        Pageable pageable = PageUtil.getNewsInsert(num, size);
+        Page<Goods> page = goodsRepository.findAllBySid(storeId, pageable);
+        page.filter(Goods::getPutaway)
+                .map(goods -> new GoodsSimpleVO().setGoodsImg(goods.getCover())
+                        .setGoodsName(goods.getTitle()).setGoodsId(goods.getGid()));
+        System.out.println(page.getContent());
+        return null;
+    }
+
+    public List<GoodsSimpleVO> getRecommendNew() {
+        return recommendGoodsRepository.findAll().stream()
+                .filter(RecommendGoods::getStatus).max(Comparator.comparingLong(RecommendGoods::getCreateTime))
+                .orElseThrow(() -> new RuntimeException("无推荐")).getGids()
+                .stream().filter(Strings::isNotBlank)
+                .map(gid -> {
+                    Goods goods = goodsRepository.findById(gid).orElseThrow(() -> new RuntimeException("无推荐商品"));
+                    return createGoodsSimple(goods);
+                }).collect(Collectors.toList());
+    }
+
+    private GoodsSimpleVO createGoodsSimple(Goods goods) {
+        return new GoodsSimpleVO().setGoodsName(goods.getTitle()).setGoodsId(goods.getGid()).setGoodsPrice(goods.getDefaultPrice()).setGoodsImg(goods.getCover());
     }
 
     public GoodsSimpleVO getSimpleByCategory(GoodsClassifyEnum goodsClassify) {
@@ -93,14 +106,22 @@ public class RecommendService {
     public List<GoodsSimpleVO> getHeadGoodsList() {
         //todo 商品列表头部推荐算法,暂时取极物造店铺中前五个
         List<Goods> list = goodsRepository.findAllBySidAndPutaway("5d639c11d6018000015e1865", true);
-        return list.stream().sorted(Comparator.comparingLong(Goods::getCreateTime).reversed()).map(goods -> new GoodsSimpleVO().setGoodsId(goods.getGid()).setGoodsImg(goodsDetailRepository.findByGid(goods.getGid()).get().getSlideshow().split(",")[0]).setGoodsName(goods.getTitle()).setGoodsPrice(goods.getDefaultPrice()))
+        return list.stream().sorted(Comparator.comparingLong(Goods::getCreateTime).reversed())
+                .map(goods -> new GoodsSimpleVO().setGoodsId(goods.getGid()).setGoodsImg(goodsDetailRepository.findByGid(goods.getGid()).get().getSlideshow().split(",")[0]).setGoodsName(goods.getTitle()).setGoodsPrice(goods.getDefaultPrice()))
                 .limit(5L).collect(Collectors.toList());
     }
 
+//    public List<GoodsSimpleVO> getHeadGoodsListTemp(){
+//        List<GoodsSimpleVO> list = new ArrayList<>();
+//        GoodsSimpleVO vo1 = new GoodsSimpleVO().setGoodsId("5dcaaa5ed60180000103b55b").setGoodsImg("http://cdn.jiwuzao.com/22dc086ef6844b47901d7bf87afc123f.jpg");
+//        GoodsSimpleVO vo2 = new GoodsSimpleVO().setGoodsId("5dcaaba6d60180000103b581").setGoodsImg("http://cdn.jiwuzao.com/9acd4495192d4a6ab5886aa8e778ba4c.jpg");
+//    }
+
     /**
      * 增加一个极匠推荐店铺。
+     *
      * @param storeId 店铺id
-     * @param images 图片数组
+     * @param images  图片数组
      * @return RecommendStore
      */
     public RecommendStore addRecommendStore(String storeId, String... images) {
@@ -116,6 +137,7 @@ public class RecommendService {
 
     /**
      * 获取一个推荐店铺
+     *
      * @return 推荐
      */
     public RecommendStore getLatestRecommendStore() {
@@ -125,5 +147,6 @@ public class RecommendService {
                 new RecommendStore().setStoreId("5d639c11d6018000015e1865").setImages(images)
         );
     }
+
 
 }

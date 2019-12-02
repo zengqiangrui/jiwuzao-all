@@ -7,10 +7,7 @@ import com.jiwuzao.common.pojo.goods.GoodsPagePojo;
 import com.kauuze.major.domain.mongo.repository.*;
 import com.kauuze.major.domain.mysql.repository.PayOrderRepository;
 import com.kauuze.major.include.yun.TencentUtil;
-import com.kauuze.major.service.ChatService;
-import com.kauuze.major.service.ExpressService;
-import com.kauuze.major.service.GoodsService;
-import com.kauuze.major.service.ScheduleService;
+import com.kauuze.major.service.*;
 import lombok.AllArgsConstructor;
 import org.bouncycastle.math.ec.ScaleYPointMap;
 import org.junit.Test;
@@ -30,14 +27,28 @@ public class GoodsServiceTest {
     private GoodsService goodsService;
 
     @Autowired
-    private GoodsRepository goodsRepository;
-
-    @Autowired
     private PayOrderRepository payOrderRepository;
 
     @Autowired
-    private GoodsDetailRepository goodsDetailRepository;
+    private UserBasicService userBasicService;
 
+    @Test
+    public void recommendGoods() {
+//        String phonePrefix = "151515151";
+//        String phone = "";
+//        String pwd = "ernest1982";
+//        for (int i = 1; i < 51; i++) {
+//            if (i < 10) {
+//                phone = phonePrefix + "0" + i;
+//            } else {
+//                phone = phonePrefix + i;
+//            }
+//            String nickName = "Jiwuzao" + i;
+//            String pwdRegist = i + pwd;
+//            Integer sms = userBasicService.sendSms(phone);
+//            System.out.println(i + "," + userBasicService.register(phone, pwdRegist, nickName, sms).getState());
+//        }
+    }
 
     @Test
     public void showGoods() {
@@ -92,7 +103,7 @@ public class GoodsServiceTest {
 //    }
 
     @Test
-    public void dataTrans(){
+    public void dataTrans() {
 //        List<Goods> all = goodsRepository.findAll();
 //        for (Goods goods : all) {
 //            Optional<GoodsDetail> optional = goodsDetailRepository.findByGid(goods.getGid());
@@ -105,7 +116,7 @@ public class GoodsServiceTest {
     }
 
     @Test
-    public void trans(){
+    public void trans() {
 //        goodsRepository.findByUid(1).forEach(System.out::println);
 
     }

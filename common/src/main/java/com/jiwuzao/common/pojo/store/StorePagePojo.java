@@ -17,7 +17,7 @@ public class StorePagePojo {
 
     private Integer pageNum = 0;
 
-    private Integer pageSize = 6;
+    private Integer pageSize = 100;
 
     @StringMax
     private String orderBy = "createTime";
