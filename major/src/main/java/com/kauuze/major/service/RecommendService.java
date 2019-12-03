@@ -111,11 +111,24 @@ public class RecommendService {
                 .limit(5L).collect(Collectors.toList());
     }
 
-//    public List<GoodsSimpleVO> getHeadGoodsListTemp(){
-//        List<GoodsSimpleVO> list = new ArrayList<>();
-//        GoodsSimpleVO vo1 = new GoodsSimpleVO().setGoodsId("5dcaaa5ed60180000103b55b").setGoodsImg("http://cdn.jiwuzao.com/22dc086ef6844b47901d7bf87afc123f.jpg");
-//        GoodsSimpleVO vo2 = new GoodsSimpleVO().setGoodsId("5dcaaba6d60180000103b581").setGoodsImg("http://cdn.jiwuzao.com/9acd4495192d4a6ab5886aa8e778ba4c.jpg");
-//    }
+    public List<GoodsSimpleVO> getHeadGoodsListTemp(){
+        List<GoodsSimpleVO> list = new ArrayList<>();
+        GoodsSimpleVO vo1 = new GoodsSimpleVO().setGoodsId("5dcaaa5ed60180000103b55b").setGoodsImg("http://cdn.jiwuzao.com/8586430e554f40ff81c27aafdd949de1.jpg");
+        GoodsSimpleVO vo2 = new GoodsSimpleVO().setGoodsId("5dcaaba6d60180000103b581").setGoodsImg("http://cdn.jiwuzao.com/3c4ca03202dd4738a7c0a43ff84376bc.jpg");
+        GoodsSimpleVO vo3 = new GoodsSimpleVO().setGoodsId("5dda98f1d60180000135cfe7").setGoodsImg("http://cdn.jiwuzao.com/200c8435b4294c6a8c64f029b73244e6.jpg");
+        GoodsSimpleVO vo4 = new GoodsSimpleVO().setGoodsId("5de4c021d601800001c4d293").setGoodsImg("http://cdn.jiwuzao.com/995a7c68afc94a9ab528461691ce38e3.jpg");
+        GoodsSimpleVO vo5 = new GoodsSimpleVO().setGoodsId("5de5db57d601800001c4de00").setGoodsImg("http://cdn.jiwuzao.com/91c8a8c751d54526916595eef4362595.jpg");
+        GoodsSimpleVO vo6 = new GoodsSimpleVO().setGoodsId("5de5d24dd601800001c4d94f").setGoodsImg("http://cdn.jiwuzao.com/713ee8f0be004f7c8e9caa146a8aaa7f.jpg");
+        list.add(vo1);
+        list.add(vo2);
+        list.add(vo3);
+        list.add(vo4);
+        list.add(vo5);
+        list.add(vo6);
+        return list;
+
+
+    }
 
     /**
      * 增加一个极匠推荐店铺。

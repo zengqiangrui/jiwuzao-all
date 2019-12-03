@@ -44,7 +44,8 @@ public class RecommendController {
      */
     @RequestMapping("/getHeadGoodsList")
     public JsonResult getHeadGoodsList() {
-        List<GoodsSimpleVO> list = recommendService.getHeadGoodsList();
+        //todo 商品自定义推荐
+        List<GoodsSimpleVO> list = recommendService.getHeadGoodsListTemp();
         return JsonResult.success(list);
     }
 
