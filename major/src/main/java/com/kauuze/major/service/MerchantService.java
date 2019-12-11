@@ -130,6 +130,7 @@ public class MerchantService {
                 return "该店铺名称已被使用";
             }
             myStore = new Store();
+            myStore.setStoreStyle(storeStyle);
             myStore.setCreateTime(System.currentTimeMillis());
         } else {
             myStore = opt.get();
@@ -144,7 +145,6 @@ public class MerchantService {
         myStore.setStoreBgImg(storeBgImg);
         myStore.setServicePhone(servicePhone);
         myStore.setStoreIntro(storeIntro);
-        myStore.setStoreStyle(storeStyle);
         return Json.encode(storeRepository.save(myStore));
     }
 

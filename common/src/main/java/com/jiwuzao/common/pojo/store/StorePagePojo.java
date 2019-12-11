@@ -22,5 +22,4 @@ public class StorePagePojo {
     @StringMax
     private String orderBy = "createTime";
 
-
 }

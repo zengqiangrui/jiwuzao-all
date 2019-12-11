@@ -48,8 +48,8 @@ public class ChatController {
     private Session session;
     //接收uid
     private String uid = "";
-
     private String groupId = "";
+
     //用于延时处理信息入库的list
 //    private List<Future> futures = new ArrayList<>();
 
