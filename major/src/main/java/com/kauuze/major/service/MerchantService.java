@@ -287,4 +287,5 @@ public class MerchantService {
         vo.setTurnover(bigDecimal);
         return vo;
     }
+
 }

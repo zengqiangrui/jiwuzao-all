@@ -95,7 +95,11 @@ public class MerchantService {
         MongoUtil.updateNotNon("id",verifyActor2,VerifyActor.class);
         UserToken userToken = new UserToken();
         userToken.setUid(uid);
-        userToken.setRole(RoleEnum.merchant);
+        if(auditType == AuditTypeEnum.agree){
+            userToken.setRole(RoleEnum.merchant);
+        }else{
+            userToken.setRole(RoleEnum.user);
+        }
         MongoUtil.updateNotNon("uid",userToken,UserToken.class);
         return null;
     }

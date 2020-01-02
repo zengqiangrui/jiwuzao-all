@@ -593,7 +593,6 @@ public class GoodsService {
         //点赞操作
         apprise = new Apprise(null, uid, gid, System.currentTimeMillis());
         appriseRepository.save(apprise);
-
         GoodsDetail detail1Up = new GoodsDetail();
         Long cnt = detail.getAppriseCnt() + 1;
         detail1Up.setGid(detail.getGid());
