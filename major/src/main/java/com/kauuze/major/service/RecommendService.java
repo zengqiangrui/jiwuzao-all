@@ -116,9 +116,9 @@ public class RecommendService {
         GoodsSimpleVO vo1 = new GoodsSimpleVO().setGoodsId("5dcaaa5ed60180000103b55b").setGoodsImg("http://cdn.jiwuzao.com/8586430e554f40ff81c27aafdd949de1.jpg");
         GoodsSimpleVO vo2 = new GoodsSimpleVO().setGoodsId("5dcaaba6d60180000103b581").setGoodsImg("http://cdn.jiwuzao.com/3c4ca03202dd4738a7c0a43ff84376bc.jpg");
         GoodsSimpleVO vo3 = new GoodsSimpleVO().setGoodsId("5dda98f1d60180000135cfe7").setGoodsImg("http://cdn.jiwuzao.com/200c8435b4294c6a8c64f029b73244e6.jpg");
-        GoodsSimpleVO vo4 = new GoodsSimpleVO().setGoodsId("5df0bcf7d6018000012bc36d").setGoodsImg("http://cdn.jiwuzao.com/24aa475f0d2048aebabb2e34ccc8c7ad.jpg");
-        GoodsSimpleVO vo5 = new GoodsSimpleVO().setGoodsId("5df0bcf7d6018000012bc36d").setGoodsImg("http://cdn.jiwuzao.com/fd73807fe0d44a8abd93bdb353c5b0f7.jpg");
-        GoodsSimpleVO vo6 = new GoodsSimpleVO().setGoodsId("5e1049dcd601800001fd1dd3").setGoodsImg("http://cdn.jiwuzao.com/43eaa631eef143dc89efc348a678d38e.jpg");
+        GoodsSimpleVO vo4 = new GoodsSimpleVO().setGoodsId("5df0c4e2d6018000012bc3ba").setGoodsImg("http://cdn.jiwuzao.com/24aa475f0d2048aebabb2e34ccc8c7ad.jpg");
+        GoodsSimpleVO vo5 = new GoodsSimpleVO().setGoodsId("5df1a5f7d6018000012bc82f").setGoodsImg("http://cdn.jiwuzao.com/fd73807fe0d44a8abd93bdb353c5b0f7.jpg");
+        GoodsSimpleVO vo6 = new GoodsSimpleVO().setGoodsId("5e105072d601800001fd1eb4").setGoodsImg("http://cdn.jiwuzao.com/43eaa631eef143dc89efc348a678d38e.jpg");
         list.add(vo1);
         list.add(vo2);
         list.add(vo3);
@@ -126,8 +126,6 @@ public class RecommendService {
         list.add(vo5);
         list.add(vo6);
         return list;
-
-
     }
 
     /**
