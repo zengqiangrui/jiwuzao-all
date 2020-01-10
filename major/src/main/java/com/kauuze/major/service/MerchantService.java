@@ -148,6 +148,48 @@ public class MerchantService {
         return Json.encode(storeRepository.save(myStore));
     }
 
+    /**
+     * 用户手机端对店铺进行操作，无需验证手机号
+     *
+     * @param uid
+     * @param storeName
+     * @param storeIcon
+     * @param storeBgImg
+     * @param servicePhone
+     * @param storeIntro
+     * @param storeStyle
+     * @return
+     */
+    public String modifyOrOpenStoreByPhone(int uid, String storeName, String storeIcon, String storeBgImg, String servicePhone, String storeIntro, StoreStyleEnum storeStyle) {
+        VerifyActor verifyActor = verifyActorRepository.findByUid(uid);
+        if (verifyActor == null || verifyActor.getAuditType() != AuditTypeEnum.agree) {
+            return "您未通过实名认证";
+        }
+        Optional<Store> opt = storeRepository.findByUid(uid);
+        Store myStore;
+        if (!opt.isPresent()) {
+            if (storeRepository.findByStoreName(storeName) != null) {
+                return "该店铺名称已被使用";
+            }
+            myStore = new Store();
+            myStore.setStoreStyle(storeStyle);
+            myStore.setCreateTime(System.currentTimeMillis());
+        } else {
+            myStore = opt.get();
+            if (!StringUtil.isEq(myStore.getStoreName(), storeName) && storeRepository.findByStoreName(storeName) != null) {
+                return "该店铺名称已被使用";
+            }
+            myStore.setModifyTime(System.currentTimeMillis());
+        }
+        myStore.setUid(uid);
+        myStore.setStoreName(storeName);
+        myStore.setStoreIcon(storeIcon);
+        myStore.setStoreBgImg(storeBgImg);
+        myStore.setServicePhone(servicePhone);
+        myStore.setStoreIntro(storeIntro);
+        return Json.encode(storeRepository.save(myStore));
+    }
+
 //    /**
 //     * 缴纳保证金二维码
 //     *

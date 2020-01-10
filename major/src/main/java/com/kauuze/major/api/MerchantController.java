@@ -4,6 +4,7 @@ import com.jiwuzao.common.domain.mongo.entity.userBastic.Store;
 import com.jiwuzao.common.include.PageDto;
 import com.jiwuzao.common.pojo.common.IpAddressPojo;
 import com.jiwuzao.common.pojo.common.PagePojo;
+import com.jiwuzao.common.pojo.merchant.OpenStorePhonePojo;
 import com.jiwuzao.common.pojo.merchant.OpenStorePojo;
 import com.jiwuzao.common.pojo.merchant.VerifyActorPojo;
 import com.jiwuzao.common.pojo.store.StoreIdPojo;
@@ -74,6 +75,12 @@ public class MerchantController {
     @Merchant
     public JsonResult modifyOrOpenStore(@RequestAttribute int uid, @Valid @RequestBody OpenStorePojo openStorePojo) {
         return JsonResult.success(merchantService.modifyOrOpenStore(uid, openStorePojo.getStoreName(), openStorePojo.getStoreIcon(), openStorePojo.getStoreBgImg(), openStorePojo.getServicePhone(), openStorePojo.getMsCode(), openStorePojo.getStoreIntro(), openStorePojo.getStoreStyle()));
+    }
+    
+    @RequestMapping("/modifyOrOpenStoreByPhone")
+    @Merchant
+    public JsonResult modifyOrOpenStoreByPhone(@RequestAttribute int uid, @Valid @RequestBody OpenStorePhonePojo pojo){
+        return JsonResult.success(merchantService.modifyOrOpenStoreByPhone(uid,pojo.getStoreName(),pojo.getStoreIcon(),pojo.getStoreBgImg(),pojo.getServicePhone(),pojo.getStoreIntro(),pojo.getStoreStyle()));
     }
 
     /**
