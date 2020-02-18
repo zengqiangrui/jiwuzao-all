@@ -147,9 +147,9 @@ public class WithdrawService {
      * @return 提现申请
      */
     public WithdrawOrder merchantCreateCommonWithDraw(int uid, String storeId, BigDecimal remitMoney, String remark) {
-        if (remitMoney.compareTo(new BigDecimal(1000)) < 0) {//提现金额不足1000,无法提现
-            throw new StoreException(StoreExceptionEnum.STORE_REMIT_SHORTAGE);
-        }
+//        if (remitMoney.compareTo(new BigDecimal(1000)) < 0) {//提现金额不足1000,无法提现
+//            throw new StoreException(StoreExceptionEnum.STORE_REMIT_SHORTAGE);
+//        }
         Optional<WithdrawOrder> opt = withdrawOrderRepository.findByStoreIdAndWithdrawStatus(storeId, WithdrawStatusEnum.wait);
         if (opt.isPresent()) throw new RuntimeException("还有未处理的提现申请");//如果存在待处理的提现请求，不能继续提现
         Store store = checkAndGetStore(storeId);

@@ -76,7 +76,7 @@ public class MerchantController {
     public JsonResult modifyOrOpenStore(@RequestAttribute int uid, @Valid @RequestBody OpenStorePojo openStorePojo) {
         return JsonResult.success(merchantService.modifyOrOpenStore(uid, openStorePojo.getStoreName(), openStorePojo.getStoreIcon(), openStorePojo.getStoreBgImg(), openStorePojo.getServicePhone(), openStorePojo.getMsCode(), openStorePojo.getStoreIntro(), openStorePojo.getStoreStyle()));
     }
-    
+
     @RequestMapping("/modifyOrOpenStoreByPhone")
     @Merchant
     public JsonResult modifyOrOpenStoreByPhone(@RequestAttribute int uid, @Valid @RequestBody OpenStorePhonePojo pojo){
